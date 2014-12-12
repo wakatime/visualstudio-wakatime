@@ -31,9 +31,10 @@
     <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Version="1.0" Language="en-US" Publisher="Wakatime" />
     <DisplayName>VSPackageWakaTime</DisplayName>
     <Description>WakaTime is an open-source productivity and analytics tool for programmers using Visual Studio. It depends on Python being installed on the user's machine. Once the WakaTime Visual Studio plugin is installed, you get a dashboard with reports about your programming by time, language, project, and branch. You just code as you normally do and reap the benefits of our dashboard!</Description>
+    <License>LICENSE.txt</License>
   </Metadata>
   <Installation InstalledByMsi="false">
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[10.0,12.0)" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[11.0,)" />
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
