@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47">
     <Name>VSPackageWakaTime</Name>
@@ -24,12 +25,12 @@
     <MefComponent>|%CurrentProject%|</MefComponent>
   </Content>
 </Vsix>
-<!--
+-->
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Version="1.0" Language="en-US" Publisher="Wakatime" />
     <DisplayName>VSPackageWakaTime</DisplayName>
-    <Description>Wakatime visual studio plugin would be built to solve time tracking for visual studio programmers. This would be an open source plugin to automatically  track the time programmer spend in programming so that he/she never have to manually track it again.</Description>
+    <Description>WakaTime is an open-source productivity and analytics tool for programmers using Visual Studio. It depends on Python being installed on the user's machine. Once the WakaTime Visual Studio plugin is installed, you get a dashboard with reports about your programming by time, language, project, and branch. You just code as you normally do and reap the benefits of our dashboard!</Description>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[10.0,12.0)" />
@@ -42,4 +43,4 @@
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
   </Assets>
 </PackageManifest>
--->
+
