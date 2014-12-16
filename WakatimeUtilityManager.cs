@@ -30,7 +30,7 @@ namespace Wakatime.VSPackageWakaTime
         private const string WakatimeUtilityName = "wakatime-cli.py";
         
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "0.1";
+        private const string VERSION = "0.0.1";
         
         private Process _process = new Process();
         private string _apiKey = null;
