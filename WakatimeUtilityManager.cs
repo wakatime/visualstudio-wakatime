@@ -25,10 +25,12 @@ namespace Wakatime.VSPackageWakaTime
             [In] IntPtr hProcess,
             [Out] out bool wow64Process
         );
-
+        
         private const string PythonUtilityName = "Python.exe";
         private const string WakatimeUtilityName = "wakatime-cli.py";
-        private const string VSWakatimePluginName = "VSWakaTimePlugin V1.0";
+        
+        private const string PLUGIN_NAME = "visualstudio-wakatime";
+        private const string VERSION = "0.1";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -112,8 +114,8 @@ namespace Wakatime.VSPackageWakaTime
                 //For debugging purpose
                 //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
                 string arguments = WakatimeUtilityName + " --key=" + _apiKey 
-                                    + " --file=" + fileName 
-                                    + " --plugin=" + VSWakatimePluginName;
+                                    + " --file=" + fileName
+                                    + " --plugin=" + PLUGIN_NAME + "/" + VERSION;
 
                 if (!string.IsNullOrEmpty(projectName))
                     arguments = arguments + " --project=" + projectName;
