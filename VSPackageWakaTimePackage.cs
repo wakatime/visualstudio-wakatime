@@ -144,7 +144,7 @@ namespace Wakatime.VSPackageWakaTime
         {
             try
             {
-                _utilityManager.sendFile(document.FullName);  // No need to compare previous heartbeat in case of save
+                _utilityManager.sendFile(document.FullName, " --write");  // No need to compare previous heartbeat in case of save
                 _lastFileSent = document.FullName;
             }
             catch(Exception ex)

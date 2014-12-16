@@ -28,6 +28,7 @@ namespace Wakatime.VSPackageWakaTime
 
         private const string PythonUtilityName = "Python.exe";
         private const string WakatimeUtilityName = "wakatime-cli.py";
+        private const string VSWakatimePluginName = "VSWakaTimePlugin V1.0";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -103,14 +104,16 @@ namespace Wakatime.VSPackageWakaTime
             }
         }
 
-        public void sendFile(string fileName)
+        public void sendFile(string fileName, string reasonForSending = "")
         {
             try
             {
                 fileName = "\"" + fileName + "\"";
                 //For debugging purpose
                 //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
-                string arguments = WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
+                string arguments = WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName + " --plugin=" + VSWakatimePluginName;
+                if (!string.IsNullOrEmpty(reasonForSending))
+                    arguments = arguments + reasonForSending;
 
                 ProcessStartInfo procInfo = new ProcessStartInfo();
                 procInfo.UseShellExecute = false;
