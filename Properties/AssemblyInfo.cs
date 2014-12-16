@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("VSPackageWakaTime")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Wakatime")]
+[assembly: AssemblyCompany("WakaTime")]
 [assembly: AssemblyProduct("VSPackageWakaTime")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
