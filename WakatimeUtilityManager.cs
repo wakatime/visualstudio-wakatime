@@ -104,14 +104,20 @@ namespace Wakatime.VSPackageWakaTime
             }
         }
 
-        public void sendFile(string fileName, string reasonForSending = "")
+        public void sendFile(string fileName, string projectName = "", string reasonForSending = "")
         {
             try
             {
                 fileName = "\"" + fileName + "\"";
                 //For debugging purpose
                 //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
-                string arguments = WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName + " --plugin=" + VSWakatimePluginName;
+                string arguments = WakatimeUtilityName + " --key=" + _apiKey 
+                                    + " --file=" + fileName 
+                                    + " --plugin=" + VSWakatimePluginName;
+
+                if (!string.IsNullOrEmpty(projectName))
+                    arguments = arguments + " --project=" + projectName;
+
                 if (!string.IsNullOrEmpty(reasonForSending))
                     arguments = arguments + reasonForSending;
 

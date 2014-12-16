@@ -144,7 +144,9 @@ namespace Wakatime.VSPackageWakaTime
         {
             try
             {
-                _utilityManager.sendFile(document.FullName, " --write");  // No need to compare previous heartbeat in case of save
+                _utilityManager.sendFile(document.FullName, 
+                    (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ?_objDTE.Solution.FullName : "",
+                    " --write");  // No need to compare previous heartbeat in case of save
                 _lastFileSent = document.FullName;
             }
             catch(Exception ex)
@@ -229,7 +231,8 @@ namespace Wakatime.VSPackageWakaTime
         {
             if (fileName != _lastFileSent)
             {
-                _utilityManager.sendFile(fileName);
+                _utilityManager.sendFile(fileName, 
+                    (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ? _objDTE.Solution.FullName : "");
                 _lastFileSent = fileName;
 
                 _heartbeatTimer.Change(HeartbeatInterval, HeartbeatInterval); // Extend timer by another 2 minutes.
@@ -257,7 +260,9 @@ namespace Wakatime.VSPackageWakaTime
             {
                 if (_objDTE.ActiveDocument != null)
                 {
-                    _utilityManager.sendFile(_objDTE.ActiveDocument.FullName); // No need to compare previous heartbeat
+                    // No need to compare previous heartbeat
+                    _utilityManager.sendFile(_objDTE.ActiveDocument.FullName,
+                        (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ? _objDTE.Solution.FullName : ""); 
                     _lastFileSent = _objDTE.ActiveDocument.FullName;
                 }
             }
