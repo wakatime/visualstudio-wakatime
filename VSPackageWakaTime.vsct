@@ -40,7 +40,7 @@
         <Parent guid="guidSHLMainMenu"
                 id="IDM_VS_MENU_TOOLS" />
         <Strings>
-          <ButtonText>Wakatime</ButtonText>
+          <ButtonText>WakaTime</ButtonText>
         </Strings>
       </Menu>-->
 
@@ -48,7 +48,7 @@
         priority="0x0100" type="Menu">
         <Parent guid="guidVSPackageWakaTimeCmdSet" id="MyMenuGroup"/>
         <Strings>
-          <CommandName>Wakatime</CommandName>
+          <CommandName>WakaTime</CommandName>
         </Strings>
       </Menu>
     </Menus>
@@ -84,7 +84,7 @@
         <Parent guid="guidVSPackageWakaTimeCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>App Key</ButtonText>
+          <ButtonText>API Key</ButtonText>
         </Strings>
       </Button>-->
 
@@ -93,7 +93,7 @@
         <Icon guid="guidImages" id="bmpPic2" />
         <Strings>
           <CommandName>cmdidUpdateAppKey</CommandName>
-          <ButtonText>App Key</ButtonText>
+          <ButtonText>API Key</ButtonText>
         </Strings>
       </Button>
     </Buttons>
