@@ -1,10 +1,10 @@
 <!--
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47">
-    <Name>VSPackageWakaTime</Name>
+    <Name>WakaTime</Name>
     <Author>WakaTime</Author>
-    <Version>1.0</Version>
-    <Description xml:space="preserve">Time tracking for Visual Studio programmers</Description>
+    <Version>0.0.1</Version>
+    <Description xml:space="preserve">Automatic time tracking and analytics about your programmings</Description>
     <Locale>1033</Locale>
     <SupportedProducts>
       <VisualStudio Version="10.0">
@@ -27,8 +27,8 @@
 -->
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Version="0.0.1" Language="en-US" Publisher="Wakatime" />
-    <DisplayName>visualstudio-wakatime</DisplayName>
+    <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Version="0.0.1" Language="en-US" Publisher="WakaTime" />
+    <DisplayName>WakaTime</DisplayName>
     <Description>WakaTime is an open-source productivity and analytics tool for programmers using Visual Studio. It depends on Python being installed on the user's machine. Once the WakaTime Visual Studio plugin is installed, you get a dashboard with reports about your programming by time, language, project, and branch. You just code as you normally do and reap the benefits of our dashboard!</Description>
     <License>LICENSE.txt</License>
   </Metadata>
