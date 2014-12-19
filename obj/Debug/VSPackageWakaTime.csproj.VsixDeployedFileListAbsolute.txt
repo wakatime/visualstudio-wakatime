@@ -1,5 +1,0 @@
-C:\Users\IEUser\AppData\Local\Microsoft\VisualStudio\12.0Exp\Extensions\WakaTime\WakaTime\0.0.1\\VSPackageWakaTime.dll
-C:\Users\IEUser\AppData\Local\Microsoft\VisualStudio\12.0Exp\Extensions\WakaTime\WakaTime\0.0.1\\VSPackageWakaTime.pkgdef
-C:\Users\IEUser\AppData\Local\Microsoft\VisualStudio\12.0Exp\Extensions\WakaTime\WakaTime\0.0.1\\extension.vsixmanifest
-C:\Users\IEUser\AppData\Local\Microsoft\VisualStudio\12.0Exp\Extensions\WakaTime\WakaTime\0.0.1\\LICENSE.txt
-C:\Users\IEUser\AppData\Local\Microsoft\VisualStudio\12.0Exp\Extensions\WakaTime\WakaTime\0.0.1\\VSPackageWakaTime.pdb

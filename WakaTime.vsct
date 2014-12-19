@@ -25,7 +25,7 @@
 
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidVSPackageWakaTimePkg">
+  <Commands package="guidWakaTimePkg">
     <!-- Inside this section we have different sub-sections: one for the menus, another  
     for the menu groups, one for the buttons (the actual commands), one for the combos 
     and the last one for the bitmaps used. Each element is identified by a command id that  
@@ -35,7 +35,7 @@
     with command ids defined by other packages. -->
 
     <Menus>
-      <!--<Menu guid="guidVSPackageWakaTimeCmdSet"
+      <!--<Menu guid="guidWakaTimeCmdSet"
         id="TopLevelMenu" priority="0x700" type="Menu">
         <Parent guid="guidSHLMainMenu"
                 id="IDM_VS_MENU_TOOLS" />
@@ -44,9 +44,9 @@
         </Strings>
       </Menu>-->
 
-      <Menu guid="guidVSPackageWakaTimeCmdSet" id="SubMenu"
+      <Menu guid="guidWakaTimeCmdSet" id="SubMenu"
         priority="0x0100" type="Menu">
-        <Parent guid="guidVSPackageWakaTimeCmdSet" id="MyMenuGroup"/>
+        <Parent guid="guidWakaTimeCmdSet" id="MyMenuGroup"/>
         <Strings>
           <CommandName>WakaTime</CommandName>
         </Strings>
@@ -59,12 +59,12 @@
          must be a menu. -->
     <Groups>
 
-      <Group guid="guidVSPackageWakaTimeCmdSet" id="MyMenuGroup" priority="0x0600">
+      <Group guid="guidWakaTimeCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
       </Group>
 
-      <Group guid="guidVSPackageWakaTimeCmdSet" id="SubMenuGroup" priority="0x0000">
-        <Parent guid="guidVSPackageWakaTimeCmdSet" id="SubMenu"/>
+      <Group guid="guidWakaTimeCmdSet" id="SubMenuGroup" priority="0x0000">
+        <Parent guid="guidWakaTimeCmdSet" id="SubMenu"/>
       </Group>
     </Groups>
     
@@ -80,19 +80,19 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
 
-      <!--<Button guid="guidVSPackageWakaTimeCmdSet" id="cmdidUpdateAppKey" priority="0x0100" type="Button">
-        <Parent guid="guidVSPackageWakaTimeCmdSet" id="MyMenuGroup" />
+      <!--<Button guid="guidWakaTimeCmdSet" id="cmdidUpdateAppKey" priority="0x0100" type="Button">
+        <Parent guid="guidWakaTimeCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>API Key</ButtonText>
         </Strings>
       </Button>-->
 
-      <Button guid="guidVSPackageWakaTimeCmdSet" id="cmdidUpdateAppKey" priority="0x0000" type="Button">
-        <Parent guid="guidVSPackageWakaTimeCmdSet" id="SubMenuGroup" />
+      <Button guid="guidWakaTimeCmdSet" id="cmdidUpdateAppKey" priority="0x0000" type="Button">
+        <Parent guid="guidWakaTimeCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages" id="bmpPic2" />
         <Strings>
-          <CommandName>cmdidUpdateAppKey</CommandName>
+          <CommandName>cmdidUpdateApiKey</CommandName>
           <ButtonText>API Key</ButtonText>
         </Strings>
       </Button>
@@ -116,10 +116,10 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidVSPackageWakaTimePkg" value="{52d9c3ff-c893-408e-95e4-d7484ec7fa47}" />
+    <GuidSymbol name="guidWakaTimePkg" value="{52d9c3ff-c893-408e-95e4-d7484ec7fa47}" />
     
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidVSPackageWakaTimeCmdSet" value="{054caf12-7fba-40d1-8dc8-bd69f838b910}">
+    <GuidSymbol name="guidWakaTimeCmdSet" value="{054caf12-7fba-40d1-8dc8-bd69f838b910}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="TopLevelMenu" value="0x1021"/>
       <IDSymbol name="SubMenu" value="0x1100"/>

@@ -28,7 +28,7 @@ namespace WakaTime.WakaTime {
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(GuidList.guidVSPackageWakaTimePkgString)]
+    [Guid(GuidList.guidWakaTimePkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
     public sealed class WakaTime : Package {
         private const int HeartbeatInterval = 2 * 60 * 1000; // 2 minute in milli seconds
@@ -76,7 +76,7 @@ namespace WakaTime.WakaTime {
                 if (null != mcs)
                 {
                     // Create the command for the menu item.
-                    CommandID menuCommandID = new CommandID(GuidList.guidVSPackageWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateApiKey);
+                    CommandID menuCommandID = new CommandID(GuidList.guidWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateApiKey);
                     MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
                     mcs.AddCommand(menuItem);
                 }
