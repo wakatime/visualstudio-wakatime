@@ -98,11 +98,8 @@ namespace WakaTime.WakaTime {
             }
         }
 
-        public void sendFile(string fileName, string projectName = "", string reasonForSending = "")
-        {
-            try
-            {
-                fileName = "\"" + fileName + "\"";
+        public void sendFile(string fileName, string projectName = "", string reasonForSending = "") {
+            try {
                 //For debugging purpose
                 //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
                 string arguments = WakatimeUtilityName + " --key=" + _apiKey 
@@ -114,6 +111,10 @@ namespace WakaTime.WakaTime {
 
                 if (!string.IsNullOrEmpty(reasonForSending))
                     arguments = arguments + reasonForSending;
+                
+                Logger.Instance.writeToLog(getCurrentDirectory());
+                Logger.Instance.writeToLog(PythonUtilityName);
+                Logger.Instance.writeToLog(arguments);
 
                 ProcessStartInfo procInfo = new ProcessStartInfo();
                 procInfo.UseShellExecute = false;
@@ -124,12 +125,10 @@ namespace WakaTime.WakaTime {
 
                 var proc = Process.Start(procInfo);
             }
-            catch (InvalidOperationException ex)
-            {
+            catch (InvalidOperationException ex) {
                 Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
             }
-            catch(Exception ex)
-            {
+            catch(Exception ex) {
                 Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
             }
         }
