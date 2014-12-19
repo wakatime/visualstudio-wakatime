@@ -30,3 +30,4 @@
 *.
 
 obj/
+.DS_Store
