@@ -38,7 +38,7 @@ namespace WakaTime.WakaTime {
                 string apiKey = txtAPIKey.Text.Trim();
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
-                    //WakatimeConfigFileHelper.updateApiKey(apiKey);
+                    //ConfigFileHelper.updateApiKey(apiKey);
                     UtilityManager.Instance.ApiKey = apiKey;
                 }
                 else

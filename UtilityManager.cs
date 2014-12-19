@@ -94,7 +94,7 @@ namespace WakaTime.WakaTime {
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog("WakatimeUtilityManager initialize : " + ex.Message);
+                Logger.Instance.writeToLog("UtilityManager initialize : " + ex.Message);
             }
         }
 
@@ -126,11 +126,11 @@ namespace WakaTime.WakaTime {
             }
             catch (InvalidOperationException ex)
             {
-                Logger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
+                Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
+                Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
             }
         }
 

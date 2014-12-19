@@ -80,7 +80,7 @@
             this.Controls.Add(this.lblAPIKey);
             this.Name = "APIKeyForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Wakatime";
+            this.Text = "WakaTime";
             this.Load += new System.EventHandler(this.APIKeyForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
