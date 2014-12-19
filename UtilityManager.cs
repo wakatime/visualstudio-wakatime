@@ -18,11 +18,8 @@ namespace WakaTime.WakaTime {
             [Out] out bool wow64Process
         );
         
-        private const string PythonUtilityName = "Python.exe";
-        private const string WakatimeUtilityName = "wakatime-cli.py";
-        
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "0.0.1";
+        private const string VERSION = "1.0.2";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -31,28 +28,21 @@ namespace WakaTime.WakaTime {
 
         private UtilityManager() { }
 
-        public string ApiKey
-        {
-            get
-            {
+        public string ApiKey {
+            get {
                 return _apiKey;
             }
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value) == false)
-                {
+            set {
+                if (string.IsNullOrWhiteSpace(value) == false) {
                     _apiKey = value;
                     ConfigFileHelper.updateApiKey(value);
                 }
             }
         }
 
-        public static UtilityManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
+        public static UtilityManager Instance {
+            get {
+                if (_instance == null) {
                     _instance = new UtilityManager();
                 }
                 return _instance;
@@ -63,65 +53,64 @@ namespace WakaTime.WakaTime {
         /// Check Python installed or not, APIKEY exists or not, Command line utility installed or not
         /// </summary>
         /// <returns></returns>
-        public void initialize()
-        {
-            try
-            {
+        public void initialize() {
+            try {
                 //Check if Python installed or not
-                string filePath = GetFullPath(PythonUtilityName);
-                if (string.IsNullOrWhiteSpace(filePath))
-                {
+                if (!doesPythonExist()) {
                     string pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi";
-                    if (is64BitOperatingSystem)
-                    {
+                    if (is64BitOperatingSystem) {
                         pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi";
                     }
-
-                    Downloader.downloadPython(pythonDownloadUrl, PythonUtilityName);
+                    Downloader.downloadPython(pythonDownloadUrl, getPythonDir());
                 }
 
-                if (isCommandLineUtilityExist() == false)
-                {
-                    Downloader.downloadUtility("https://github.com/wakatime//wakatime//archive//master.zip", WakatimeUtilityName);
+                if (doesCLIExist() == false) {
+                    Downloader.downloadCLI("https://github.com/wakatime/wakatime/archive/master.zip", getCLIDir());
                 }
 
                 _apiKey = ConfigFileHelper.getApiKey();
 
-                if (string.IsNullOrWhiteSpace(_apiKey))
-                {
+                if (string.IsNullOrWhiteSpace(_apiKey)) {
                     Logger.Instance.writeToLog("API Key could not be found.");
                 }
             }
-            catch(Exception ex)
-            {
+            catch(Exception ex) {
                 Logger.Instance.writeToLog("UtilityManager initialize : " + ex.Message);
             }
+        }
+
+        public string getPythonDir() {
+            return getCurrentDirectory() + "\\Python";
+        }
+
+        public string getCLIDir() {
+            return getCurrentDirectory() + "\\wakatime";
+        }
+
+        public string getCLI() {
+            return getCLIDir() + "\\wakatime-master\\wakatime-cli.py";
         }
 
         public void sendFile(string fileName, string projectName = "", string reasonForSending = "") {
             try {
                 //For debugging purpose
                 //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
-                string arguments = WakatimeUtilityName + " --key=" + _apiKey 
-                                    + " --file=" + fileName
+                string arguments = getCLI() + " --key=\"" + _apiKey + "\""
+                                    + " --file=\"" + fileName + "\""
                                     + " --plugin=" + PLUGIN_NAME + "/" + VERSION;
 
                 if (!string.IsNullOrEmpty(projectName))
-                    arguments = arguments + " --project=" + projectName;
+                    arguments = arguments + " --project=\"" + projectName + "\"";
 
                 if (!string.IsNullOrEmpty(reasonForSending))
                     arguments = arguments + reasonForSending;
-                
-                Logger.Instance.writeToLog(getCurrentDirectory());
-                Logger.Instance.writeToLog(PythonUtilityName);
-                Logger.Instance.writeToLog(arguments);
 
                 ProcessStartInfo procInfo = new ProcessStartInfo();
                 procInfo.UseShellExecute = false;
-                procInfo.FileName = PythonUtilityName;
+                procInfo.FileName = "pythonw";
                 procInfo.CreateNoWindow = true;
                 procInfo.Arguments = arguments;
-                procInfo.WorkingDirectory = getCurrentDirectory();
+                procInfo.WorkingDirectory = getPythonDir();
 
                 var proc = Process.Start(procInfo);
             }
@@ -138,23 +127,16 @@ namespace WakaTime.WakaTime {
         /// http://stackoverflow.com/questions/336633/how-to-detect-windows-64-bit-platform-with-net
         /// </summary>
         /// <returns></returns>
-        public static bool InternalCheckIsWow64()
-        {
-            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) ||
-                Environment.OSVersion.Version.Major >= 6)
-            {
-                using (Process p = Process.GetCurrentProcess())
-                {
+        public static bool InternalCheckIsWow64() {
+            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major >= 6) {
+                using (Process p = Process.GetCurrentProcess()) {
                     bool retVal;
-                    if (!IsWow64Process(p.Handle, out retVal))
-                    {
+                    if (!IsWow64Process(p.Handle, out retVal)) {
                         return false;
                     }
                     return retVal;
                 }
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -163,46 +145,29 @@ namespace WakaTime.WakaTime {
         /// Check if wakatime command line exists or not
         /// </summary>
         /// <returns></returns>
-        private bool isCommandLineUtilityExist()
-        {
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            var path = System.IO.Path.GetDirectoryName(assembly);
-
-            string utilityAbsolutePath = path + "\\wakatime-cli.py";
-            if (File.Exists(utilityAbsolutePath))
-            {
+        private bool doesCLIExist() {
+            if (File.Exists(getCLI())) {
                 return true;
             }
-
             return false;
         }
 
         /// <summary>
-        /// Given file name it returns absolute path
+        /// Check if local python installation exists
         /// </summary>
-        /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetFullPath(string fileName)
-        {
-            if (File.Exists(fileName))
-                return Path.GetFullPath(fileName);
-
-            var values = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine);
-            foreach (var path in values.Split(';'))
-            {
-                var fullPath = Path.Combine(path, fileName);
-                if (File.Exists(fullPath))
-                    return fullPath;
+        private bool doesPythonExist() {
+            if (File.Exists(getPythonDir() + "\\pythonw.exe")) {
+                return true;
             }
-            return null;
+            return false;
         }
 
         /// <summary>
         /// Returns current working dir
         /// </summary>
         /// <returns></returns>
-        static public string getCurrentDirectory()
-        {
+        static public string getCurrentDirectory() {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
             var path = Path.GetDirectoryName(assembly);
 

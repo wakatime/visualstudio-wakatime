@@ -7,50 +7,36 @@ using System.Threading;
 
 namespace WakaTime.WakaTime {
     class Downloader {
+
         /// <summary>
-        /// Download to current working directory
+        /// Download wakatime-cli
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="utilityName"></param>
-        static public void downloadUtility(string url, string utilityName) {
+        /// <param name="installDir"></param>
+        static public void downloadCLI(string url, string installDir) {
             WebClient client = new WebClient();
             string currentDir = getCurrentDirectory();
-            string fileToDownload = currentDir + "\\utility.zip";
+            string fileToDownload = currentDir + "\\wakatime-cli.zip";
             // Download utility
             client.DownloadFile(url, fileToDownload);
 
             //Extract to some temp folder
-            string extractFolderName = currentDir + "\\utility";
-            ZipFile.ExtractToDirectory(fileToDownload, extractFolderName);
-
-            //search command line utility and copy
-            string utilityFullpath = searchFile(extractFolderName, utilityName);
-            if (string.IsNullOrWhiteSpace(utilityFullpath) == false) {
-                File.Copy(utilityFullpath, currentDir + "\\" + utilityName, true);
-            }
-
-            //copy 'wakatime' folder
-            string folderPath = searchFolder(extractFolderName, "wakatime");
-            if (string.IsNullOrWhiteSpace(folderPath) == false) {
-                DirectoryCopy(folderPath, currentDir + "\\wakatime", true);
-            }
+            ZipFile.ExtractToDirectory(fileToDownload, installDir);
         }
 
         /// <summary>
-        /// Download Python
+        /// Download and install Python
         /// </summary>
         /// <param name="url"></param>
-        /// <param name="utilityName"></param>
-        static public void downloadPython(string url, string utilityName) {
-            string currentDir = getCurrentDirectory();
-            string fileToDownload = currentDir + "\\python.msi";
+        /// <param name="installDir"></param>
+        static public void downloadPython(string url, string installDir) {
+            string fileToDownload = getCurrentDirectory() + "\\python.msi";
 
             WebClient client = new WebClient();
             client.DownloadFile(url, fileToDownload);
 
-            string installDir = currentDir + "\\PythonInstall";
-            string arguments = "/i \"" + fileToDownload + "\" " + "TARGETDIR=\"" + installDir + "\" /norestart /quiet";
-
+            string arguments = "/i \"" + fileToDownload + "\" " + "TARGETDIR=\"" + installDir + "\" /norestart /qb!";
+            
             ProcessStartInfo procInfo = new ProcessStartInfo();
             procInfo.UseShellExecute = false;
             procInfo.FileName = "msiexec";
@@ -58,25 +44,6 @@ namespace WakaTime.WakaTime {
             procInfo.Arguments = arguments;
 
             var proc = Process.Start(procInfo);
-            Thread.Sleep(60000);// waiting to complete python download
-
-            addPathToEnvironmentVariable(installDir);
-        }
-
-        static public void addPathToEnvironmentVariable(string pathToAppend) {
-            String oldPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine).Trim();
-            string newPath = oldPath;
-            if (oldPath.Length > 0)
-            {
-                if (oldPath[oldPath.Length - 1] != ';')
-                {
-                    newPath += ';';
-                }
-            }
-            newPath += (pathToAppend + ';');
-
-            Environment.SetEnvironmentVariable("PATH", newPath, EnvironmentVariableTarget.Machine);
-            Environment.SetEnvironmentVariable("PATH", newPath);
         }
 
         static public string getCurrentDirectory() {
