@@ -2,10 +2,8 @@
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Wakatime.VSPackageWakaTime
-{
-    class WakatimeConfigFileHelper
-    {
+namespace WakaTime.WakaTime {
+    class ConfigFileHelper {
         [DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
 

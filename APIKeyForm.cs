@@ -8,10 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Wakatime.VSPackageWakaTime
-{
-    public partial class APIKeyForm : Form
-    {
+namespace WakaTime.WakaTime {
+    public partial class APIKeyForm : Form {
         public APIKeyForm()
         {
             InitializeComponent();
@@ -21,7 +19,7 @@ namespace Wakatime.VSPackageWakaTime
         {
             try
             {
-                string apiKey = WakatimeConfigFileHelper.getApiKey();
+                string apiKey = ConfigFileHelper.getApiKey();
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
                     txtAPIKey.Text = apiKey;
@@ -41,7 +39,7 @@ namespace Wakatime.VSPackageWakaTime
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
                     //WakatimeConfigFileHelper.updateApiKey(apiKey);
-                    WakatimeUtilityManager.Instance.ApiKey = apiKey;
+                    UtilityManager.Instance.ApiKey = apiKey;
                 }
                 else
                 {

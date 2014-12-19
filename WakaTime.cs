@@ -9,8 +9,7 @@ using Microsoft.VisualStudio.Shell;
 using EnvDTE;
 using System.Threading;
 
-namespace Wakatime.VSPackageWakaTime
-{
+namespace WakaTime.WakaTime {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -31,11 +30,10 @@ namespace Wakatime.VSPackageWakaTime
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidVSPackageWakaTimePkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
-    public sealed class VSPackageWakaTimePackage : Package
-    {
+    public sealed class WakaTime : Package {
         private const int HeartbeatInterval = 2 * 60 * 1000; // 2 minute in milli seconds
 
-        WakatimeUtilityManager _utilityManager = WakatimeUtilityManager.Instance;
+        UtilityManager _utilityManager = UtilityManager.Instance;
         private EnvDTE.DTE _objDTE = null;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
@@ -49,8 +47,7 @@ namespace Wakatime.VSPackageWakaTime
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public VSPackageWakaTimePackage()
-        {
+        public WakaTime() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
@@ -69,7 +66,7 @@ namespace Wakatime.VSPackageWakaTime
                 Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
                 base.Initialize();
                 IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
-                VSWakatimeLogger.Instance.initialize(log);
+                Logger.Instance.initialize(log);
 
                 // Check for Python, Wakatime utility and Api Key
                 _utilityManager.initialize();
@@ -79,7 +76,7 @@ namespace Wakatime.VSPackageWakaTime
                 if (null != mcs)
                 {
                     // Create the command for the menu item.
-                    CommandID menuCommandID = new CommandID(GuidList.guidVSPackageWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateAppKey);
+                    CommandID menuCommandID = new CommandID(GuidList.guidVSPackageWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateApiKey);
                     MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
                     mcs.AddCommand(menuItem);
                 }
@@ -92,7 +89,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog(ex.Message);
+                Logger.Instance.writeToLog(ex.Message);
             }
         }
 
@@ -113,7 +110,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("Window_Activated : " + ex.Message);
+                Logger.Instance.writeToLog("Window_Activated : " + ex.Message);
             }
         }
 
@@ -129,7 +126,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch (Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("DocumentEvents_DocumentOpened : " + ex.Message);
+                Logger.Instance.writeToLog("DocumentEvents_DocumentOpened : " + ex.Message);
             }
         }
 
@@ -148,7 +145,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("DocumentEvents_DocumentSaved : " + ex.Message);
+                Logger.Instance.writeToLog("DocumentEvents_DocumentSaved : " + ex.Message);
             }
         }
         #endregion
@@ -166,7 +163,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("MenuItemCallback : " + ex.Message);
+                Logger.Instance.writeToLog("MenuItemCallback : " + ex.Message);
             }
         }
 
@@ -265,7 +262,7 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch (Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("HeartbeatTimerCallBack : " + ex.Message);
+                Logger.Instance.writeToLog("HeartbeatTimerCallBack : " + ex.Message);
             }
         }
     }

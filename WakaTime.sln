@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSPackageWakaTime", "VSPackageWakaTime.csproj", "{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WakaTime", "WakaTime.csproj", "{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

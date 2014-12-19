@@ -2,12 +2,8 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace Wakatime.VSPackageWakaTime
-{
-    static class PkgCmdIDList
-    {
-        public const uint cmdidUpdateAppKey =        0x100;
-
-
+namespace WakaTime.WakaTime {
+    static class PkgCmdIDList {
+        public const uint cmdidUpdateApiKey =        0x100;
     };
 }

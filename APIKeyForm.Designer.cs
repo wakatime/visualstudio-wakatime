@@ -1,7 +1,5 @@
-﻿namespace Wakatime.VSPackageWakaTime
-{
-    partial class APIKeyForm
-    {
+﻿namespace WakaTime.WakaTime {
+    partial class APIKeyForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>

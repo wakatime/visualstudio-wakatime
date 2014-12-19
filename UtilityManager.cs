@@ -3,13 +3,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Wakatime.VSPackageWakaTime
-{
+namespace WakaTime.WakaTime {
     /// <summary>
     /// Singleton class to check plugin .
     /// </summary>
-    class WakatimeUtilityManager
-    {
+    class UtilityManager {
         static bool is64BitProcess = (IntPtr.Size == 8);
         static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
 
@@ -29,9 +27,9 @@ namespace Wakatime.VSPackageWakaTime
         private Process _process = new Process();
         private string _apiKey = null;
 
-        private static WakatimeUtilityManager _instance;
+        private static UtilityManager _instance;
 
-        private WakatimeUtilityManager() { }
+        private UtilityManager() { }
 
         public string ApiKey
         {
@@ -44,18 +42,18 @@ namespace Wakatime.VSPackageWakaTime
                 if (string.IsNullOrWhiteSpace(value) == false)
                 {
                     _apiKey = value;
-                    WakatimeConfigFileHelper.updateApiKey(value);
+                    ConfigFileHelper.updateApiKey(value);
                 }
             }
         }
 
-        public static WakatimeUtilityManager Instance
+        public static UtilityManager Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new WakatimeUtilityManager();
+                    _instance = new UtilityManager();
                 }
                 return _instance;
             }
@@ -79,24 +77,24 @@ namespace Wakatime.VSPackageWakaTime
                         pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi";
                     }
 
-                    VSWakatimeDownloader.downloadPython(pythonDownloadUrl, PythonUtilityName);
+                    Downloader.downloadPython(pythonDownloadUrl, PythonUtilityName);
                 }
 
                 if (isCommandLineUtilityExist() == false)
                 {
-                    VSWakatimeDownloader.downloadUtility("https://github.com/wakatime//wakatime//archive//master.zip", WakatimeUtilityName);
+                    Downloader.downloadUtility("https://github.com/wakatime//wakatime//archive//master.zip", WakatimeUtilityName);
                 }
 
-                _apiKey = WakatimeConfigFileHelper.getApiKey();
+                _apiKey = ConfigFileHelper.getApiKey();
 
                 if (string.IsNullOrWhiteSpace(_apiKey))
                 {
-                    VSWakatimeLogger.Instance.writeToLog("API Key could not be found.");
+                    Logger.Instance.writeToLog("API Key could not be found.");
                 }
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("WakatimeUtilityManager initialize : " + ex.Message);
+                Logger.Instance.writeToLog("WakatimeUtilityManager initialize : " + ex.Message);
             }
         }
 
@@ -128,11 +126,11 @@ namespace Wakatime.VSPackageWakaTime
             }
             catch (InvalidOperationException ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
+                Logger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
             }
             catch(Exception ex)
             {
-                VSWakatimeLogger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
+                Logger.Instance.writeToLog("WakatimeUtilityManager sendFile : " + ex.Message);
             }
         }
 
