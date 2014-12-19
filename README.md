@@ -7,6 +7,8 @@ WakaTime is a productivity & time tracking tool for programmers. Once the WakaTi
 Installation
 ------------
 
+Heads Up! WakaTime depends on [Python](http://www.python.org/getit/) being installed to work correctly.
+
 1. Inside Visual Studio, navigate to `Tools` -> `Extensions and Updates...`
 
 2. Click the `Online` category at the left, then search for `wakatime`.
