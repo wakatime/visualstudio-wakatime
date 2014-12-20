@@ -19,7 +19,7 @@ namespace WakaTime.WakaTime {
         );
         
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "2.0.0";
+        private const string VERSION = "2.0.1";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -172,18 +172,12 @@ namespace WakaTime.WakaTime {
 
             ProcessStartInfo procInfo = new ProcessStartInfo();
             procInfo.UseShellExecute = false;
-            procInfo.RedirectStandardError = true;
             procInfo.FileName = getPython();
             procInfo.CreateNoWindow = true;
             procInfo.Arguments = arguments;
 
             try {
                 var proc = Process.Start(procInfo);
-                string errors = proc.StandardError.ReadToEnd();
-                if (errors != null && errors != "") {
-                    Logger.Instance.error("UtilityManager sendFile : " + getPython() + " " + arguments);
-                    Logger.Instance.error("UtilityManager sendFile : " + errors);
-                }
             } catch (InvalidOperationException ex) {
                 Logger.Instance.error("UtilityManager sendFile : " + getPython() + " " + arguments);
                 Logger.Instance.error("UtilityManager sendFile : " + ex.Message);
