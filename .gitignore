@@ -31,3 +31,4 @@
 
 obj/
 .DS_Store
+*.pdb
