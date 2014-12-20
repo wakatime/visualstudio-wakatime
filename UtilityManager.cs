@@ -19,7 +19,7 @@ namespace WakaTime.WakaTime {
         );
         
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "1.0.2";
+        private const string VERSION = "1.0.3";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -55,13 +55,13 @@ namespace WakaTime.WakaTime {
         /// <returns></returns>
         public void initialize() {
             try {
-                //Check if Python installed or not
-                if (!doesPythonExist()) {
+                // Make sure python is installed
+                if (!isPythonInstalled()) {
                     string pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi";
                     if (is64BitOperatingSystem) {
                         pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi";
                     }
-                    Downloader.downloadPython(pythonDownloadUrl, getPythonDir());
+                    Downloader.downloadPython(pythonDownloadUrl, "\\python34");
                 }
 
                 if (doesCLIExist() == false) {
@@ -81,6 +81,44 @@ namespace WakaTime.WakaTime {
 
         public string getPythonDir() {
             return getCurrentDirectory() + "\\Python";
+        }
+
+        public string getPython() {
+            string[] locations = {
+                "pythonw",
+                "python",
+                "\\python37\\pythonw",
+                "\\python36\\pythonw",
+                "\\python35\\pythonw",
+                "\\python34\\pythonw",
+                "\\python33\\pythonw",
+                "\\python32\\pythonw",
+                "\\python31\\pythonw",
+                "\\python30\\pythonw",
+                "\\python27\\pythonw",
+                "\\python26\\pythonw",
+                "\\python37\\python",
+                "\\python36\\python",
+                "\\python35\\python",
+                "\\python34\\python",
+                "\\python33\\python",
+                "\\python32\\python",
+                "\\python31\\python",
+                "\\python30\\python",
+                "\\python27\\python",
+                "\\python26\\python",
+            };
+            foreach (string location in locations) {
+                try {
+                    ProcessStartInfo procInfo = new ProcessStartInfo();
+                    procInfo.UseShellExecute = false;
+                    procInfo.FileName = location;
+                    procInfo.CreateNoWindow = true;
+                    procInfo.Arguments = "--version";
+                    return location;
+                } catch (Exception ex) { }
+            }
+            return null;
         }
 
         public string getCLIDir() {
@@ -107,10 +145,9 @@ namespace WakaTime.WakaTime {
 
                 ProcessStartInfo procInfo = new ProcessStartInfo();
                 procInfo.UseShellExecute = false;
-                procInfo.FileName = "pythonw";
+                procInfo.FileName = getPython();
                 procInfo.CreateNoWindow = true;
                 procInfo.Arguments = arguments;
-                procInfo.WorkingDirectory = getPythonDir();
 
                 var proc = Process.Start(procInfo);
             }
@@ -153,11 +190,23 @@ namespace WakaTime.WakaTime {
         }
 
         /// <summary>
-        /// Check if local python installation exists
+        /// Check if bundled python installation exists
         /// </summary>
         /// <returns></returns>
         private bool doesPythonExist() {
             if (File.Exists(getPythonDir() + "\\pythonw.exe")) {
+                return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Check if python is installed
+        /// </summary>
+        /// <returns></returns>
+        private bool isPythonInstalled() {
+            if (getPython() != null) {
                 return true;
             }
             return false;
