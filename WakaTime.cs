@@ -38,7 +38,6 @@ namespace WakaTime.WakaTime {
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private string _lastFileSent = string.Empty; //Last heartbeat sent to Wakatime
-        private System.Threading.Timer _heartbeatTimer;
 
         /// <summary>
         /// Default constructor of the package.
@@ -71,8 +70,7 @@ namespace WakaTime.WakaTime {
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-                if (null != mcs)
-                {
+                if (null != mcs) {
                     // Create the command for the menu item.
                     CommandID menuCommandID = new CommandID(GuidList.guidWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateApiKey);
                     MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
@@ -80,13 +78,10 @@ namespace WakaTime.WakaTime {
                 }
 
                 bool isApiKeyFound = checkForApiKey();
-                if (isApiKeyFound)
-                {
+                if (isApiKeyFound) {
                     initializeEvents();
                 }
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 Logger.Instance.error(ex.Message);
             }
         }
@@ -96,18 +91,14 @@ namespace WakaTime.WakaTime {
         /// </summary>
         /// <param name="gotFocus">Activated window</param>
         /// <param name="lostFocus">Deactivated window</param>
-        public void Window_Activated(Window gotFocus, Window lostFocus)
-        {
-            try
-            {
+        public void Window_Activated(Window gotFocus, Window lostFocus) {
+            try {
                 Document activeDoc = _objDTE.ActiveWindow.Document;
                 if (activeDoc != null)
                 {
                     sendFileToWakatime(activeDoc.FullName);
                 }
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 Logger.Instance.error("Window_Activated : " + ex.Message);
             }
         }
@@ -116,14 +107,10 @@ namespace WakaTime.WakaTime {
         /// Called when any document is opened.
         /// </summary>
         /// <param name="document"></param>
-        public void DocumentEvents_DocumentOpened(EnvDTE.Document document)
-        {
-            try
-            {
+        public void DocumentEvents_DocumentOpened(EnvDTE.Document document) {
+            try {
                 sendFileToWakatime(document.FullName);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentOpened : " + ex.Message);
             }
         }
@@ -132,17 +119,13 @@ namespace WakaTime.WakaTime {
         /// Called when any document is saved.
         /// </summary>
         /// <param name="document"></param>
-        public void DocumentEvents_DocumentSaved(EnvDTE.Document document)
-        {
-            try
-            {
+        public void DocumentEvents_DocumentSaved(EnvDTE.Document document) {
+            try {
                 _utilityManager.sendFile(document.FullName, 
                     (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ?_objDTE.Solution.FullName : "",
                     " --write");  // No need to compare previous heartbeat in case of save
                 _lastFileSent = document.FullName;
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentSaved : " + ex.Message);
             }
         }
@@ -153,39 +136,29 @@ namespace WakaTime.WakaTime {
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            try
-            {
+        private void MenuItemCallback(object sender, EventArgs e) {
+            try {
                 displayApiKeyDialog();
-            }
-            catch(Exception ex)
-            {
+            } catch(Exception ex) {
                 Logger.Instance.error("MenuItemCallback : " + ex.Message);
             }
         }
 
-        private bool checkForApiKey()
-        {
-            if (string.IsNullOrWhiteSpace(_utilityManager.ApiKey)) // If key does not exist then prompt user to enter key
-            {
+        private bool checkForApiKey() {
+            if (string.IsNullOrWhiteSpace(_utilityManager.ApiKey)) { // If key does not exist then prompt user to enter key
                 DialogResult result = displayApiKeyDialog();
-                if (result == DialogResult.Cancel)//Otherwise it is assumed that user has entered some key.
-                {
+                if (result == DialogResult.Cancel) { //Otherwise it is assumed that user has entered some key.
                     return false;
                 }
             }
-
             return true;
         }
 
         /// <summary>
         /// Initialize events and create timer
         /// </summary>
-        private void initializeEvents()
-        {
-            if (_objDTE == null)
-            {
+        private void initializeEvents() {
+            if (_objDTE == null) {
                 //Initialize events for file open/switch/save.
                 _objDTE = (DTE)GetService(typeof(DTE));
                 _docEvents = _objDTE.Events.DocumentEvents;
@@ -195,20 +168,15 @@ namespace WakaTime.WakaTime {
                 _docEvents.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(DocumentEvents_DocumentSaved);
                 _windowEvents.WindowActivated += new _dispWindowEvents_WindowActivatedEventHandler(Window_Activated);
             }
-
-            // Create heartbeat timer
-            createHeartbeatTimer();
         }
 
         /// <summary>
         /// Display Api Key dialog box.
         /// </summary>
-        private DialogResult displayApiKeyDialog()
-        {
+        private DialogResult displayApiKeyDialog() {
             APIKeyForm form = new APIKeyForm();
             DialogResult result = form.ShowDialog();
-            if (result == DialogResult.OK)
-            {
+            if (result == DialogResult.OK) {
                 initializeEvents(); //If during plgin initialization user does not eneter key then this time 'events' should be initialized
             }
 
@@ -219,49 +187,14 @@ namespace WakaTime.WakaTime {
         /// Send file with absolute path to wakatime and store same in _lastFileSent
         /// </summary>
         /// <param name="fileName"></param>
-        private void sendFileToWakatime(string fileName)
-        {
-            if (fileName != _lastFileSent)
-            {
+        private void sendFileToWakatime(string fileName) {
+            if (fileName != _lastFileSent) {
                 _utilityManager.sendFile(fileName, 
                     (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ? _objDTE.Solution.FullName : "");
                 _lastFileSent = fileName;
 
-                _heartbeatTimer.Change(HeartbeatInterval, HeartbeatInterval); // Extend timer by another 2 minutes.
             }
         }
 
-        /// <summary>
-        /// Timer to send heartbeat in every 2 minutes if no file selection has been changed.
-        /// </summary>
-        private void createHeartbeatTimer()
-        {
-            if (_heartbeatTimer == null)
-            {
-                _heartbeatTimer = new System.Threading.Timer(new TimerCallback(HeartbeatTimerCallBack), null, HeartbeatInterval, HeartbeatInterval);
-            }
-        }
-
-        /// <summary>
-        /// Heartbeat call back fired in every 2 minutes to send active file.
-        /// </summary>
-        /// <param name="state"></param>
-        private void HeartbeatTimerCallBack(object state)
-        {
-            try
-            {
-                if (_objDTE.ActiveDocument != null)
-                {
-                    // No need to compare previous heartbeat
-                    _utilityManager.sendFile(_objDTE.ActiveDocument.FullName,
-                        (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ? _objDTE.Solution.FullName : ""); 
-                    _lastFileSent = _objDTE.ActiveDocument.FullName;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.error("HeartbeatTimerCallBack : " + ex.Message);
-            }
-        }
     }
 }
