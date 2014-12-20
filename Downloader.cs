@@ -17,10 +17,13 @@ namespace WakaTime.WakaTime {
             WebClient client = new WebClient();
             string currentDir = getCurrentDirectory();
             string fileToDownload = currentDir + "\\wakatime-cli.zip";
+
             // Download utility
+            Logger.Instance.info("Downloader: downloading wakatime-cli...");
             client.DownloadFile(url, fileToDownload);
 
             //Extract to some temp folder
+            Logger.Instance.info("Downloader: extracting wakatime-cli...");
             ZipFile.ExtractToDirectory(fileToDownload, installDir);
         }
 
@@ -33,17 +36,25 @@ namespace WakaTime.WakaTime {
             string fileToDownload = getCurrentDirectory() + "\\python.msi";
 
             WebClient client = new WebClient();
+            Logger.Instance.info("Downloader: downloading python.msi...");
             client.DownloadFile(url, fileToDownload);
 
-            string arguments = "/i \"" + fileToDownload + "\" " + "TARGETDIR=\"" + installDir + "\" /norestart /qb!";
+            string arguments = "/i \"" + fileToDownload + "\"";
+            if (installDir != null) {
+                arguments = arguments + " TARGETDIR=\"" + installDir + "\"";
+            }
+            arguments = arguments + " /norestart /qb!";
             
             ProcessStartInfo procInfo = new ProcessStartInfo();
             procInfo.UseShellExecute = false;
+            procInfo.RedirectStandardError = true;
             procInfo.FileName = "msiexec";
             procInfo.CreateNoWindow = true;
             procInfo.Arguments = arguments;
 
+            Logger.Instance.info("Downloader: installing python...");
             var proc = Process.Start(procInfo);
+            Logger.Instance.info("Downloader: finished installing python.");
         }
 
         static public string getCurrentDirectory() {

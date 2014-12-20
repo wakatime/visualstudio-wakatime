@@ -21,14 +21,17 @@ namespace WakaTime.WakaTime {
 
         public void initialize(IVsActivityLog log) {
             _log = log;
-            int hr = log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                this.ToString(),
-                string.Format(CultureInfo.CurrentCulture,
-                "Entering initializer for: {0}", this.ToString()));
         }
 
-        public void writeToLog(string message) {
+        public void error(string message) {
             _log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
+                           this.ToString(),
+                           string.Format(CultureInfo.CurrentCulture,
+                                        "{0}", message));
+        }
+
+        public void info(string message) {
+            _log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
                            this.ToString(),
                            string.Format(CultureInfo.CurrentCulture,
                                         "{0}", message));

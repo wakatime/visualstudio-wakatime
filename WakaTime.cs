@@ -59,14 +59,12 @@ namespace WakaTime.WakaTime {
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
-        {
-            try
-            {
+        protected override void Initialize() {
+            IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
+            Logger.Instance.initialize(log);
+            try {
                 Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
                 base.Initialize();
-                IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
-                Logger.Instance.initialize(log);
 
                 // Check for Python, Wakatime utility and Api Key
                 _utilityManager.initialize();
@@ -89,7 +87,7 @@ namespace WakaTime.WakaTime {
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog(ex.Message);
+                Logger.Instance.error(ex.Message);
             }
         }
 
@@ -110,7 +108,7 @@ namespace WakaTime.WakaTime {
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog("Window_Activated : " + ex.Message);
+                Logger.Instance.error("Window_Activated : " + ex.Message);
             }
         }
 
@@ -126,7 +124,7 @@ namespace WakaTime.WakaTime {
             }
             catch (Exception ex)
             {
-                Logger.Instance.writeToLog("DocumentEvents_DocumentOpened : " + ex.Message);
+                Logger.Instance.error("DocumentEvents_DocumentOpened : " + ex.Message);
             }
         }
 
@@ -145,7 +143,7 @@ namespace WakaTime.WakaTime {
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog("DocumentEvents_DocumentSaved : " + ex.Message);
+                Logger.Instance.error("DocumentEvents_DocumentSaved : " + ex.Message);
             }
         }
         #endregion
@@ -163,7 +161,7 @@ namespace WakaTime.WakaTime {
             }
             catch(Exception ex)
             {
-                Logger.Instance.writeToLog("MenuItemCallback : " + ex.Message);
+                Logger.Instance.error("MenuItemCallback : " + ex.Message);
             }
         }
 
@@ -262,7 +260,7 @@ namespace WakaTime.WakaTime {
             }
             catch (Exception ex)
             {
-                Logger.Instance.writeToLog("HeartbeatTimerCallBack : " + ex.Message);
+                Logger.Instance.error("HeartbeatTimerCallBack : " + ex.Message);
             }
         }
     }

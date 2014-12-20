@@ -57,25 +57,30 @@ namespace WakaTime.WakaTime {
             try {
                 // Make sure python is installed
                 if (!isPythonInstalled()) {
+                    Logger.Instance.info("UtilityManager: Python not found.");
                     string pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi";
                     if (is64BitOperatingSystem) {
                         pythonDownloadUrl = "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi";
                     }
-                    Downloader.downloadPython(pythonDownloadUrl, "\\python34");
+                    Downloader.downloadPython(pythonDownloadUrl, null);
+                } else {
+                    Logger.Instance.info("UtilityManager: Python found at " + getPython());
                 }
 
-                if (doesCLIExist() == false) {
+                if (!doesCLIExist()) {
+                    Logger.Instance.info("UtilityManager: wakatime-cli not found.");
                     Downloader.downloadCLI("https://github.com/wakatime/wakatime/archive/master.zip", getCLIDir());
+                } else {
+                    Logger.Instance.info("UtilityManager: wakatime-cli found at " + getCLI());
                 }
 
                 _apiKey = ConfigFileHelper.getApiKey();
 
                 if (string.IsNullOrWhiteSpace(_apiKey)) {
-                    Logger.Instance.writeToLog("API Key could not be found.");
+                    Logger.Instance.error("API Key could not be found.");
                 }
-            }
-            catch(Exception ex) {
-                Logger.Instance.writeToLog("UtilityManager initialize : " + ex.Message);
+            } catch(Exception ex) {
+                Logger.Instance.error("UtilityManager initialize : " + ex.Message);
             }
         }
 
@@ -87,6 +92,16 @@ namespace WakaTime.WakaTime {
             string[] locations = {
                 "pythonw",
                 "python",
+                "\\Python37\\pythonw",
+                "\\Python36\\pythonw",
+                "\\Python35\\pythonw",
+                "\\Python34\\pythonw",
+                "\\Python33\\pythonw",
+                "\\Python32\\pythonw",
+                "\\Python31\\pythonw",
+                "\\Python30\\pythonw",
+                "\\Python27\\pythonw",
+                "\\Python26\\pythonw",
                 "\\python37\\pythonw",
                 "\\python36\\pythonw",
                 "\\python35\\pythonw",
@@ -97,6 +112,16 @@ namespace WakaTime.WakaTime {
                 "\\python30\\pythonw",
                 "\\python27\\pythonw",
                 "\\python26\\pythonw",
+                "\\Python37\\python",
+                "\\Python36\\python",
+                "\\Python35\\python",
+                "\\Python34\\python",
+                "\\Python33\\python",
+                "\\Python32\\python",
+                "\\Python31\\python",
+                "\\Python30\\python",
+                "\\Python27\\python",
+                "\\Python26\\python",
                 "\\python37\\python",
                 "\\python36\\python",
                 "\\python35\\python",
@@ -112,10 +137,15 @@ namespace WakaTime.WakaTime {
                 try {
                     ProcessStartInfo procInfo = new ProcessStartInfo();
                     procInfo.UseShellExecute = false;
+                    procInfo.RedirectStandardError = true;
                     procInfo.FileName = location;
                     procInfo.CreateNoWindow = true;
                     procInfo.Arguments = "--version";
-                    return location;
+                    var proc = Process.Start(procInfo);
+                    string errors = proc.StandardError.ReadToEnd();
+                    if (errors == null || errors == "") {
+                        return location;
+                    }
                 } catch (Exception ex) { }
             }
             return null;
@@ -130,32 +160,36 @@ namespace WakaTime.WakaTime {
         }
 
         public void sendFile(string fileName, string projectName = "", string reasonForSending = "") {
+            string arguments = getCLI() + " --key=\"" + _apiKey + "\""
+                                + " --file=\"" + fileName + "\""
+                                + " --plugin=" + PLUGIN_NAME + "/" + VERSION;
+
+            if (!string.IsNullOrEmpty(projectName))
+                arguments = arguments + " --project=\"" + projectName + "\"";
+            
+            if (!string.IsNullOrEmpty(reasonForSending))
+                arguments = arguments + reasonForSending;
+
+            ProcessStartInfo procInfo = new ProcessStartInfo();
+            procInfo.UseShellExecute = false;
+            procInfo.RedirectStandardError = true;
+            procInfo.FileName = getPython();
+            procInfo.CreateNoWindow = true;
+            procInfo.Arguments = arguments;
+
             try {
-                //For debugging purpose
-                //string arguments = "/K " + PythonUtilityName + " " + WakatimeUtilityName + " --key=" + _apiKey + " --file=" + fileName;
-                string arguments = getCLI() + " --key=\"" + _apiKey + "\""
-                                    + " --file=\"" + fileName + "\""
-                                    + " --plugin=" + PLUGIN_NAME + "/" + VERSION;
-
-                if (!string.IsNullOrEmpty(projectName))
-                    arguments = arguments + " --project=\"" + projectName + "\"";
-
-                if (!string.IsNullOrEmpty(reasonForSending))
-                    arguments = arguments + reasonForSending;
-
-                ProcessStartInfo procInfo = new ProcessStartInfo();
-                procInfo.UseShellExecute = false;
-                procInfo.FileName = getPython();
-                procInfo.CreateNoWindow = true;
-                procInfo.Arguments = arguments;
-
                 var proc = Process.Start(procInfo);
-            }
-            catch (InvalidOperationException ex) {
-                Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
-            }
-            catch(Exception ex) {
-                Logger.Instance.writeToLog("UtilityManager sendFile : " + ex.Message);
+                string errors = proc.StandardError.ReadToEnd();
+                if (errors != null && errors != "") {
+                    Logger.Instance.error("UtilityManager sendFile : " + getPython() + " " + arguments);
+                    Logger.Instance.error("UtilityManager sendFile : " + errors);
+                }
+            } catch (InvalidOperationException ex) {
+                Logger.Instance.error("UtilityManager sendFile : " + getPython() + " " + arguments);
+                Logger.Instance.error("UtilityManager sendFile : " + ex.Message);
+            } catch (Exception ex) {
+                Logger.Instance.error("UtilityManager sendFile : " + getPython() + " " + arguments);
+                Logger.Instance.error("UtilityManager sendFile : " + ex.Message);
             }
         }
 
