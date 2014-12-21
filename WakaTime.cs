@@ -7,7 +7,6 @@ using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using EnvDTE;
-using System.Threading;
 
 namespace WakaTime.WakaTime {
     /// <summary>
@@ -37,7 +36,8 @@ namespace WakaTime.WakaTime {
         private EnvDTE.DTE _objDTE = null;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
-        private string _lastFileSent = string.Empty; //Last heartbeat sent to Wakatime
+        private string _lastFileSent = string.Empty;
+        private DateTime _lastTimeSent = DateTime.Parse("01/01/1970 00:00:00");
 
         /// <summary>
         /// Default constructor of the package.
@@ -64,6 +64,10 @@ namespace WakaTime.WakaTime {
             try {
                 Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
                 base.Initialize();
+
+                // IVsExtensionManager manager = GetService(typeof(SVsExtensionManager)) as IVsExtensionManager;
+                // var extension = manager.GetInstalledExtensions().Where(n => n.Header.Name == "WakaTime").SingleOrDefault();
+                // Version currentVersion = extension.Header.Version;
 
                 // Check for Python, Wakatime utility and Api Key
                 _utilityManager.initialize();
@@ -93,10 +97,10 @@ namespace WakaTime.WakaTime {
         /// <param name="lostFocus">Deactivated window</param>
         public void Window_Activated(Window gotFocus, Window lostFocus) {
             try {
-                Document activeDoc = _objDTE.ActiveWindow.Document;
-                if (activeDoc != null)
-                {
-                    sendFileToWakatime(activeDoc.FullName);
+                Document document = _objDTE.ActiveWindow.Document;
+                if (document != null) {
+                    string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
+                    sendFileToWakatime(document.FullName, project, false);
                 }
             } catch(Exception ex) {
                 Logger.Instance.error("Window_Activated : " + ex.Message);
@@ -109,7 +113,8 @@ namespace WakaTime.WakaTime {
         /// <param name="document"></param>
         public void DocumentEvents_DocumentOpened(EnvDTE.Document document) {
             try {
-                sendFileToWakatime(document.FullName);
+                string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
+                sendFileToWakatime(document.FullName, project, false);
             } catch (Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentOpened : " + ex.Message);
             }
@@ -121,10 +126,8 @@ namespace WakaTime.WakaTime {
         /// <param name="document"></param>
         public void DocumentEvents_DocumentSaved(EnvDTE.Document document) {
             try {
-                _utilityManager.sendFile(document.FullName, 
-                    (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ?_objDTE.Solution.FullName : "",
-                    " --write");  // No need to compare previous heartbeat in case of save
-                _lastFileSent = document.FullName;
+                string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
+                sendFileToWakatime(document.FullName, project, true);
             } catch(Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentSaved : " + ex.Message);
             }
@@ -187,12 +190,13 @@ namespace WakaTime.WakaTime {
         /// Send file with absolute path to wakatime and store same in _lastFileSent
         /// </summary>
         /// <param name="fileName"></param>
-        private void sendFileToWakatime(string fileName) {
-            if (fileName != _lastFileSent) {
-                _utilityManager.sendFile(fileName, 
-                    (_objDTE.Solution != null && !string.IsNullOrEmpty(_objDTE.Solution.FullName)) ? _objDTE.Solution.FullName : "");
+        private void sendFileToWakatime(string fileName, string projectName, bool isWrite) {
+            DateTime now = DateTime.UtcNow;
+            TimeSpan minutesSinceLastSent = now - _lastTimeSent;
+            if (fileName != _lastFileSent || isWrite || minutesSinceLastSent.Minutes >= 2) {
+                _utilityManager.sendFile(fileName, projectName, isWrite, _objDTE.Version);
                 _lastFileSent = fileName;
-
+                _lastTimeSent = now;
             }
         }
 

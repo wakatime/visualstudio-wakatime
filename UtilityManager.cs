@@ -159,16 +159,16 @@ namespace WakaTime.WakaTime {
             return getCLIDir() + "\\wakatime-master\\wakatime-cli.py";
         }
 
-        public void sendFile(string fileName, string projectName = "", string reasonForSending = "") {
+        public void sendFile(string fileName, string projectName, bool isWrite, string visualStudioVersion) {
             string arguments = getCLI() + " --key=\"" + _apiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=" + PLUGIN_NAME + "/" + VERSION;
+                                + " --plugin=\"" + PLUGIN_NAME + "/" + VERSION + " visualstudio/" + visualStudioVersion + "\"";
 
             if (!string.IsNullOrEmpty(projectName))
                 arguments = arguments + " --project=\"" + projectName + "\"";
             
-            if (!string.IsNullOrEmpty(reasonForSending))
-                arguments = arguments + reasonForSending;
+            if (isWrite)
+                arguments = arguments + " --write";
 
             ProcessStartInfo procInfo = new ProcessStartInfo();
             procInfo.UseShellExecute = false;
