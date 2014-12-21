@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Globalization;
@@ -89,7 +90,7 @@ namespace WakaTime.WakaTime {
                 Logger.Instance.error(ex.Message);
             }
         }
-
+        
         /// <summary>
         /// Send file on switching document.
         /// </summary>
@@ -99,8 +100,7 @@ namespace WakaTime.WakaTime {
             try {
                 Document document = _objDTE.ActiveWindow.Document;
                 if (document != null) {
-                    string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
-                    sendFileToWakatime(document.FullName, project, false);
+                    sendFileToWakatime(document.FullName, false);
                 }
             } catch(Exception ex) {
                 Logger.Instance.error("Window_Activated : " + ex.Message);
@@ -113,8 +113,7 @@ namespace WakaTime.WakaTime {
         /// <param name="document"></param>
         public void DocumentEvents_DocumentOpened(EnvDTE.Document document) {
             try {
-                string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
-                sendFileToWakatime(document.FullName, project, false);
+                sendFileToWakatime(document.FullName, false);
             } catch (Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentOpened : " + ex.Message);
             }
@@ -126,8 +125,7 @@ namespace WakaTime.WakaTime {
         /// <param name="document"></param>
         public void DocumentEvents_DocumentSaved(EnvDTE.Document document) {
             try {
-                string project = document.ProjectItem != null && !string.IsNullOrWhiteSpace(document.ProjectItem.Name) ? document.ProjectItem.Name : null;
-                sendFileToWakatime(document.FullName, project, true);
+                sendFileToWakatime(document.FullName, true);
             } catch(Exception ex) {
                 Logger.Instance.error("DocumentEvents_DocumentSaved : " + ex.Message);
             }
@@ -190,10 +188,14 @@ namespace WakaTime.WakaTime {
         /// Send file with absolute path to wakatime and store same in _lastFileSent
         /// </summary>
         /// <param name="fileName"></param>
-        private void sendFileToWakatime(string fileName, string projectName, bool isWrite) {
+        private void sendFileToWakatime(string fileName, bool isWrite) {
             DateTime now = DateTime.UtcNow;
             TimeSpan minutesSinceLastSent = now - _lastTimeSent;
             if (fileName != _lastFileSent || isWrite || minutesSinceLastSent.Minutes >= 2) {
+                string projectName = _objDTE.Solution != null && !string.IsNullOrWhiteSpace(_objDTE.Solution.FullName) ? _objDTE.Solution.FullName : null;
+                if (!string.IsNullOrWhiteSpace(projectName)) {
+                    projectName = Path.GetFileNameWithoutExtension(projectName);
+                }
                 _utilityManager.sendFile(fileName, projectName, isWrite, _objDTE.Version);
                 _lastFileSent = fileName;
                 _lastTimeSent = now;

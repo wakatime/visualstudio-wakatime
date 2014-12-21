@@ -27,7 +27,7 @@ namespace WakaTime.WakaTime {
         private static UtilityManager _instance;
 
         private UtilityManager() { }
-
+        
         public string ApiKey {
             get {
                 return _apiKey;
@@ -39,7 +39,7 @@ namespace WakaTime.WakaTime {
                 }
             }
         }
-
+        
         public static UtilityManager Instance {
             get {
                 if (_instance == null) {
@@ -83,7 +83,7 @@ namespace WakaTime.WakaTime {
                 Logger.Instance.error("UtilityManager initialize : " + ex.Message);
             }
         }
-
+        
         public string getPythonDir() {
             return getCurrentDirectory() + "\\Python";
         }
@@ -154,17 +154,17 @@ namespace WakaTime.WakaTime {
         public string getCLIDir() {
             return getCurrentDirectory() + "\\wakatime";
         }
-
+        
         public string getCLI() {
             return getCLIDir() + "\\wakatime-master\\wakatime-cli.py";
         }
 
         public void sendFile(string fileName, string projectName, bool isWrite, string visualStudioVersion) {
-            string arguments = getCLI() + " --key=\"" + _apiKey + "\""
+            string arguments = "\"" + getCLI() + "\" --key=\"" + _apiKey + "\""
                                 + " --file=\"" + fileName + "\""
                                 + " --plugin=\"" + PLUGIN_NAME + "/" + VERSION + " visualstudio/" + visualStudioVersion + "\"";
 
-            if (!string.IsNullOrEmpty(projectName))
+            if (!string.IsNullOrWhiteSpace(projectName))
                 arguments = arguments + " --project=\"" + projectName + "\"";
             
             if (isWrite)
