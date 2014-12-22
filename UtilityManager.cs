@@ -19,7 +19,7 @@ namespace WakaTime.WakaTime {
         );
         
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "2.0.1";
+        private const string VERSION = "2.0.2";
         
         private Process _process = new Process();
         private string _apiKey = null;
