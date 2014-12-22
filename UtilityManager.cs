@@ -162,7 +162,7 @@ namespace WakaTime.WakaTime {
         public void sendFile(string fileName, string projectName, bool isWrite, string visualStudioVersion) {
             string arguments = "\"" + getCLI() + "\" --key=\"" + _apiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=\"" + PLUGIN_NAME + "/" + VERSION + " visualstudio/" + visualStudioVersion + "\"";
+                                + " --plugin=\"visualstudio/" + visualStudioVersion + " " + PLUGIN_NAME + "/" + VERSION + "\"";
 
             if (!string.IsNullOrWhiteSpace(projectName))
                 arguments = arguments + " --project=\"" + projectName + "\"";
