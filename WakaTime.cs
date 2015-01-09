@@ -46,8 +46,7 @@ namespace WakaTime.WakaTime {
         /// any Visual Studio service because at this point the package object is created but 
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
-        /// </summary>
-        
+        /// </summary> "included to fix syntax highlighting"
         public WakaTime() {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
@@ -59,8 +58,7 @@ namespace WakaTime.WakaTime {
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initialization code that rely on services provided by VisualStudio.
-        /// </summary>
-        
+        /// </summary> "included to fix syntax highlighting"
         protected override void Initialize() {
             IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
             Logger.Instance.initialize(log);
