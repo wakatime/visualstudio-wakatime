@@ -19,7 +19,6 @@ namespace WakaTime.WakaTime {
         );
         
         private const string PLUGIN_NAME = "visualstudio-wakatime";
-        private const string VERSION = "2.0.2";
         
         private Process _process = new Process();
         private string _apiKey = null;
@@ -156,13 +155,13 @@ namespace WakaTime.WakaTime {
         }
         
         public string getCLI() {
-            return getCLIDir() + "\\wakatime-master\\wakatime-cli.py";
+            return getCLIDir() + "\\wakatime-master\\wakatime\\cli.py";
         }
 
         public void sendFile(string fileName, string projectName, bool isWrite, string visualStudioVersion) {
             string arguments = "\"" + getCLI() + "\" --key=\"" + _apiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=\"visualstudio/" + visualStudioVersion + " " + PLUGIN_NAME + "/" + VERSION + "\"";
+                                + " --plugin=\"visualstudio/" + visualStudioVersion + " " + PLUGIN_NAME + "/" + WakaTime.VERSION + "\"";
 
             if (!string.IsNullOrWhiteSpace(projectName))
                 arguments = arguments + " --project=\"" + projectName + "\"";

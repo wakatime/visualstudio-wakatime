@@ -33,6 +33,8 @@ namespace WakaTime.WakaTime {
     public sealed class WakaTime : Package {
         private const int HeartbeatInterval = 2 * 60 * 1000; // 2 minute in milli seconds
 
+        public const string VERSION = "2.0.2";
+
         UtilityManager _utilityManager = UtilityManager.Instance;
         private EnvDTE.DTE _objDTE = null;
         private DocumentEvents _docEvents;
