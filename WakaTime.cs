@@ -19,9 +19,9 @@ namespace WakaTime.WakaTime {
 
     public sealed class WakaTime : Package {
 
-        public const string VERSION = "2.0.2";
+        public const string VERSION = "2.0.3";
         
-        private const int HeartbeatInterval = 2; // minutes
+        private const int heartbeatInterval = 2; // minutes
         private UtilityManager _utilityManager = UtilityManager.Instance;
         private EnvDTE.DTE _objDTE = null;
         private DocumentEvents _docEvents;
