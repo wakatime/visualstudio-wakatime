@@ -17,7 +17,7 @@ Heads Up! WakaTime depends on [Python](http://www.python.org/getit/) being insta
 
 4. Click the `Restart Now` button.
 
-3. Enter your [api key](https://wakatime.com/settings#apikey) from [https://wakatime.com/settings#apikey](https://wakatime.com/settings#apikey), then press `enter`.
+3. Enter your [api key](https://wakatime.com/settings#apikey), then press `enter`.
 
 4. Use Visual Studio like you normally do and your time will be tracked for you automatically.
 
