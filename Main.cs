@@ -25,7 +25,7 @@ namespace WakaTime {
         public const string VERSION = "2.0.3";
         public static string PLUGIN_NAME = "visualstudio-wakatime";
         public static string EDITOR_NAME = "visualstudio";
-        public static int EDITOR_VERSION = 0;
+        public static string EDITOR_VERSION = "";
         public static string CURRENT_PYTHON_VERSION = "3.4.3";
         
         private const int heartbeatInterval = 2; // minutes
@@ -47,10 +47,11 @@ namespace WakaTime {
         );
         #endregion
 
-        public Main() {
-        }
-
         #region " StartUp/CleanUp "
+
+        public Main()
+        {
+        }
 
         protected override void Initialize() {
             IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
@@ -61,6 +62,7 @@ namespace WakaTime {
                 _objDTE = (DTE)GetService(typeof(DTE));
                 _docEvents = _objDTE.Events.DocumentEvents;
                 _windowEvents = _objDTE.Events.WindowEvents;
+                EDITOR_VERSION = _objDTE.Version;
 
                 // Make sure python is installed
                 if (!isPythonInstalled())
@@ -254,7 +256,7 @@ namespace WakaTime {
         {
             string arguments = "\"" + getCLI() + "\" --key=\"" + apiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=\"" + EDITOR_NAME + "/" + EDITOR_VERSION.ToString() + " " + PLUGIN_NAME + "/" + VERSION + "\"";
+                                + " --plugin=\"" + EDITOR_NAME + "/" + EDITOR_VERSION + " " + PLUGIN_NAME + "/" + VERSION + "\"";
             
             if (isWrite)
                 arguments = arguments + " --write";
