@@ -2,7 +2,7 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace WakaTime.WakaTime {
+namespace WakaTime {
     static class PkgCmdIDList {
         public const uint cmdidUpdateApiKey =        0x100;
     };

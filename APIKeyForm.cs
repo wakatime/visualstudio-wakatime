@@ -8,18 +8,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace WakaTime.WakaTime {
-    public partial class APIKeyForm : Form {
-        public APIKeyForm()
+namespace WakaTime
+{
+    public partial class ApiKeyForm : Form
+    {
+        public ApiKeyForm()
         {
             InitializeComponent();
         }
 
-        private void APIKeyForm_Load(object sender, EventArgs e)
+        private void ApiKeyForm_Load(object sender, EventArgs e)
         {
             try
             {
-                string apiKey = ConfigFileHelper.getApiKey();
+                string apiKey = Config.getApiKey();
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
                     txtAPIKey.Text = apiKey;
@@ -38,8 +40,8 @@ namespace WakaTime.WakaTime {
                 string apiKey = txtAPIKey.Text.Trim();
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
-                    //ConfigFileHelper.updateApiKey(apiKey);
-                    UtilityManager.Instance.ApiKey = apiKey;
+                    Config.setApiKey(apiKey);
+                    Main.apiKey = apiKey;
                 }
                 else
                 {
@@ -47,7 +49,7 @@ namespace WakaTime.WakaTime {
                     this.DialogResult = DialogResult.None; // do not close dialog box
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }

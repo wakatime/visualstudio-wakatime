@@ -1,5 +1,13 @@
-﻿namespace WakaTime.WakaTime {
-    partial class APIKeyForm {
+﻿namespace WakaTime
+{
+    partial class ApiKeyForm
+    {
+
+        private System.Windows.Forms.Label lblAPIKey;
+        private System.Windows.Forms.TextBox txtAPIKey;
+        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnCancel;
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -81,17 +89,12 @@
             this.Name = "APIKeyForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WakaTime";
-            this.Load += new System.EventHandler(this.APIKeyForm_Load);
+            this.Load += new System.EventHandler(this.ApiKeyForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-
-        private System.Windows.Forms.Label lblAPIKey;
-        private System.Windows.Forms.TextBox txtAPIKey;
-        private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.Button btnCancel;
     }
 }

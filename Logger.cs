@@ -2,11 +2,9 @@
 using Microsoft.VisualStudio.Shell.Interop;
 using System.Globalization;
 
-namespace WakaTime.WakaTime {
-    /// <summary>
-    /// Singleton class for logging in Visula studio default logger file ActivityLog.xml
-    /// </summary>
+namespace WakaTime {
     class Logger {
+        // Singleton class for logging in Visula studio default logger file ActivityLog.xml
         private static Logger _instance;
         private IVsActivityLog _log;
 
