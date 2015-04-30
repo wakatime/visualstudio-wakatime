@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WakaTime.WakaTime {
+namespace WakaTime {
     using System;
     
     
