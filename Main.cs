@@ -22,7 +22,7 @@ namespace WakaTime {
     {
 
         #region " Fields "
-        public const string VERSION = "2.0.3";
+        public const string VERSION = "3.0.0";
         public static string PLUGIN_NAME = "visualstudio-wakatime";
         public static string EDITOR_NAME = "visualstudio";
         public static string EDITOR_VERSION = "";
@@ -92,7 +92,7 @@ namespace WakaTime {
                     MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
                     mcs.AddCommand(menuItem);
                 }
-
+                
                 // setup event handlers
                 _docEvents.DocumentOpened += new _dispDocumentEvents_DocumentOpenedEventHandler(DocumentEvents_DocumentOpened);
                 _docEvents.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(DocumentEvents_DocumentSaved);
