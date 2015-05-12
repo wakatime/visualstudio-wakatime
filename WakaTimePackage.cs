@@ -18,7 +18,7 @@ namespace WakaTime {
     [Guid(GuidList.guidWakaTimePkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
 
-    public sealed class Main : Package
+    public sealed class WakaTimePackage : Package
     {
 
         #region " Fields "
@@ -43,7 +43,7 @@ namespace WakaTime {
 
         #region " StartUp/CleanUp "
 
-        public Main()
+        public WakaTimePackage()
         {
         }
 
@@ -147,14 +147,14 @@ namespace WakaTime {
                 System.Threading.Thread thread = new System.Threading.Thread(
                     delegate()
                     {
-                        lock (Main.threadLock)
+                        lock (WakaTimePackage.threadLock)
                         {
 
-                            if (isWrite || Main.lastFile == null || Main.enoughTimePassed() || !currentFile.Equals(Main.lastFile))
+                            if (isWrite || WakaTimePackage.lastFile == null || WakaTimePackage.enoughTimePassed() || !currentFile.Equals(WakaTimePackage.lastFile))
                             {
                                 sendHeartbeat(currentFile, isWrite);
-                                Main.lastFile = currentFile;
-                                Main.lastHeartbeat = DateTime.UtcNow;
+                                WakaTimePackage.lastFile = currentFile;
+                                WakaTimePackage.lastHeartbeat = DateTime.UtcNow;
                             }
 
                         }
@@ -166,7 +166,7 @@ namespace WakaTime {
 
         public static bool enoughTimePassed()
         {
-            if (Main.lastHeartbeat == null || Main.lastHeartbeat < DateTime.UtcNow.AddMinutes(-1))
+            if (WakaTimePackage.lastHeartbeat == null || WakaTimePackage.lastHeartbeat < DateTime.UtcNow.AddMinutes(-1))
             {
                 return true;
             }

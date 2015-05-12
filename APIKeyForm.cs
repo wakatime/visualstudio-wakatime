@@ -41,7 +41,7 @@ namespace WakaTime
                 if (string.IsNullOrWhiteSpace(apiKey) == false)
                 {
                     Config.setApiKey(apiKey);
-                    Main.apiKey = apiKey;
+                    WakaTimePackage.apiKey = apiKey;
                 }
                 else
                 {
