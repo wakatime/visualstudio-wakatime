@@ -22,7 +22,7 @@ namespace WakaTime {
     {
 
         #region " Fields "
-        public const string VERSION = "4.0.1";
+        public const string VERSION = "4.0.2";
         public static string PLUGIN_NAME = "visualstudio-wakatime";
         public static string EDITOR_NAME = "visualstudio";
         public static string EDITOR_VERSION = "";
