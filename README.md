@@ -3,6 +3,13 @@ visualstudio-wakatime
 
 WakaTime is a productivity & time tracking tool for programmers. Once the WakaTime plugin is installed, you get a dashboard with reports about your programming by time, language, project, and branch.
 
+Pre-requisites
+------------
+
+1. Visual Studio 2013
+
+2. Visual Studio 2013 SDK installed - https://www.microsoft.com/en-us/download/details.aspx?id=40758
+
 
 Installation
 ------------
