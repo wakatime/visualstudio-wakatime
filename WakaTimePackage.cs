@@ -1,162 +1,166 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using System.Threading;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Shell;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Process = System.Diagnostics.Process;
+using Thread = System.Threading.Thread;
 
-namespace WakaTime {
-
+namespace WakaTime
+{
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid(GuidList.guidWakaTimePkgString)]
+    [Guid(GuidList.GuidWakaTimePkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
-
     public sealed class WakaTimePackage : Package
     {
+        #region Fields
+        public const string Version = "4.0.2";
+        public static string PluginName = "visualstudio-wakatime";
+        public static string EditorName = "visualstudio";
+        public static string EditorVersion = "";
+        public static string CurrentPythonVersion = "3.4.3";
 
-        #region " Fields "
-        public const string VERSION = "4.0.2";
-        public static string PLUGIN_NAME = "visualstudio-wakatime";
-        public static string EDITOR_NAME = "visualstudio";
-        public static string EDITOR_VERSION = "";
-        public static string CURRENT_PYTHON_VERSION = "3.4.3";
-        
-        private const int heartbeatInterval = 2; // minutes
-        private static EnvDTE.DTE _objDTE = null;
+        private const int HeartbeatInterval = 2; // minutes
+        private static DTE _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
-        public static string apiKey = null;
-        public static string lastFile = null;
-        public static DateTime lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        public static Object threadLock = new Object();
-        static bool is64BitProcess = (IntPtr.Size == 8);
-        static bool is64BitOperatingSystem = is64BitProcess || InternalCheckIsWow64();
-
+        public static string ApiKey;
+        public static string LastFile;
+        public static DateTime LastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
+        public static Object ThreadLock = new Object();
+        static readonly bool Is64BitProcess = (IntPtr.Size == 8);
+        static readonly bool Is64BitOperatingSystem = Is64BitProcess || InternalCheckIsWow64();
         #endregion
 
-        #region " StartUp/CleanUp "
-
-        public WakaTimePackage()
+        #region StartUp/CleanUp
+        protected override void Initialize()
         {
-        }
-
-        protected override void Initialize() {
-            IVsActivityLog log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
-            Logger.Instance.initialize(log);
-            try {
+            var log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
+            Logger.Instance.Initialize(log);
+            try
+            {
                 base.Initialize();
 
-                _objDTE = (DTE)GetService(typeof(DTE));
-                _docEvents = _objDTE.Events.DocumentEvents;
-                _windowEvents = _objDTE.Events.WindowEvents;
-                EDITOR_VERSION = _objDTE.Version;
+                _objDte = (DTE)GetService(typeof(DTE));
+                _docEvents = _objDte.Events.DocumentEvents;
+                _windowEvents = _objDte.Events.WindowEvents;
+                EditorVersion = _objDte.Version;
 
                 // Make sure python is installed
-                if (!isPythonInstalled())
+                if (!IsPythonInstalled())
                 {
-                    string url = getPythonDownloadUrl();
-                    Downloader.downloadPython(url, getConfigDir());
+                    var url = GetPythonDownloadUrl();
+                    Downloader.DownloadPython(url, GetConfigDir());
                 }
 
-                if (!doesCLIExist())
+                if (!DoesCliExist())
                 {
-                    string url = "https://github.com/wakatime/wakatime/archive/master.zip";
-                    Downloader.downloadCLI(url, getConfigDir());
+                    const string url = "https://github.com/wakatime/wakatime/archive/master.zip";
+                    Downloader.DownloadCli(url, GetConfigDir());
                 }
 
-                apiKey = Config.getApiKey();
+                ApiKey = Config.GetApiKey();
 
-                if (string.IsNullOrWhiteSpace(apiKey))
-                {
-                    promptApiKey();
-                }
+                if (string.IsNullOrWhiteSpace(ApiKey))                
+                    PromptApiKey();                
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
-                OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-                if (null != mcs) {
+                var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+                if (null != mcs)
+                {
                     // Create the command for the menu item.
-                    CommandID menuCommandID = new CommandID(GuidList.guidWakaTimeCmdSet, (int)PkgCmdIDList.cmdidUpdateApiKey);
-                    MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                    var menuCommandId = new CommandID(GuidList.GuidWakaTimeCmdSet, (int)PkgCmdIdList.CmdidUpdateApiKey);
+                    var menuItem = new MenuCommand(MenuItemCallback, menuCommandId);
                     mcs.AddCommand(menuItem);
                 }
-                
+
                 // setup event handlers
-                _docEvents.DocumentOpened += new _dispDocumentEvents_DocumentOpenedEventHandler(DocumentEvents_DocumentOpened);
-                _docEvents.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(DocumentEvents_DocumentSaved);
-                _windowEvents.WindowActivated += new _dispWindowEvents_WindowActivatedEventHandler(Window_Activated);
+                _docEvents.DocumentOpened += DocumentEvents_DocumentOpened;
+                _docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
+                _windowEvents.WindowActivated += Window_Activated;
 
-            } catch(Exception ex) {
-                Logger.Instance.error(ex.Message);
             }
-        }
-        #endregion
-
-        #region " Event Handlers "
-        public void Window_Activated(Window gotFocus, Window lostFocus) {
-            try {
-                Document document = _objDTE.ActiveWindow.Document;
-                if (document != null) {
-                    handleActivity(document.FullName, false);
-                }
-            } catch(Exception ex) {
-                Logger.Instance.error("Window_Activated : " + ex.Message);
-            }
-        }
-
-        public void DocumentEvents_DocumentOpened(EnvDTE.Document document) {
-            try {
-                handleActivity(document.FullName, false);
-            } catch (Exception ex) {
-                Logger.Instance.error("DocumentEvents_DocumentOpened : " + ex.Message);
-            }
-        }
-
-        public void DocumentEvents_DocumentSaved(EnvDTE.Document document) {
-            try {
-                handleActivity(document.FullName, true);
-            } catch(Exception ex) {
-                Logger.Instance.error("DocumentEvents_DocumentSaved : " + ex.Message);
-            }
-        }
-        #endregion
-
-        #region " Methods "
-
-        public static string getPythonDownloadUrl()
-        {
-            string url = "https://www.python.org/ftp/python/" + CURRENT_PYTHON_VERSION + "/python-" + CURRENT_PYTHON_VERSION;
-            if (is64BitOperatingSystem)
+            catch (Exception ex)
             {
-                url = url + ".amd64";
+                Logger.Instance.Error(ex.Message);
             }
+        }
+        #endregion
+
+        #region Event Handlers
+        public void Window_Activated(Window gotFocus, Window lostFocus)
+        {
+            try
+            {
+                var document = _objDte.ActiveWindow.Document;
+                if (document != null)                
+                    HandleActivity(document.FullName, false);                
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("Window_Activated : " + ex.Message);
+            }
+        }
+
+        public void DocumentEvents_DocumentOpened(Document document)
+        {
+            try
+            {
+                HandleActivity(document.FullName, false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("DocumentEvents_DocumentOpened : " + ex.Message);
+            }
+        }
+
+        public void DocumentEvents_DocumentSaved(Document document)
+        {
+            try
+            {
+                HandleActivity(document.FullName, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("DocumentEvents_DocumentSaved : " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Methods
+        public static string GetPythonDownloadUrl()
+        {
+            var url = "https://www.python.org/ftp/python/" + CurrentPythonVersion + "/python-" + CurrentPythonVersion;
+
+            if (Is64BitOperatingSystem)            
+                url = url + ".amd64";
+            
             url = url + ".msi";
+
             return url;
         }
 
-        public static void handleActivity(string currentFile, bool isWrite)
+        public static void HandleActivity(string currentFile, bool isWrite)
         {
             if (currentFile != null)
             {
-                System.Threading.Thread thread = new System.Threading.Thread(
+                var thread = new Thread(
                     delegate()
                     {
-                        lock (WakaTimePackage.threadLock)
+                        lock (ThreadLock)
                         {
-
-                            if (isWrite || WakaTimePackage.lastFile == null || WakaTimePackage.enoughTimePassed() || !currentFile.Equals(WakaTimePackage.lastFile))
+                            if (isWrite || LastFile == null || EnoughTimePassed() || !currentFile.Equals(LastFile))
                             {
-                                sendHeartbeat(currentFile, isWrite);
-                                WakaTimePackage.lastFile = currentFile;
-                                WakaTimePackage.lastHeartbeat = DateTime.UtcNow;
+                                SendHeartbeat(currentFile, isWrite);
+                                LastFile = currentFile;
+                                LastHeartbeat = DateTime.UtcNow;
                             }
-
                         }
                     }
                 );
@@ -164,16 +168,13 @@ namespace WakaTime {
             }
         }
 
-        public static bool enoughTimePassed()
+        public static bool EnoughTimePassed()
         {
-            if (WakaTimePackage.lastHeartbeat == null || WakaTimePackage.lastHeartbeat < DateTime.UtcNow.AddMinutes(-1))
-            {
-                return true;
-            }
-            return false;
+            return LastHeartbeat == null || LastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
         }
 
-        public static string getPython() {
+        public static string GetPython()
+        {
             string[] locations = {
                 "pythonw",
                 "python",
@@ -218,119 +219,123 @@ namespace WakaTime {
                 "\\python27\\python",
                 "\\python26\\python",
             };
-            foreach (string location in locations) {
-                try {
-                    ProcessStartInfo procInfo = new ProcessStartInfo();
-                    procInfo.UseShellExecute = false;
-                    procInfo.RedirectStandardError = true;
-                    procInfo.FileName = location;
-                    procInfo.CreateNoWindow = true;
-                    procInfo.Arguments = "--version";
-                    var proc = System.Diagnostics.Process.Start(procInfo);
-                    string errors = proc.StandardError.ReadToEnd();
-                    if (errors == null || errors == "") {
+
+            foreach (var location in locations)
+            {
+                try
+                {
+                    var procInfo = new ProcessStartInfo
+                    {
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        FileName = location,
+                        CreateNoWindow = true,
+                        Arguments = "--version"
+                    };
+                    var proc = Process.Start(procInfo);
+                    var errors = proc.StandardError.ReadToEnd();
+                    if (string.IsNullOrEmpty(errors))                    
                         return location;
-                    }
-                } catch { }
+                }
+                catch { /* ignored */ }
             }
             return null;
         }
 
-        public static string getConfigDir()
+        public static string GetConfigDir()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
 
-        public static string getCLI()
+        public static string GetCli()
         {
-            return getConfigDir() + "\\wakatime-master\\wakatime\\cli.py";
+            return GetConfigDir() + "\\wakatime-master\\wakatime\\cli.py";
         }
 
-        public static void sendHeartbeat(string fileName, bool isWrite)
+        public static void SendHeartbeat(string fileName, bool isWrite)
         {
-            string arguments = "\"" + getCLI() + "\" --key=\"" + apiKey + "\""
+            var arguments = "\"" + GetCli() + "\" --key=\"" + ApiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=\"" + EDITOR_NAME + "/" + EDITOR_VERSION + " " + PLUGIN_NAME + "/" + VERSION + "\"";
-            
+                                + " --plugin=\"" + EditorName + "/" + EditorVersion + " " + PluginName + "/" + Version + "\"";
+
             if (isWrite)
                 arguments = arguments + " --write";
 
-            string projectName = getProjectName();
+            var projectName = GetProjectName();
             if (!string.IsNullOrWhiteSpace(projectName))
                 arguments = arguments + " --project=\"" + projectName + "\"";
 
-            ProcessStartInfo procInfo = new ProcessStartInfo();
-            procInfo.UseShellExecute = false;
-            procInfo.FileName = getPython();
-            procInfo.CreateNoWindow = true;
-            procInfo.Arguments = arguments;
+            var procInfo = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                FileName = GetPython(),
+                CreateNoWindow = true,
+                Arguments = arguments
+            };
 
-            try {
-                var proc = System.Diagnostics.Process.Start(procInfo);
-            } catch (InvalidOperationException ex) {
-                Logger.Instance.error("Could not send heartbeat : " + getPython() + " " + arguments);
-                Logger.Instance.error("Could not send heartbeat : " + ex.Message);
-            } catch (Exception ex) {
-                Logger.Instance.error("Could not send heartbeat : " + getPython() + " " + arguments);
-                Logger.Instance.error("Could not send heartbeat : " + ex.Message);
+            try
+            {
+                Process.Start(procInfo);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.Instance.Error("Could not send heartbeat : " + GetPython() + " " + arguments);
+                Logger.Instance.Error("Could not send heartbeat : " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("Could not send heartbeat : " + GetPython() + " " + arguments);
+                Logger.Instance.Error("Could not send heartbeat : " + ex.Message);
             }
         }
 
-        public static bool InternalCheckIsWow64() {
-            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major >= 6) {
-                using (System.Diagnostics.Process p = System.Diagnostics.Process.GetCurrentProcess())
+        public static bool InternalCheckIsWow64()
+        {
+            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major >= 6)
+            {
+                using (var p = Process.GetCurrentProcess())
                 {
                     bool retVal;
-                    if (!NativeMethods.IsWow64Process(p.Handle, out retVal)) {
-                        return false;
-                    }
-                    return retVal;
+                    return NativeMethods.IsWow64Process(p.Handle, out retVal) && retVal;
                 }
-            } else {
-                return false;
             }
-        }
 
-        private static bool doesCLIExist()
-        {
-            if (File.Exists(getCLI())) {
-                return true;
-            }
             return false;
         }
 
-        private static bool isPythonInstalled()
+        private static bool DoesCliExist()
         {
-            if (getPython() != null) {
-                return true;
-            }
-            return false;
+            return File.Exists(GetCli());
         }
 
-        private void MenuItemCallback(object sender, EventArgs e) {
-            try {
-                promptApiKey();
-            } catch(Exception ex) {
-                Logger.Instance.error("MenuItemCallback : " + ex.Message);
-            }
-        }
-
-        private DialogResult promptApiKey()
+        private static bool IsPythonInstalled()
         {
-            ApiKeyForm form = new ApiKeyForm();
-            DialogResult result = form.ShowDialog();
-            return result;
+            return GetPython() != null;
         }
 
-        private static string getProjectName() {
-            string projectName = _objDTE.Solution != null && !string.IsNullOrWhiteSpace(_objDTE.Solution.FullName) ? _objDTE.Solution.FullName : null;
-            if (!string.IsNullOrWhiteSpace(projectName)) {
-                return Path.GetFileNameWithoutExtension(projectName);
+        private void MenuItemCallback(object sender, EventArgs e)
+        {
+            try
+            {
+                PromptApiKey();
             }
-            return null;
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("MenuItemCallback : " + ex.Message);
+            }
         }
 
+        private static void PromptApiKey()
+        {
+            var form = new ApiKeyForm();
+            form.ShowDialog();            
+        }
+
+        private static string GetProjectName()
+        {
+            var projectName = _objDte.Solution != null && !string.IsNullOrWhiteSpace(_objDte.Solution.FullName) ? _objDte.Solution.FullName : null;
+            return !string.IsNullOrWhiteSpace(projectName) ? Path.GetFileNameWithoutExtension(projectName) : null;
+        }
         #endregion
-
     }
 }

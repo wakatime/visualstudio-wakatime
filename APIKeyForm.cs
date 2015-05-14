@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WakaTime
@@ -21,11 +14,9 @@ namespace WakaTime
         {
             try
             {
-                string apiKey = Config.getApiKey();
-                if (string.IsNullOrWhiteSpace(apiKey) == false)
-                {
-                    txtAPIKey.Text = apiKey;
-                }
+                var apiKey = Config.GetApiKey();
+                if (!string.IsNullOrWhiteSpace(apiKey))                
+                    txtAPIKey.Text = apiKey;                
             }
             catch (Exception ex)
             {
@@ -37,16 +28,17 @@ namespace WakaTime
         {
             try
             {
-                string apiKey = txtAPIKey.Text.Trim();
-                if (string.IsNullOrWhiteSpace(apiKey) == false)
+                Guid apiKey;
+                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out apiKey);                              
+                if (parse)
                 {
-                    Config.setApiKey(apiKey);
-                    WakaTimePackage.apiKey = apiKey;
+                    Config.SetApiKey(apiKey.ToString());
+                    WakaTimePackage.ApiKey = apiKey.ToString();
                 }
                 else
                 {
                     MessageBox.Show("Please enter valid Api Key.");
-                    this.DialogResult = DialogResult.None; // do not close dialog box
+                    DialogResult = DialogResult.None; // do not close dialog box
                 }
             }
             catch (Exception ex)
