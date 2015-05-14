@@ -19,7 +19,7 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        public const string Version = "4.0.2";
+        public const string Version = "4.0.3";
         public static string PluginName = "visualstudio-wakatime";
         public static string EditorName = "visualstudio";
         public static string EditorVersion = "";
@@ -285,7 +285,7 @@ namespace WakaTime
             {
                 Logger.Instance.Error("Could not send heartbeat : " + GetPython() + " " + arguments);
                 Logger.Instance.Error("Could not send heartbeat : " + ex.Message);
-            }
+            }            
         }
 
         public static bool InternalCheckIsWow64()
