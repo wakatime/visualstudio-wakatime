@@ -34,6 +34,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ApiKeyForm));
             this.lblAPIKey = new System.Windows.Forms.Label();
             this.txtAPIKey = new System.Windows.Forms.TextBox();
             this.btnOk = new System.Windows.Forms.Button();
@@ -43,25 +44,25 @@
             // lblAPIKey
             // 
             this.lblAPIKey.AutoSize = true;
-            this.lblAPIKey.Location = new System.Drawing.Point(12, 63);
+            this.lblAPIKey.Location = new System.Drawing.Point(13, 16);
             this.lblAPIKey.Name = "lblAPIKey";
-            this.lblAPIKey.Size = new System.Drawing.Size(45, 13);
+            this.lblAPIKey.Size = new System.Drawing.Size(53, 15);
             this.lblAPIKey.TabIndex = 0;
-            this.lblAPIKey.Text = "API Key";
+            this.lblAPIKey.Text = "API Key :";
             // 
             // txtAPIKey
             // 
-            this.txtAPIKey.Location = new System.Drawing.Point(64, 60);
+            this.txtAPIKey.Location = new System.Drawing.Point(74, 12);
             this.txtAPIKey.Name = "txtAPIKey";
-            this.txtAPIKey.Size = new System.Drawing.Size(262, 20);
+            this.txtAPIKey.Size = new System.Drawing.Size(305, 23);
             this.txtAPIKey.TabIndex = 1;
             // 
             // btnOk
             // 
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(172, 147);
+            this.btnOk.Location = new System.Drawing.Point(199, 52);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(75, 23);
+            this.btnOk.Size = new System.Drawing.Size(87, 27);
             this.btnOk.TabIndex = 2;
             this.btnOk.Text = "Ok";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -70,23 +71,27 @@
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(253, 147);
+            this.btnCancel.Location = new System.Drawing.Point(293, 52);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.Size = new System.Drawing.Size(87, 27);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // APIKeyForm
+            // ApiKeyForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(338, 182);
+            this.ClientSize = new System.Drawing.Size(391, 91);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.txtAPIKey);
             this.Controls.Add(this.lblAPIKey);
-            this.Name = "APIKeyForm";
+            this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "ApiKeyForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "WakaTime";
             this.Load += new System.EventHandler(this.ApiKeyForm_Load);

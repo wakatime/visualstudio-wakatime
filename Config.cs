@@ -1,42 +1,33 @@
 ﻿using System;
 using System.Text;
-using System.Runtime.InteropServices;
 
 namespace WakaTime
 {
     class Config
     {
-        public static string getApiKey()
+        public static string GetApiKey()
         {
-            StringBuilder keyValue = new StringBuilder(255);
-            string configFilepath = getConfigFilePath();
-            if (string.IsNullOrWhiteSpace(configFilepath) == false)
-            {
-                if (NativeMethods.GetPrivateProfileString("settings", "api_key", "", keyValue, 255, configFilepath) > 0)
-                {
-                    return keyValue.ToString();
-                }
-            }
+            var keyValue = new StringBuilder(255);
+            var configFilepath = GetConfigFilePath();
+            if (!string.IsNullOrWhiteSpace(configFilepath) &&
+                NativeMethods.GetPrivateProfileString("settings", "api_key", "", keyValue, 255, configFilepath) > 0)
+                return keyValue.ToString();
 
             return null;
         }
 
-        public static void setApiKey(string apiKey)
+        public static void SetApiKey(string apiKey)
         {
-            string configFilepath = getConfigFilePath();
-            if (string.IsNullOrWhiteSpace(apiKey) == false)
-            {
-                NativeMethods.WritePrivateProfileString("settings", "api_key", apiKey, configFilepath);
-            }
+            var configFilepath = GetConfigFilePath();
+            if (string.IsNullOrWhiteSpace(apiKey) == false)            
+                NativeMethods.WritePrivateProfileString("settings", "api_key", apiKey, configFilepath);            
         }
 
-        public static string getConfigFilePath()
+        public static string GetConfigFilePath()
         {
-            string userHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (string.IsNullOrWhiteSpace(userHomeDir) == false)
-            {
-                return userHomeDir + "\\.wakatime.cfg";
-            }
+            var userHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (string.IsNullOrWhiteSpace(userHomeDir) == false)            
+                return userHomeDir + "\\.wakatime.cfg";            
 
             return null;
         }
