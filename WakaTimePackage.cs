@@ -20,19 +20,20 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        public static string Version = string.Empty;
-        public static string PluginName = "visualstudio-wakatime";
-        public static string EditorName = "visualstudio";
-        public static string EditorVersion = string.Empty;
-        public static string CurrentPythonVersion = "3.4.3";
-        
-        static DTE _objDte;
-        DocumentEvents _docEvents;
-        WindowEvents _windowEvents;
+        private static string _version = string.Empty;
+        private const string PluginName = "visualstudio-wakatime";
+        private const string EditorName = "visualstudio";
+        private static string _editorVersion = string.Empty;
+        private const string CurrentPythonVersion = "3.4.3";
+
+        private static DTE _objDte;
+        private DocumentEvents _docEvents;
+        private WindowEvents _windowEvents;
+
         public static string ApiKey;
-        public static string LastFile;
-        public static DateTime LastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        public static object ThreadLock = new object();
+        private static string _lastFile;
+        DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
+        private static readonly object ThreadLock = new object();
         static readonly bool Is64BitProcess = (IntPtr.Size == 8);
         static readonly bool Is64BitOperatingSystem = Is64BitProcess || InternalCheckIsWow64();
         #endregion
@@ -49,8 +50,8 @@ namespace WakaTime
                 _objDte = (DTE)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
-                Version = CoreAssembly.Version.ToString();
-                EditorVersion = _objDte.Version;                
+                _version = CoreAssembly.Version.ToString();
+                _editorVersion = _objDte.Version;                
 
                 // Make sure python is installed
                 if (!IsPythonInstalled())
@@ -134,7 +135,8 @@ namespace WakaTime
         #endregion
 
         #region Methods
-        public static string GetPythonDownloadUrl()
+
+        private static string GetPythonDownloadUrl()
         {
             var url = "https://www.python.org/ftp/python/" + CurrentPythonVersion + "/python-" + CurrentPythonVersion;
 
@@ -146,31 +148,29 @@ namespace WakaTime
             return url;
         }
 
-        public static void HandleActivity(string currentFile, bool isWrite)
+        private void HandleActivity(string currentFile, bool isWrite)
         {
-            if (currentFile != null)
-            {
-                var thread = new Thread(
-                    delegate()
+            if (currentFile == null) return;
+
+            var thread = new Thread(
+                delegate()
+                {
+                    lock (ThreadLock)
                     {
-                        lock (ThreadLock)
-                        {
-                            if (isWrite || LastFile == null || EnoughTimePassed() || !currentFile.Equals(LastFile))
-                            {
-                                SendHeartbeat(currentFile, isWrite);
-                                LastFile = currentFile;
-                                LastHeartbeat = DateTime.UtcNow;
-                            }
-                        }
+                        if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
+                            return;
+
+                        SendHeartbeat(currentFile, isWrite);
+                        _lastFile = currentFile;
+                        _lastHeartbeat = DateTime.UtcNow;
                     }
-                );
-                thread.Start();
-            }
+                });
+            thread.Start();
         }
 
-        public static bool EnoughTimePassed()
+        private bool EnoughTimePassed()
         {
-            return LastHeartbeat == null || LastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
+            return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
         }
 
         public static string GetPython()
@@ -256,7 +256,7 @@ namespace WakaTime
         {
             var arguments = "\"" + GetCli() + "\" --key=\"" + ApiKey + "\""
                                 + " --file=\"" + fileName + "\""
-                                + " --plugin=\"" + EditorName + "/" + EditorVersion + " " + PluginName + "/" + Version + "\"";
+                                + " --plugin=\"" + EditorName + "/" + _editorVersion + " " + PluginName + "/" + _version + "\"";
 
             if (isWrite)
                 arguments = arguments + " --write";
@@ -291,17 +291,14 @@ namespace WakaTime
 
         public static bool InternalCheckIsWow64()
         {
-            if ((Environment.OSVersion.Version.Major == 5 && Environment.OSVersion.Version.Minor >= 1) || Environment.OSVersion.Version.Major >= 6)
-            {
-                using (var p = Process.GetCurrentProcess())
-                {
-                    bool retVal;
-                    return NativeMethods.IsWow64Process(p.Handle, out retVal) && retVal;
-                }
-            }
+            if ((Environment.OSVersion.Version.Major != 5 || Environment.OSVersion.Version.Minor < 1) &&
+                Environment.OSVersion.Version.Major < 6) return false;
 
-            const bool a = false;
-            return a;
+            using (var p = Process.GetCurrentProcess())
+            {
+                bool retVal;
+                return NativeMethods.IsWow64Process(p.Handle, out retVal) && retVal;
+            }
         }
 
         private static bool DoesCliExist()
@@ -314,7 +311,7 @@ namespace WakaTime
             return GetPython() != null;
         }
 
-        private void MenuItemCallback(object sender, EventArgs e)
+        private static void MenuItemCallback(object sender, EventArgs e)
         {
             try
             {
