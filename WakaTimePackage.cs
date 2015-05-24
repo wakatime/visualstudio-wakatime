@@ -2,6 +2,7 @@
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
@@ -19,20 +20,19 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        public const string Version = "4.0.3";
+        public static string Version = string.Empty;
         public static string PluginName = "visualstudio-wakatime";
         public static string EditorName = "visualstudio";
-        public static string EditorVersion = "";
+        public static string EditorVersion = string.Empty;
         public static string CurrentPythonVersion = "3.4.3";
-
-        private const int HeartbeatInterval = 2; // minutes
-        private static DTE _objDte;
-        private DocumentEvents _docEvents;
-        private WindowEvents _windowEvents;
+        
+        static DTE _objDte;
+        DocumentEvents _docEvents;
+        WindowEvents _windowEvents;
         public static string ApiKey;
         public static string LastFile;
         public static DateTime LastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        public static Object ThreadLock = new Object();
+        public static object ThreadLock = new object();
         static readonly bool Is64BitProcess = (IntPtr.Size == 8);
         static readonly bool Is64BitOperatingSystem = Is64BitProcess || InternalCheckIsWow64();
         #endregion
@@ -49,7 +49,8 @@ namespace WakaTime
                 _objDte = (DTE)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
-                EditorVersion = _objDte.Version;
+                Version = CoreAssembly.Version.ToString();
+                EditorVersion = _objDte.Version;                
 
                 // Make sure python is installed
                 if (!IsPythonInstalled())
@@ -299,7 +300,8 @@ namespace WakaTime
                 }
             }
 
-            return false;
+            const bool a = false;
+            return a;
         }
 
         private static bool DoesCliExist()
@@ -334,6 +336,12 @@ namespace WakaTime
         {
             var projectName = _objDte.Solution != null && !string.IsNullOrWhiteSpace(_objDte.Solution.FullName) ? _objDte.Solution.FullName : null;
             return !string.IsNullOrWhiteSpace(projectName) ? Path.GetFileNameWithoutExtension(projectName) : null;
+        }
+
+        static class CoreAssembly
+        {
+            static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
+            public static readonly Version Version = Reference.GetName().Version;
         }
         #endregion
     }
