@@ -33,3 +33,4 @@ obj/
 .DS_Store
 *.pdb
 *.pdb
+*.nlp
