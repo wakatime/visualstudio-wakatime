@@ -14,9 +14,8 @@ namespace WakaTime
         {
             try
             {
-                var apiKey = Config.GetApiKey();
-                if (!string.IsNullOrWhiteSpace(apiKey))                
-                    txtAPIKey.Text = apiKey;                
+                txtAPIKey.Text = Config.GetApiKey().Trim();
+                txtProxy.Text = Config.GetProxy().Trim();
             }
             catch (Exception ex)
             {
@@ -33,6 +32,7 @@ namespace WakaTime
                 if (parse)
                 {
                     Config.SetApiKey(apiKey.ToString());
+                    Config.SetProxy(string.IsNullOrEmpty(txtProxy.Text.Trim()) ? null : txtProxy.Text);
                     WakaTimePackage.ApiKey = apiKey.ToString();
                 }
                 else

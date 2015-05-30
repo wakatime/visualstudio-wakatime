@@ -39,6 +39,8 @@
             this.txtAPIKey = new System.Windows.Forms.TextBox();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.txtProxy = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblAPIKey
@@ -53,14 +55,16 @@
             // txtAPIKey
             // 
             this.txtAPIKey.Location = new System.Drawing.Point(74, 12);
+            this.txtAPIKey.MaxLength = 255;
             this.txtAPIKey.Name = "txtAPIKey";
             this.txtAPIKey.Size = new System.Drawing.Size(305, 23);
             this.txtAPIKey.TabIndex = 1;
             // 
             // btnOk
             // 
+            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(199, 52);
+            this.btnOk.Location = new System.Drawing.Point(199, 76);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(87, 27);
             this.btnOk.TabIndex = 2;
@@ -70,19 +74,39 @@
             // 
             // btnCancel
             // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(293, 52);
+            this.btnCancel.Location = new System.Drawing.Point(293, 76);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(87, 27);
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
+            // txtProxy
+            // 
+            this.txtProxy.Location = new System.Drawing.Point(73, 43);
+            this.txtProxy.MaxLength = 255;
+            this.txtProxy.Name = "txtProxy";
+            this.txtProxy.Size = new System.Drawing.Size(305, 23);
+            this.txtProxy.TabIndex = 5;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(24, 47);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(42, 15);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Proxy :";
+            // 
             // ApiKeyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(391, 91);
+            this.ClientSize = new System.Drawing.Size(391, 115);
+            this.Controls.Add(this.txtProxy);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.txtAPIKey);
@@ -101,5 +125,8 @@
         }
 
         #endregion
+
+        private System.Windows.Forms.TextBox txtProxy;
+        private System.Windows.Forms.Label label1;
     }
 }

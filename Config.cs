@@ -13,21 +13,38 @@ namespace WakaTime
                 NativeMethods.GetPrivateProfileString("settings", "api_key", "", keyValue, 255, configFilepath) > 0)
                 return keyValue.ToString();
 
-            return null;
+            return string.Empty;
         }
 
-        public static void SetApiKey(string apiKey)
+        public static void SetApiKey(string value)
         {
             var configFilepath = GetConfigFilePath();
-            if (string.IsNullOrWhiteSpace(apiKey) == false)            
-                NativeMethods.WritePrivateProfileString("settings", "api_key", apiKey, configFilepath);            
+            if (!string.IsNullOrWhiteSpace(value))
+                NativeMethods.WritePrivateProfileString("settings", "api_key", value, configFilepath);
+        }
+
+        public static string GetProxy()
+        {
+            var proxy = new StringBuilder(255);
+            var configFilepath = GetConfigFilePath();
+            if (!string.IsNullOrWhiteSpace(configFilepath) &&
+                NativeMethods.GetPrivateProfileString("settings", "proxy", "", proxy, 255, configFilepath) > 0)
+                return proxy.ToString();
+
+            return string.Empty;
+        }
+
+        public static void SetProxy(string value)
+        {
+            var configFilepath = GetConfigFilePath();
+            NativeMethods.WritePrivateProfileString("settings", "proxy", value, configFilepath);
         }
 
         public static string GetConfigFilePath()
         {
             var userHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (string.IsNullOrWhiteSpace(userHomeDir) == false)            
-                return userHomeDir + "\\.wakatime.cfg";            
+            if (string.IsNullOrWhiteSpace(userHomeDir) == false)
+                return userHomeDir + "\\.wakatime.cfg";
 
             return null;
         }
