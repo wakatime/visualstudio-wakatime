@@ -135,11 +135,17 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APIKeyForm.cs">
+    <Compile Include="ApiKeyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="APIKeyForm.Designer.cs">
-      <DependentUpon>APIKeyForm.cs</DependentUpon>
+    <Compile Include="ApiKeyForm.Designer.cs">
+      <DependentUpon>ApiKeyForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Downloader.cs" />
     <Compile Include="Logger.cs" />
@@ -158,8 +164,11 @@
     <Compile Include="PkgCmdID.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="APIKeyForm.resx">
-      <DependentUpon>APIKeyForm.cs</DependentUpon>
+    <EmbeddedResource Include="ApiKeyForm.resx">
+      <DependentUpon>ApiKeyForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

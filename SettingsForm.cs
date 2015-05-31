@@ -3,18 +3,19 @@ using System.Windows.Forms;
 
 namespace WakaTime
 {
-    public partial class ApiKeyForm : Form
+    public partial class SettingsForm : Form
     {
-        public ApiKeyForm()
+        public SettingsForm()
         {
             InitializeComponent();
         }
 
-        private void ApiKeyForm_Load(object sender, EventArgs e)
+        private void SettingsForm_Load(object sender, EventArgs e)
         {
             try
             {
                 txtAPIKey.Text = Config.GetApiKey().Trim();
+                txtProxy.Text = Config.GetProxy().Trim();
             }
             catch (Exception ex)
             {
@@ -31,6 +32,7 @@ namespace WakaTime
                 if (parse)
                 {
                     Config.SetApiKey(apiKey.ToString());
+                    Config.SetProxy(string.IsNullOrEmpty(txtProxy.Text.Trim()) ? null : txtProxy.Text);
                     WakaTimePackage.ApiKey = apiKey.ToString();
                 }
                 else
@@ -44,6 +46,5 @@ namespace WakaTime
                 MessageBox.Show(ex.Message);
             }
         }
-
     }
 }

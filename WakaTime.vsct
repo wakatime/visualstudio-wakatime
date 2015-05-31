@@ -66,8 +66,8 @@
         <Parent guid="guidWakaTimeCmdSet" id="SubMenuGroup" />
         <Icon guid="guidImages" id="bmpWakatime" />
         <Strings>
-          <CommandName>cmdidUpdateApiKey</CommandName>
-          <ButtonText>API Key</ButtonText>
+          <CommandName>UpdateWakaTimeSettings</CommandName>
+          <ButtonText>Settings</ButtonText>
         </Strings>
       </Button>
     </Buttons>

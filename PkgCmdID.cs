@@ -5,6 +5,6 @@ namespace WakaTime
 {
     static class PkgCmdIdList
     {
-        public const uint CmdidUpdateApiKey = 0x100;
+        public const uint UpdateWakaTimeSettings = 0x100;
     };
 }

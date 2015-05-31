@@ -87,7 +87,7 @@ namespace WakaTime
                 if (null != mcs)
                 {
                     // Create the command for the menu item.
-                    var menuCommandId = new CommandID(GuidList.GuidWakaTimeCmdSet, (int)PkgCmdIdList.CmdidUpdateApiKey);
+                    var menuCommandId = new CommandID(GuidList.GuidWakaTimeCmdSet, (int)PkgCmdIdList.UpdateWakaTimeSettings);
                     var menuItem = new MenuCommand(MenuItemCallback, menuCommandId);
                     mcs.AddCommand(menuItem);
                 }
@@ -328,7 +328,7 @@ namespace WakaTime
         {
             try
             {
-                PromptApiKey();
+                SettingsPopup();
             }
             catch (Exception ex)
             {
@@ -339,7 +339,13 @@ namespace WakaTime
         private static void PromptApiKey()
         {
             var form = new ApiKeyForm();
-            form.ShowDialog();            
+            form.ShowDialog();
+        }
+
+        private static void SettingsPopup()
+        {
+            var form = new SettingsForm();
+            form.ShowDialog();
         }
 
         private static string GetProjectName()
