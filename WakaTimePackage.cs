@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -20,10 +22,13 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
+        private const string CurrentWakaTimeCLIVersion = "4.0.13"; // https://github.com/wakatime/wakatime/blob/master/HISTORY.rst
+        private const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
         private static string _version = string.Empty;
         private const string PluginName = "visualstudio-wakatime";
         private const string EditorName = "visualstudio";
         private static string _editorVersion = string.Empty;
+        private static string _pythonBinaryLocation = null;
         private const string CurrentPythonVersion = "3.4.3";
 
         private static DTE _objDte;
@@ -32,6 +37,7 @@ namespace WakaTime
 
         public static string ApiKey;
         private static string _lastFile;
+        private static string _configDir = null;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
         private static readonly object ThreadLock = new object();
         static readonly bool Is64BitProcess = (IntPtr.Size == 8);
@@ -50,7 +56,7 @@ namespace WakaTime
                 _objDte = (DTE)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
-                _version = CoreAssembly.Version.ToString();
+                _version = CoreAssembly.Version.Major.ToString() + '.' + CoreAssembly.Version.Minor.ToString() + '.' + CoreAssembly.Version.Build.ToString();
                 _editorVersion = _objDte.Version;                
 
                 // Make sure python is installed
@@ -60,10 +66,15 @@ namespace WakaTime
                     Downloader.DownloadPython(url, GetConfigDir());
                 }
 
-                if (!DoesCliExist())
+                if (!DoesCliExist() || !IsCliLatestVersion())
                 {
-                    const string url = "https://github.com/wakatime/wakatime/archive/master.zip";
-                    Downloader.DownloadCli(url, GetConfigDir());
+                    try
+                    {
+                        Directory.Delete(GetConfigDir() + "\\wakatime-master", true);
+                    }
+                    catch { /* ignored */ }
+
+                    Downloader.DownloadCli(CliUrl, GetConfigDir());
                 }
 
                 ApiKey = Config.GetApiKey();
@@ -175,6 +186,9 @@ namespace WakaTime
 
         public static string GetPython()
         {
+            if (_pythonBinaryLocation != null)
+                return _pythonBinaryLocation;
+
             string[] locations = {
                 "pythonw",
                 "python",
@@ -219,32 +233,30 @@ namespace WakaTime
                 "\\python27\\python",
                 "\\python26\\python",
             };
-
-            foreach (var location in locations)
+            foreach (string location in locations)
             {
-                try
+                RunProcess process = new RunProcess(location, "--version");
+
+                process.Run();
+
+                if (process.OK())
                 {
-                    var procInfo = new ProcessStartInfo
+                    if (process.Output().StartsWith("Python "))
                     {
-                        UseShellExecute = false,
-                        RedirectStandardError = true,
-                        FileName = location,
-                        CreateNoWindow = true,
-                        Arguments = "--version"
-                    };
-                    var proc = Process.Start(procInfo);
-                    var errors = proc.StandardError.ReadToEnd();
-                    if (string.IsNullOrEmpty(errors))                    
+                        _pythonBinaryLocation = location;
                         return location;
+                    }
                 }
-                catch { /* ignored */ }
             }
             return null;
         }
 
         public static string GetConfigDir()
         {
-            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (_configDir != null)
+                return _configDir;
+            _configDir = Application.UserAppDataPath;
+            return _configDir;
         }
 
         public static string GetCli()
@@ -254,39 +266,28 @@ namespace WakaTime
 
         public static void SendHeartbeat(string fileName, bool isWrite)
         {
-            var arguments = "\"" + GetCli() + "\" --key=\"" + ApiKey + "\""
-                                + " --file=\"" + fileName + "\""
-                                + " --plugin=\"" + EditorName + "/" + _editorVersion + " " + PluginName + "/" + _version + "\"";
+            List<String> arguments = new List<String>();
+
+            arguments.Add(GetCli());
+            arguments.Add("--key");
+            arguments.Add(ApiKey);
+            arguments.Add("--file");
+            arguments.Add(fileName);
+            arguments.Add("--plugin");
+            arguments.Add(EditorName + "/" + _editorVersion + " " + PluginName + "/" + _version);
 
             if (isWrite)
-                arguments = arguments + " --write";
+                arguments.Add("--write");
 
             var projectName = GetProjectName();
             if (!string.IsNullOrWhiteSpace(projectName))
-                arguments = arguments + " --project=\"" + projectName + "\"";
-
-            var procInfo = new ProcessStartInfo
             {
-                UseShellExecute = false,
-                FileName = GetPython(),
-                CreateNoWindow = true,
-                Arguments = arguments
-            };
-
-            try
-            {
-                Process.Start(procInfo);
+                arguments.Add("--project");
+                arguments.Add(projectName);
             }
-            catch (InvalidOperationException ex)
-            {
-                Logger.Instance.Error("Could not send heartbeat : " + GetPython() + " " + arguments);
-                Logger.Instance.Error("Could not send heartbeat : " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.Error("Could not send heartbeat : " + GetPython() + " " + arguments);
-                Logger.Instance.Error("Could not send heartbeat : " + ex.Message);
-            }            
+
+            RunProcess process = new RunProcess(GetPython(), arguments.ToArray());
+            process.RunInBackground();
         }
 
         public static bool InternalCheckIsWow64()
@@ -309,6 +310,18 @@ namespace WakaTime
         private static bool IsPythonInstalled()
         {
             return GetPython() != null;
+        }
+
+        private static bool IsCliLatestVersion()
+        {
+            RunProcess process = new RunProcess(GetPython(), GetCli(), "--version");
+            process.Run();
+            if (process.OK() && process.Error().Equals(CurrentWakaTimeCLIVersion))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)
