@@ -22,7 +22,7 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        private const string CurrentWakaTimeCLIVersion = "4.0.13"; // https://github.com/wakatime/wakatime/blob/master/HISTORY.rst
+        private const string CurrentWakaTimeCLIVersion = "4.0.14"; // https://github.com/wakatime/wakatime/blob/master/HISTORY.rst
         private const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
         private static string _version = string.Empty;
         private const string PluginName = "visualstudio-wakatime";
