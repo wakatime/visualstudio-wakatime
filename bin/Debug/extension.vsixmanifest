@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Publisher="WakaTime" Language="en-US" Version="5.0.0" />
+    <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Publisher="WakaTime" Language="en-US" Version="5.0.1" />
     <DisplayName>WakaTime</DisplayName>
     <Description xml:space="preserve">WakaTime is a productivity &amp; time tracking tool for programmers. Once the WakaTime plugin is installed, you get a dashboard with reports about your programming by time, language, project, and branch.</Description>
     <MoreInfo>https://github.com/wakatime/visualstudio-wakatime</MoreInfo>
