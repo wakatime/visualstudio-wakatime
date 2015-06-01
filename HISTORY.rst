@@ -22,6 +22,13 @@ History
 - correctly log message from py.warnings module
 
 
+5.0.1 (2015-06-01)
+++++++++++++++++++
+
+- update wakatime cli to v4.0.14
+- correctly log message from py.warnings module
+
+
 5.0.0 (2015-05-30)
 ++++++++++++++++++
 
