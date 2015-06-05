@@ -22,6 +22,12 @@ History
 - correctly log message from py.warnings module
 
 
+5.0.2 (2015-06-05)
+++++++++++++++++++
+
+- detect python binary from successful execution of python, without checking output
+
+
 5.0.1 (2015-06-01)
 ++++++++++++++++++
 
