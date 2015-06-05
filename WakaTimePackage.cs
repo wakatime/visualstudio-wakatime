@@ -241,11 +241,8 @@ namespace WakaTime
 
                 if (process.OK())
                 {
-                    if (process.Output().StartsWith("Python "))
-                    {
-                        _pythonBinaryLocation = location;
-                        return location;
-                    }
+                    _pythonBinaryLocation = location;
+                    return location;
                 }
             }
             return null;
