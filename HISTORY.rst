@@ -2,6 +2,25 @@
 History
 -------
 
+5.0.3 (2015-06-07)
+++++++++++++++++++
+
+- new way of finding Python executable (legacy mode was kept)
+- added debug option into SettingsForm
+- Added a class to hold all constant values
+
+5.0.2 (2015-06-05)
+++++++++++++++++++
+
+- detect python binary from successful execution of python, without checking output
+
+
+5.0.1 (2015-06-01)
+++++++++++++++++++
+
+- update wakatime cli to v4.0.14
+- correctly log message from py.warnings module
+
 
 5.0.0 (2015-05-30)
 ++++++++++++++++++
