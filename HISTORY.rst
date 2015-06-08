@@ -2,12 +2,12 @@
 History
 -------
 
-5.0.3 (2015-06-07)
+5.0.3 (2015-06-08)
 ++++++++++++++++++
 
-- new way of finding Python executable (legacy mode was kept)
+- look for Python binary location in Windows registry
 - added debug option into SettingsForm
-- Added a class to hold all constant values
+
 
 5.0.2 (2015-06-05)
 ++++++++++++++++++
