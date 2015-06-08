@@ -1,110 +1,92 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 
 namespace WakaTime
 {
     class RunProcess
     {
-        private string _program;
-        private string[] _arguments;
+        private readonly string _program;
+        private readonly string[] _arguments;
         private bool _captureOutput;
-        private string _stdOut;
-        private string _stdErr;
-        private Exception _exception;
 
-        public RunProcess(string program, params string[] arguments)
+        internal RunProcess(string program, params string[] arguments)
         {
-            this._program = program;
-            this._arguments = arguments;
-            this._captureOutput = true;
+            _program = program;
+            _arguments = arguments;
+            _captureOutput = true;
         }
 
-        public void RunInBackground()
+        internal void RunInBackground()
         {
-            this._captureOutput = false;
-            this.Run();
+            _captureOutput = false;
+            Run();
         }
 
-        public string Output()
+        internal string Output { get; private set; }
+
+        internal string Error { get; private set; }
+
+        internal bool Success
         {
-            return this._stdOut;
+            get { return Exception == null; }
         }
 
-        public string Error()
-        {
-            return this._stdErr;
-        }
+        internal Exception Exception { get; private set; }        
 
-        public bool OK()
-        {
-            return this._exception == null;
-        }
-
-        public Exception Exception()
-        {
-            return this._exception;
-        }
-
-        public string ExceptionMessage()
-        {
-            return this._exception.Message;
-        }
-
-        public void Run()
+        internal void Run()
         {
             try
             {
                 var procInfo = new ProcessStartInfo
                 {
                     UseShellExecute = false,
-                    RedirectStandardError = this._captureOutput,
-                    RedirectStandardOutput = this._captureOutput,
-                    FileName = this._program,
+                    RedirectStandardError = _captureOutput,
+                    RedirectStandardOutput = _captureOutput,
+                    FileName = _program,
                     CreateNoWindow = true,
-                    Arguments = GetArgumentString(),
+                    Arguments = GetArgumentString()
                 };
+
                 using (var process = Process.Start(procInfo))
                 {
-                    if (this._captureOutput)
+                    if (_captureOutput)
                     {
 
                         var stdOut = new StringBuilder();
                         var stdErr = new StringBuilder();
 
-                        while (!process.HasExited)
+                        while (process != null && !process.HasExited)
                         {
                             stdOut.Append(process.StandardOutput.ReadToEnd());
                             stdErr.Append(process.StandardError.ReadToEnd());
                         }
-                        stdOut.Append(process.StandardOutput.ReadToEnd());
-                        stdErr.Append(process.StandardError.ReadToEnd());
 
-                        this._stdOut = stdOut.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
-                        this._stdErr = stdErr.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
+                        if (process != null)
+                        {
+                            stdOut.Append(process.StandardOutput.ReadToEnd());
+                            stdErr.Append(process.StandardError.ReadToEnd());
+                        }
+
+                        Output = stdOut.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
+                        Error = stdErr.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
                     }
 
-                    this._exception = null;
+                    Exception = null;
                 }
             }
             catch (Exception ex)
             {
-                this._stdOut = null;
-                this._stdErr = null;
-                this._exception = ex;
+                Output = null;
+                Error = null;
+                Exception = ex;
             }
         }
 
         private string GetArgumentString()
         {
-            string args = "";
-            foreach (string arg in this._arguments)
-            {
-                args = args + "\"" + arg + "\" ";
-            }
+            var args = _arguments.Aggregate("", (current, arg) => current + "\"" + arg + "\" ");
             return args.TrimEnd(' ');
         }
     }
