@@ -20,8 +20,8 @@ namespace WakaTime
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
     public sealed class WakaTimePackage : Package
     {
-        #region Fields        
-        private static string _version = string.Empty;        
+        #region Fields
+        private static string _version = string.Empty;
         private static string _editorVersion = string.Empty;
         private static WakaTimeConfigFile _wakaTimeConfigFile;
 
@@ -30,9 +30,9 @@ namespace WakaTime
         private WindowEvents _windowEvents;
 
         public static string ApiKey;
-        private static string _lastFile;        
+        private static string _lastFile;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        private static readonly object ThreadLock = new object();        
+        private static readonly object ThreadLock = new object();
         #endregion
 
         #region Startup/Cleanup
@@ -48,7 +48,7 @@ namespace WakaTime
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
                 _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
-                _editorVersion = _objDte.Version;         
+                _editorVersion = _objDte.Version;
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -137,7 +137,7 @@ namespace WakaTime
         }
         #endregion
 
-        #region Methods        
+        #region Methods
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
@@ -162,7 +162,7 @@ namespace WakaTime
         private bool EnoughTimePassed()
         {
             return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
-        }        
+        }
 
         static string ConfigDir
         {
@@ -171,7 +171,7 @@ namespace WakaTime
 
         static string GetCli()
         {
-            return Path.Combine(ConfigDir, PythonManager.CliPath);            
+            return Path.Combine(ConfigDir, PythonManager.CliPath);
         }
 
         public static void SendHeartbeat(string fileName, bool isWrite)
@@ -184,7 +184,7 @@ namespace WakaTime
                 "--file",
                 fileName,
                 "--plugin",
-                WakaTimeConstants.EditorName + "/" + _editorVersion + " " + WakaTimeConstants.PluginName + "/" + _version
+                string.Format("{0}/{1} {2}/{3}",WakaTimeConstants.EditorName,_editorVersion,WakaTimeConstants.PluginName,_version)
             };
 
             if (isWrite)
@@ -198,14 +198,14 @@ namespace WakaTime
             }
 
             var process = new RunProcess(PythonManager.GetPython(), arguments.ToArray());
-            process.RunInBackground();            
+            process.RunInBackground();
         }
 
         static bool DoesCliExist()
         {
             return File.Exists(GetCli());
         }
-        
+
         static bool IsCliLatestVersion()
         {
             var process = new RunProcess(PythonManager.GetPython(), GetCli(), "--version");
@@ -228,20 +228,43 @@ namespace WakaTime
 
         private static void PromptApiKey()
         {
-            var form = new ApiKeyForm();
-            form.ShowDialog();
+            using (var form = new ApiKeyForm())
+            {
+                form.ShowDialog();
+            }
         }
 
         private static void SettingsPopup()
         {
-            var form = new SettingsForm();
-            form.ShowDialog();
+            using (var form = new SettingsForm())
+            {
+                form.ShowDialog();
+            }
         }
 
         private static string GetProjectName()
         {
             var projectName = _objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName) ? _objDte.Solution.FullName : null;
-            return !string.IsNullOrEmpty(projectName) ? Path.GetFileNameWithoutExtension(projectName) : null;
+            return !string.IsNullOrEmpty(projectName) ? Path.GetFileNameWithoutExtension(GetExactPathName(projectName)) : null;
+        }
+
+        private static string GetExactPathName(string pathName)
+        {
+            if (!(File.Exists(pathName) || Directory.Exists(pathName)))
+                return pathName;
+
+            var di = new DirectoryInfo(pathName);
+
+            if (di.Parent != null)
+            {
+                return Path.Combine(
+                    GetExactPathName(di.Parent.FullName),
+                    di.Parent.GetFileSystemInfos(di.Name)[0].Name);
+            }
+            else
+            {
+                return di.Name.ToUpper();
+            }
         }
         #endregion
 
