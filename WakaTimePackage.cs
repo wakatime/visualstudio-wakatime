@@ -148,6 +148,7 @@ namespace WakaTime
                 {
                     lock (ThreadLock)
                     {
+                        if(IsInGracePeriod()) return;
                         if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
                             return;
 
@@ -158,7 +159,12 @@ namespace WakaTime
                 });
             thread.Start();
         }
-
+        
+        private bool IsInGracePeriod()
+        {
+            return (DateTime.UtcNow - _lastHeartbeat) <= TimeSpan.FromSeconds(5);
+        }
+        
         private bool EnoughTimePassed()
         {
             return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
