@@ -2,6 +2,19 @@
 History
 -------
 
+
+5.0.4 (2015-07-01)
+++++++++++++++++++
+
+- support for VS2012 by changing the version o Microsoft.VisualStudio.Shell
+- correct priority for project detection
+- fix offline logging
+- limit language detection to known file extensions, unless file contents has a vim modeline
+- guess language using multiple methods, then use most accurate guess
+- use entity and type for new heartbeats api resource schema
+- upgrade wakatime cli to v4.1.0
+
+
 5.0.3 (2015-06-08)
 ++++++++++++++++++
 
