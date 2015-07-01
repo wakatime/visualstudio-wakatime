@@ -20,7 +20,7 @@ namespace WakaTime
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
     public sealed class WakaTimePackage : Package
     {
-        #region Fields        
+        #region Fields
         private static string _version = string.Empty;        
         private static string _editorVersion = string.Empty;
         private static WakaTimeConfigFile _wakaTimeConfigFile;
@@ -137,7 +137,7 @@ namespace WakaTime
         }
         #endregion
 
-        #region Methods        
+        #region Methods
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
