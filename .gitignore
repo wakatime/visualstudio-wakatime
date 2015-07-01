@@ -34,3 +34,5 @@ obj/
 *.pdb
 *.pdb
 *.nlp
+
+*.csproj.user
