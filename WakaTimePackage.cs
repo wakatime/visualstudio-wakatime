@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using WakaTime.Forms;
@@ -25,7 +26,7 @@ namespace WakaTime
         private static string _editorVersion = string.Empty;
         private static WakaTimeConfigFile _wakaTimeConfigFile;
 
-        private static DTE _objDte;
+        private static DTE2 _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
 
@@ -44,7 +45,7 @@ namespace WakaTime
             {
                 base.Initialize();
 
-                _objDte = (DTE)GetService(typeof(DTE));
+                _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
                 _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
