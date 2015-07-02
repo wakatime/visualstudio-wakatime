@@ -22,18 +22,20 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        private static string _version = string.Empty;        
+        private static string _version = string.Empty;
         private static string _editorVersion = string.Empty;
-        private static WakaTimeConfigFile _wakaTimeConfigFile;
+        private static WakaTimeConfigFile _wakaTimeConfigFile;        
 
         private static DTE2 _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
+        private SolutionEvents _solutionEvents;
 
         public static string ApiKey;
-        private static string _lastFile;        
+        private static string _lastFile;
+        private static string _solutionName = string.Empty;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        private static readonly object ThreadLock = new object();        
+        private static readonly object ThreadLock = new object();
         #endregion
 
         #region Startup/Cleanup
@@ -48,8 +50,9 @@ namespace WakaTime
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
+                _solutionEvents = _objDte.Events.SolutionEvents;
                 _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
-                _editorVersion = _objDte.Version;         
+                _editorVersion = _objDte.Version;
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -86,10 +89,10 @@ namespace WakaTime
                 }
 
                 // setup event handlers
-                _docEvents.DocumentOpened += DocumentEvents_DocumentOpened;
-                _docEvents.DocumentSaved += DocumentEvents_DocumentSaved;
-                _windowEvents.WindowActivated += Window_Activated;
-
+                _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
+                _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
+                _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
+                _solutionEvents.Opened += SolutionEventsOnOpened;
             }
             catch (Exception ex)
             {
@@ -99,7 +102,31 @@ namespace WakaTime
         #endregion
 
         #region Event Handlers
-        public void Window_Activated(Window gotFocus, Window lostFocus)
+        private void DocEventsOnDocumentOpened(Document document)
+        {
+            try
+            {
+                HandleActivity(document.FullName, false);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("DocEventsOnDocumentOpened : " + ex.Message);
+            }
+        }
+
+        private void DocEventsOnDocumentSaved(Document document)
+        {
+            try
+            {
+                HandleActivity(document.FullName, true);
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error("DocEventsOnDocumentSaved : " + ex.Message);
+            }
+        }
+
+        private void WindowEventsOnWindowActivated(Window gotFocus, Window lostFocus)
         {
             try
             {
@@ -109,31 +136,19 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("Window_Activated : " + ex.Message);
+                Logger.Instance.Error("WindowEventsOnWindowActivated : " + ex.Message);
             }
         }
 
-        public void DocumentEvents_DocumentOpened(Document document)
+        private void SolutionEventsOnOpened()
         {
             try
             {
-                HandleActivity(document.FullName, false);
+                _solutionName = _objDte.Solution.FullName;
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("DocumentEvents_DocumentOpened : " + ex.Message);
-            }
-        }
-
-        public void DocumentEvents_DocumentSaved(Document document)
-        {
-            try
-            {
-                HandleActivity(document.FullName, true);
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.Error("DocumentEvents_DocumentSaved : " + ex.Message);
+                Logger.Instance.Error("SolutionEventsOnOpened : " + ex.Message);
             }
         }
         #endregion
@@ -163,7 +178,7 @@ namespace WakaTime
         private bool EnoughTimePassed()
         {
             return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
-        }        
+        }
 
         static string ConfigDir
         {
@@ -172,7 +187,7 @@ namespace WakaTime
 
         static string GetCli()
         {
-            return Path.Combine(ConfigDir, PythonManager.CliPath);            
+            return Path.Combine(ConfigDir, PythonManager.CliPath);
         }
 
         public static void SendHeartbeat(string fileName, bool isWrite)
@@ -199,14 +214,14 @@ namespace WakaTime
             }
 
             var process = new RunProcess(PythonManager.GetPython(), arguments.ToArray());
-            process.RunInBackground();            
+            process.RunInBackground();
         }
 
         static bool DoesCliExist()
         {
             return File.Exists(GetCli());
         }
-        
+
         static bool IsCliLatestVersion()
         {
             var process = new RunProcess(PythonManager.GetPython(), GetCli(), "--version");
@@ -241,8 +256,11 @@ namespace WakaTime
 
         private static string GetProjectName()
         {
-            var projectName = _objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName) ? _objDte.Solution.FullName : null;
-            return !string.IsNullOrEmpty(projectName) ? Path.GetFileNameWithoutExtension(projectName) : null;
+            return !string.IsNullOrEmpty(_solutionName)
+                ? Path.GetFileNameWithoutExtension(_solutionName)
+                : (_objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName))
+                    ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
+                    : null;
         }
         #endregion
 
