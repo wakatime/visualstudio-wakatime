@@ -7,6 +7,7 @@ namespace WakaTime
     {
         internal string ApiKey { get; set; }
         internal string Proxy { get; set; }
+        internal string WorkPlace { get; set; }
         internal bool Debug { get; set; }
 
         private readonly string _configFilepath;
@@ -27,6 +28,9 @@ namespace WakaTime
             if (NativeMethods.GetPrivateProfileString("settings", "proxy", "", ret, 255, _configFilepath) > 0)
                 Proxy = ret.ToString();
 
+            if (NativeMethods.GetPrivateProfileString("settings", "workplace", "", ret, 255, _configFilepath) > 0)
+                WorkPlace = ret.ToString();
+
             // ReSharper disable once InvertIf
             if (NativeMethods.GetPrivateProfileString("settings", "debug", "", ret, 255, _configFilepath) > 0)
             {
@@ -42,6 +46,8 @@ namespace WakaTime
                 NativeMethods.WritePrivateProfileString("settings", "api_key", ApiKey.Trim(), _configFilepath);
             if (!string.IsNullOrEmpty(Proxy))
                 NativeMethods.WritePrivateProfileString("settings", "proxy", Proxy.Trim(), _configFilepath);
+            if (!string.IsNullOrEmpty(WorkPlace))
+                NativeMethods.WritePrivateProfileString("settings", "workplace", WorkPlace.Trim(), _configFilepath);
             NativeMethods.WritePrivateProfileString("settings", "debug", Debug.ToString().ToLower(), _configFilepath);
         }
 

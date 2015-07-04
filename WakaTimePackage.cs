@@ -197,6 +197,12 @@ namespace WakaTime
                 arguments.Add(projectName);
             }
 
+            if (!string.IsNullOrEmpty(_wakaTimeConfigFile.WorkPlace))
+            {
+                arguments.Add("--workplace");
+                arguments.Add(_wakaTimeConfigFile.WorkPlace);
+            }
+
             var process = new RunProcess(PythonManager.GetPython(), arguments.ToArray());
             process.RunInBackground();            
         }
