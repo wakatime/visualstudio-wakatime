@@ -20,6 +20,7 @@ namespace WakaTime.Forms
             {
                 txtAPIKey.Text = _wakaTimeConfigFile.ApiKey;
                 txtProxy.Text = _wakaTimeConfigFile.Proxy;
+                cboWorkplace.SelectedItem = _wakaTimeConfigFile.WorkPlace;
                 chkDebugMode.Checked = _wakaTimeConfigFile.Debug;
             }
             catch (Exception ex)
@@ -38,6 +39,7 @@ namespace WakaTime.Forms
                 {
                     _wakaTimeConfigFile.ApiKey = apiKey.ToString();
                     _wakaTimeConfigFile.Proxy = txtProxy.Text.Trim();
+                    _wakaTimeConfigFile.WorkPlace = cboWorkplace.SelectedItem.ToString();
                     _wakaTimeConfigFile.Debug = chkDebugMode.Checked;
                     _wakaTimeConfigFile.Save();
                     WakaTimePackage.ApiKey = apiKey.ToString();
