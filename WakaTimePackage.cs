@@ -31,6 +31,7 @@ namespace WakaTime
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
+        public static Boolean DEBUG = false;
         public static string ApiKey;
         private static string _lastFile;
         private static string _solutionName = string.Empty;
@@ -53,6 +54,7 @@ namespace WakaTime
                 _solutionEvents = _objDte.Events.SolutionEvents;
                 _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
                 _editorVersion = _objDte.Version;
+                Logger.Instance.Info("Initializing WakaTime v" + _version);
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -74,6 +76,7 @@ namespace WakaTime
                 }
 
                 ApiKey = _wakaTimeConfigFile.ApiKey;
+                DEBUG = _wakaTimeConfigFile.Debug;
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -93,6 +96,8 @@ namespace WakaTime
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
+
+                Logger.Instance.Info("Finished initializing WakaTime v" + _version);
             }
             catch (Exception ex)
             {
@@ -187,7 +192,7 @@ namespace WakaTime
 
         static string GetCli()
         {
-            return Path.Combine(ConfigDir, PythonManager.CliPath);
+            return Path.Combine(ConfigDir, WakaTimeConstants.CliFolder);
         }
 
         public static void SendHeartbeat(string fileName, bool isWrite)
@@ -213,8 +218,28 @@ namespace WakaTime
                 arguments.Add(projectName);
             }
 
-            var process = new RunProcess(PythonManager.GetPython(), arguments.ToArray());
-            process.RunInBackground();
+            var pythonBinary = PythonManager.GetPython();
+            if (pythonBinary != null)
+            {
+
+                var process = new RunProcess(pythonBinary, arguments.ToArray());
+                if (DEBUG)
+                {
+                    Logger.Instance.Info("[\"" + pythonBinary + "\", \"" + string.Join("\", ", arguments) + "\"]");
+                    process.Run();
+                    Logger.Instance.Info("WakaTime CLI STDOUT:" + process.Output);
+                    Logger.Instance.Info("WakaTime CLI STDERR:" + process.Error);
+                }
+                else
+                {
+                    process.RunInBackground();
+                }
+
+            }
+            else
+            {
+                Logger.Instance.Error("Could not send heartbeat because python is not installed.");
+            }
         }
 
         static bool DoesCliExist()

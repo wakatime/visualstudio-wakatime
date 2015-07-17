@@ -15,22 +15,19 @@ namespace WakaTime
             return GetPython() != null;
         }
 
-        internal static string CliPath
-        {
-            get { return @"wakatime-master\wakatime\cli.py"; }
-        }
-
         internal static string GetPython()
         {
             if (PythonBinaryLocation != null)
                 return PythonBinaryLocation;
 
-            var path = TryGetPathFromMicrosoftRegister() ?? TryGetPathFromFixedPath();            
+            var path = GetPathFromMicrosoftRegister() ?? GetPathFromFixedPath();
+
+            PythonBinaryLocation = path;
 
             return path;
         }
 
-        static string TryGetPathFromMicrosoftRegister()
+        static string GetPathFromMicrosoftRegister()
         {
             try
             {
@@ -42,15 +39,16 @@ namespace WakaTime
                 if (!match.Success) return null;
 
                 var directory = match.Groups[1].Value;
-                var fullPath = Path.Combine(directory, "pythonw.exe");
+                var fullPath = Path.Combine(directory, "pythonw");
                 var process = new RunProcess(fullPath, "--version");
 
                 process.Run();
 
-                if (!process.Success || !process.Output.StartsWith("Python "))
+                if (!process.Success)
                     return null;
 
-                PythonBinaryLocation = fullPath;
+                Logger.Instance.Info("Found python via registry at: " + fullPath.ToString());
+
                 return fullPath;
             }
             catch (Exception)
@@ -59,7 +57,7 @@ namespace WakaTime
             }
         }
 
-        static string TryGetPathFromFixedPath()
+        static string GetPathFromFixedPath()
         {
             string[] locations = {
                     "pythonw",
@@ -114,7 +112,8 @@ namespace WakaTime
 
                 if (!process.Success) continue;
 
-                PythonBinaryLocation = location;
+                Logger.Instance.Info("Found python in standard location at: " + location.ToString());
+
                 return location;
             }
 
