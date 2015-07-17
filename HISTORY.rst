@@ -3,6 +3,14 @@ History
 -------
 
 
+5.0.5 (2015-07-17)
+++++++++++++++++++
+
+- cache DTE object for getting solution name
+- more verbose logging to ActivityLog.xml
+- less strict python detection
+
+
 5.0.4 (2015-07-01)
 ++++++++++++++++++
 
