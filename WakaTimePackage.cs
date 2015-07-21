@@ -24,6 +24,7 @@ namespace WakaTime
         private static string _version = string.Empty;
         private static string _editorVersion = string.Empty;
         private static WakaTimeConfigFile _wakaTimeConfigFile;
+        private static SettingsForm _settingsForm;
 
         private static DTE2 _objDte;
         private DocumentEvents _docEvents;
@@ -41,7 +42,7 @@ namespace WakaTime
         #region Startup/Cleanup
         protected override void Initialize()
         {
-            _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);            
+            _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
 
             try
             {
@@ -52,8 +53,10 @@ namespace WakaTime
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
-                _solutionEvents = _objDte.Events.SolutionEvents;                
-                _editorVersion = _objDte.Version;                
+                _solutionEvents = _objDte.Events.SolutionEvents;
+                _editorVersion = _objDte.Version;
+                _settingsForm = new SettingsForm();
+                _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -74,8 +77,7 @@ namespace WakaTime
                     Downloader.DownloadCli(WakaTimeConstants.CliUrl, ConfigDir);
                 }
 
-                ApiKey = _wakaTimeConfigFile.ApiKey;
-                Debug = _wakaTimeConfigFile.Debug;
+                GetSettings();
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -102,7 +104,8 @@ namespace WakaTime
             {
                 Logger.Error("Error initializing Wakatime", ex);
             }
-        }
+        }        
+
         #endregion
 
         #region Event Handlers
@@ -158,6 +161,18 @@ namespace WakaTime
         #endregion
 
         #region Methods
+
+        private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
+        {
+            _wakaTimeConfigFile.Read();
+            GetSettings();
+        }
+
+        private static void GetSettings()
+        {
+            ApiKey = _wakaTimeConfigFile.ApiKey;
+            Debug = _wakaTimeConfigFile.Debug;
+        }
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
@@ -222,7 +237,12 @@ namespace WakaTime
             {
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
                 if (Debug)
+                {
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", ", arguments)));
                     process.Run();
+                    Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
+                    Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
+                }
                 else
                     process.RunInBackground();
             }
@@ -263,8 +283,7 @@ namespace WakaTime
 
         private static void SettingsPopup()
         {
-            var form = new SettingsForm();
-            form.ShowDialog();
+            _settingsForm.ShowDialog();
         }
 
         private static string GetProjectName()

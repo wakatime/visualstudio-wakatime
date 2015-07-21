@@ -6,6 +6,7 @@ namespace WakaTime.Forms
     public partial class SettingsForm : Form
     {
         private readonly WakaTimeConfigFile _wakaTimeConfigFile;
+        internal event EventHandler ConfigSaved;
 
         public SettingsForm()
         {
@@ -40,7 +41,11 @@ namespace WakaTime.Forms
                     _wakaTimeConfigFile.Proxy = txtProxy.Text.Trim();
                     _wakaTimeConfigFile.Debug = chkDebugMode.Checked;
                     _wakaTimeConfigFile.Save();
-                    WakaTimePackage.ApiKey = apiKey.ToString();
+                    OnConfigSaved();
+                    
+
+                    //WakaTimePackage.ApiKey = apiKey.ToString();
+                    
                 }
                 else
                 {
@@ -52,6 +57,12 @@ namespace WakaTime.Forms
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        protected virtual void OnConfigSaved()
+        {
+            var handler = ConfigSaved;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
     }
 }
