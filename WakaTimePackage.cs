@@ -221,7 +221,6 @@ namespace WakaTime
             var pythonBinary = PythonManager.GetPython();
             if (pythonBinary != null)
             {
-
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
                 if (DEBUG)
                 {
@@ -230,16 +229,11 @@ namespace WakaTime
                     Logger.Instance.Info("WakaTime CLI STDOUT:" + process.Output);
                     Logger.Instance.Info("WakaTime CLI STDERR:" + process.Error);
                 }
-                else
-                {
-                    process.RunInBackground();
-                }
-
+                else                
+                    process.RunInBackground();                
             }
-            else
-            {
-                Logger.Instance.Error("Could not send heartbeat because python is not installed.");
-            }
+            else            
+                Logger.Instance.Error("Could not send heartbeat because python is not installed.");            
         }
 
         static bool DoesCliExist()
