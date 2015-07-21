@@ -44,12 +44,7 @@ namespace WakaTime
 
                 process.Run();
 
-                if (!process.Success)
-                    return null;
-
-                Logger.Instance.Info("Found python via registry at: " + fullPath.ToString());
-
-                return fullPath;
+                return !process.Success ? null : fullPath;
             }
             catch (Exception)
             {
@@ -110,9 +105,7 @@ namespace WakaTime
 
                 process.Run();
 
-                if (!process.Success) continue;
-
-                Logger.Instance.Info("Found python in standard location at: " + location.ToString());
+                if (!process.Success) continue;                
 
                 return location;
             }
@@ -131,6 +124,5 @@ namespace WakaTime
 
             return url;
         }
-
     }
 }

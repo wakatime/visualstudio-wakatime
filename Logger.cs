@@ -1,39 +1,58 @@
 ﻿using System;
 using Microsoft.VisualStudio.Shell.Interop;
-using System.Globalization;
+using Microsoft.VisualStudio.Shell;
 
 namespace WakaTime
 {
-    class Logger
+    static class Logger
     {
-        // Singleton class for logging in Visul Studio default logger file ActivityLog.xml
-        private static Logger _instance;
-        private IVsActivityLog _log;
+        private static IVsOutputWindowPane _wakatimeOutputWindowPane;
 
-        public static Logger Instance
+        private static IVsOutputWindowPane WakatimeOutputWindowPane
         {
-            get { return _instance ?? (_instance = new Logger()); }
+            get { return _wakatimeOutputWindowPane ?? (_wakatimeOutputWindowPane = GetWakatimeOutputWindowPane()); }
         }
 
-        public void Initialize(IVsActivityLog log)
+        private static IVsOutputWindowPane GetWakatimeOutputWindowPane()
         {
-            _log = log;
+            var outputWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            if (outputWindow == null) return null;
+
+            var outputPaneGuid = new Guid(GuidList.GuidWakatimeOutputPane.ToByteArray());
+            IVsOutputWindowPane windowPane;
+
+            outputWindow.CreatePane(ref outputPaneGuid, "Wakatime", 1, 1);
+            outputWindow.GetPane(ref outputPaneGuid, out windowPane);
+
+            return windowPane;
+        }
+        
+        internal static void ExceptionWriteLine(string message, Exception ex = null)
+        {
+            var exceptionMessage = string.Format("{0}: {1}", message, ex);
+
+            WriteLine("Handled Exception", exceptionMessage);
         }
 
-        public void Error(string message)
+        internal static void WarningWriteLine(string message)
         {
-            _log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_ERROR,
-                ToString(),
-                string.Format(CultureInfo.CurrentCulture,
-                    "{0}", message));
+            WriteLine("Warning", message);
         }
 
-        public void Info(string message)
+        internal static void InfoWriteLine(string message)
         {
-            _log.LogEntry((UInt32)__ACTIVITYLOG_ENTRYTYPE.ALE_INFORMATION,
-                ToString(),
-                string.Format(CultureInfo.CurrentCulture,
-                    "{0}", message));
+            WriteLine("Info", message);
+        }
+
+        private static void WriteLine(string category, string message)
+        {
+            var outputWindowPane = WakatimeOutputWindowPane;
+            if (outputWindowPane == null) return;
+
+            var outputMessage = string.Format("[Wakatime {0} {1}] {2}{3}", category,
+                DateTime.Now.ToString("hh:mm:ss tt"), message, Environment.NewLine);
+
+            outputWindowPane.OutputString(outputMessage);
         }
     }
 }

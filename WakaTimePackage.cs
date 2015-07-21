@@ -24,14 +24,14 @@ namespace WakaTime
         #region Fields
         private static string _version = string.Empty;
         private static string _editorVersion = string.Empty;
-        private static WakaTimeConfigFile _wakaTimeConfigFile;        
+        private static WakaTimeConfigFile _wakaTimeConfigFile;
 
         private static DTE2 _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
-        public static Boolean DEBUG = false;
+        public static bool Debug;
         public static string ApiKey;
         private static string _lastFile;
         private static string _solutionName = string.Empty;
@@ -42,19 +42,19 @@ namespace WakaTime
         #region Startup/Cleanup
         protected override void Initialize()
         {
-            var log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
-            Logger.Instance.Initialize(log);
+            _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);            
+
             try
             {
+                Logger.InfoWriteLine(string.Format("Initializing WakaTime v{0}", _version));
+
                 base.Initialize();
 
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
-                _solutionEvents = _objDte.Events.SolutionEvents;
-                _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
-                _editorVersion = _objDte.Version;
-                Logger.Instance.Info("Initializing WakaTime v" + _version);
+                _solutionEvents = _objDte.Events.SolutionEvents;                
+                _editorVersion = _objDte.Version;                
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -76,7 +76,7 @@ namespace WakaTime
                 }
 
                 ApiKey = _wakaTimeConfigFile.ApiKey;
-                DEBUG = _wakaTimeConfigFile.Debug;
+                Debug = _wakaTimeConfigFile.Debug;
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -97,11 +97,11 @@ namespace WakaTime
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
-                Logger.Instance.Info("Finished initializing WakaTime v" + _version);
+                Logger.InfoWriteLine(string.Format("Finished initializing WakaTime v{0}", _version));
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error(ex.Message);
+                Logger.ExceptionWriteLine("Error initializing Wakatime", ex);
             }
         }
         #endregion
@@ -115,7 +115,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("DocEventsOnDocumentOpened : " + ex.Message);
+                Logger.ExceptionWriteLine("DocEventsOnDocumentOpened", ex);
             }
         }
 
@@ -127,7 +127,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("DocEventsOnDocumentSaved : " + ex.Message);
+                Logger.ExceptionWriteLine("DocEventsOnDocumentSaved", ex);
             }
         }
 
@@ -141,7 +141,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("WindowEventsOnWindowActivated : " + ex.Message);
+                Logger.ExceptionWriteLine("WindowEventsOnWindowActivated", ex);
             }
         }
 
@@ -153,7 +153,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("SolutionEventsOnOpened : " + ex.Message);
+                Logger.ExceptionWriteLine("SolutionEventsOnOpened", ex);
             }
         }
         #endregion
@@ -222,18 +222,13 @@ namespace WakaTime
             if (pythonBinary != null)
             {
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
-                if (DEBUG)
-                {
-                    Logger.Instance.Info("[\"" + pythonBinary + "\", \"" + string.Join("\", ", arguments) + "\"]");
+                if (Debug)
                     process.Run();
-                    Logger.Instance.Info("WakaTime CLI STDOUT:" + process.Output);
-                    Logger.Instance.Info("WakaTime CLI STDERR:" + process.Error);
-                }
-                else                
-                    process.RunInBackground();                
+                else
+                    process.RunInBackground();
             }
-            else            
-                Logger.Instance.Error("Could not send heartbeat because python is not installed.");            
+            else
+                Logger.ExceptionWriteLine("Could not send heartbeat because python is not installed.");
         }
 
         static bool DoesCliExist()
@@ -257,7 +252,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("MenuItemCallback : " + ex.Message);
+                Logger.ExceptionWriteLine("MenuItemCallback", ex);
             }
         }
 
