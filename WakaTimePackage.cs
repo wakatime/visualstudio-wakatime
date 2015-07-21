@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using WakaTime.Forms;
 using Thread = System.Threading.Thread;
 
