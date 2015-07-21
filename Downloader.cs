@@ -8,11 +8,15 @@ namespace WakaTime
     {
         static public void DownloadCli(string url, string dir)
         {
+            Logger.Debug("Downloading wakatime cli...");
+
             var client = new WebClient();
             var localZipFile = dir + "\\wakatime-cli.zip";
 
             // Download wakatime cli
             client.DownloadFile(url, localZipFile);
+
+            Logger.Debug("Finished downloading wakatime cli.");
 
             // Extract wakatime cli zip file
             ZipFile.ExtractToDirectory(localZipFile, dir);
@@ -20,10 +24,14 @@ namespace WakaTime
 
         static public void DownloadPython(string url, string dir)
         {
+            Logger.Debug("Downloading python...");
+
             var localFile = dir + "\\python.msi";
 
             var client = new WebClient();
             client.DownloadFile(url, localFile);
+
+            Logger.Debug("Finished downloading python.");
 
             var arguments = "/i \"" + localFile + "\"";
             arguments = arguments + " /norestart /qb!";

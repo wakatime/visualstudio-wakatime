@@ -26,20 +26,25 @@ namespace WakaTime
 
             return windowPane;
         }
-        
-        internal static void ExceptionWriteLine(string message, Exception ex = null)
+
+        internal static void Debug(string message)
+        {
+            WriteLine("Debug", message);
+        }
+
+        internal static void Error(string message, Exception ex = null)
         {
             var exceptionMessage = string.Format("{0}: {1}", message, ex);
 
             WriteLine("Handled Exception", exceptionMessage);
         }
 
-        internal static void WarningWriteLine(string message)
+        internal static void Warning(string message)
         {
             WriteLine("Warning", message);
         }
 
-        internal static void InfoWriteLine(string message)
+        internal static void Info(string message)
         {
             WriteLine("Info", message);
         }

@@ -45,7 +45,7 @@ namespace WakaTime
 
             try
             {
-                Logger.InfoWriteLine(string.Format("Initializing WakaTime v{0}", _version));
+                Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
 
                 base.Initialize();
 
@@ -96,11 +96,11 @@ namespace WakaTime
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
-                Logger.InfoWriteLine(string.Format("Finished initializing WakaTime v{0}", _version));
+                Logger.Info(string.Format("Finished initializing WakaTime v{0}", _version));
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("Error initializing Wakatime", ex);
+                Logger.Error("Error initializing Wakatime", ex);
             }
         }
         #endregion
@@ -114,7 +114,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("DocEventsOnDocumentOpened", ex);
+                Logger.Error("DocEventsOnDocumentOpened", ex);
             }
         }
 
@@ -126,7 +126,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("DocEventsOnDocumentSaved", ex);
+                Logger.Error("DocEventsOnDocumentSaved", ex);
             }
         }
 
@@ -140,7 +140,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("WindowEventsOnWindowActivated", ex);
+                Logger.Error("WindowEventsOnWindowActivated", ex);
             }
         }
 
@@ -152,7 +152,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("SolutionEventsOnOpened", ex);
+                Logger.Error("SolutionEventsOnOpened", ex);
             }
         }
         #endregion
@@ -227,7 +227,7 @@ namespace WakaTime
                     process.RunInBackground();
             }
             else
-                Logger.ExceptionWriteLine("Could not send heartbeat because python is not installed.");
+                Logger.Error("Could not send heartbeat because python is not installed.");
         }
 
         static bool DoesCliExist()
@@ -251,7 +251,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.ExceptionWriteLine("MenuItemCallback", ex);
+                Logger.Error("MenuItemCallback", ex);
             }
         }
 
