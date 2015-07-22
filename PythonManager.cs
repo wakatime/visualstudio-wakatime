@@ -50,6 +50,10 @@ namespace WakaTime
             {
                 return null;
             }
+            finally
+            {
+                Logger.Debug("Python found by Microsoft Register");
+            }
         }
 
         static string GetPathFromFixedPath()
@@ -99,18 +103,25 @@ namespace WakaTime
                     "\\python26\\python",
                 };
 
-            foreach (var location in locations)
+            try
             {
-                var process = new RunProcess(location, "--version");
+                foreach (var location in locations)
+                {
+                    var process = new RunProcess(location, "--version");
 
-                process.Run();
+                    process.Run();
 
-                if (!process.Success) continue;                
+                    if (!process.Success) continue;
 
-                return location;
+                    return location;
+                }
+
+                return null;
             }
-
-            return null;
+            finally
+            {
+                Logger.Debug("Python found by Fixed Path");
+            }            
         }
 
         internal static string GetPythonDownloadUrl()
