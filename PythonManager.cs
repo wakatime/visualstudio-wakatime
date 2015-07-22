@@ -46,8 +46,9 @@ namespace WakaTime
 
                 return !process.Success ? null : fullPath;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("GetPathFromMicrosoftRegister:", ex);
                 return null;
             }
             finally
@@ -117,6 +118,10 @@ namespace WakaTime
                 }
 
                 return null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("GetPathFromFixedPath:", ex);
             }
             finally
             {

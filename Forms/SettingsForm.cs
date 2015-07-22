@@ -25,6 +25,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
+                Logger.Error("Error when loading form SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -41,11 +42,7 @@ namespace WakaTime.Forms
                     _wakaTimeConfigFile.Proxy = txtProxy.Text.Trim();
                     _wakaTimeConfigFile.Debug = chkDebugMode.Checked;
                     _wakaTimeConfigFile.Save();
-                    OnConfigSaved();
-                    
-
-                    //WakaTimePackage.ApiKey = apiKey.ToString();
-                    
+                    OnConfigSaved();                    
                 }
                 else
                 {
@@ -55,6 +52,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
+                Logger.Error("Error when saving data from SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }

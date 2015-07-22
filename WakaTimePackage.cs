@@ -104,7 +104,7 @@ namespace WakaTime
             {
                 Logger.Error("Error initializing Wakatime", ex);
             }
-        }        
+        }
 
         #endregion
 
@@ -247,7 +247,7 @@ namespace WakaTime
                     process.RunInBackground();
             }
             else
-                Logger.Error("Could not send heartbeat because python is not installed.");
+                Logger.Error("Could not send heartbeat because python is not installed");
         }
 
         static bool DoesCliExist()
