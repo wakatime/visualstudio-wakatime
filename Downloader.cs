@@ -8,7 +8,7 @@ namespace WakaTime
     {
         static public void DownloadCli(string url, string dir)
         {
-            Logger.Instance.Info("Downloading wakatime cli...");
+            Logger.Debug("Downloading wakatime cli...");
 
             var client = new WebClient();
             var localZipFile = dir + "\\wakatime-cli.zip";
@@ -16,26 +16,22 @@ namespace WakaTime
             // Download wakatime cli
             client.DownloadFile(url, localZipFile);
 
-            Logger.Instance.Info("Finished downloading wakatime cli.");
-
-            Logger.Instance.Info("Extracting wakatime cli: " + dir.ToString());
+            Logger.Debug("Finished downloading wakatime cli.");
 
             // Extract wakatime cli zip file
             ZipFile.ExtractToDirectory(localZipFile, dir);
-
-            Logger.Instance.Info("Finished extracting wakatime cli.");
         }
 
         static public void DownloadPython(string url, string dir)
         {
-            var localFile = dir + "\\python.msi";
+            Logger.Debug("Downloading python...");
 
-            Logger.Instance.Info("Downloading python...");
+            var localFile = dir + "\\python.msi";
 
             var client = new WebClient();
             client.DownloadFile(url, localFile);
 
-            Logger.Instance.Info("Finished downloading python.");
+            Logger.Debug("Finished downloading python.");
 
             var arguments = "/i \"" + localFile + "\"";
             arguments = arguments + " /norestart /qb!";
@@ -49,11 +45,7 @@ namespace WakaTime
                 Arguments = arguments
             };
 
-            Logger.Instance.Info("Installing python...");
-
             Process.Start(procInfo);
-
-            Logger.Instance.Info("Finished installing python.");
         }
     }
 }

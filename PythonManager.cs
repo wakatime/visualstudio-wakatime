@@ -44,16 +44,16 @@ namespace WakaTime
 
                 process.Run();
 
-                if (!process.Success)
-                    return null;
-
-                Logger.Instance.Info("Found python via registry at: " + fullPath.ToString());
-
-                return fullPath;
+                return !process.Success ? null : fullPath;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error("GetPathFromMicrosoftRegister:", ex);
                 return null;
+            }
+            finally
+            {
+                Logger.Debug("Python found by Microsoft Register");
             }
         }
 
@@ -104,20 +104,29 @@ namespace WakaTime
                     "\\python26\\python",
                 };
 
-            foreach (var location in locations)
+            try
             {
-                var process = new RunProcess(location, "--version");
+                foreach (var location in locations)
+                {
+                    var process = new RunProcess(location, "--version");
 
-                process.Run();
+                    process.Run();
 
-                if (!process.Success) continue;
+                    if (!process.Success) continue;
 
-                Logger.Instance.Info("Found python in standard location at: " + location.ToString());
+                    return location;
+                }
 
-                return location;
+                return null;
             }
-
-            return null;
+            catch (Exception ex)
+            {
+                Logger.Error("GetPathFromFixedPath:", ex);
+            }
+            finally
+            {
+                Logger.Debug("Python found by Fixed Path");
+            }            
         }
 
         internal static string GetPythonDownloadUrl()
@@ -131,6 +140,5 @@ namespace WakaTime
 
             return url;
         }
-
     }
 }

@@ -34,3 +34,9 @@ Contributing
 To open and build this project, please use Visual Studio 2013 and install the Visual Studio 2013 SDK:
 
 https://www.microsoft.com/en-us/download/details.aspx?id=40758
+
+To Debug follow this instructions:
+
+1. Open Wakatime project properties (ALT + ENTER)
+2. Into Debug tab set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe```
+3. Add command line arguments: ```/rootsuffix Exp```

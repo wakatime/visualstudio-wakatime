@@ -39,9 +39,9 @@ namespace WakaTime
         internal void Save()
         {
             if (!string.IsNullOrEmpty(ApiKey))
-                NativeMethods.WritePrivateProfileString("settings", "api_key", ApiKey.Trim(), _configFilepath);
-            if (!string.IsNullOrEmpty(Proxy))
-                NativeMethods.WritePrivateProfileString("settings", "proxy", Proxy.Trim(), _configFilepath);
+                NativeMethods.WritePrivateProfileString("settings", "api_key", ApiKey.Trim(), _configFilepath);                       
+
+            NativeMethods.WritePrivateProfileString("settings", "proxy", Proxy.Trim(), _configFilepath);
             NativeMethods.WritePrivateProfileString("settings", "debug", Debug.ToString().ToLower(), _configFilepath);
         }
 

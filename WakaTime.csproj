@@ -174,7 +174,7 @@
     <Compile Include="Downloader.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="WakaTimeConfigFile.cs" />
-    <Compile Include="Guids.cs" />
+    <Compile Include="GuidList.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>

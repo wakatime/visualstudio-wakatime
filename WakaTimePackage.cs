@@ -8,7 +8,6 @@ using System.Windows.Forms;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using WakaTime.Forms;
 using Thread = System.Threading.Thread;
 
@@ -24,14 +23,15 @@ namespace WakaTime
         #region Fields
         private static string _version = string.Empty;
         private static string _editorVersion = string.Empty;
-        private static WakaTimeConfigFile _wakaTimeConfigFile;        
+        private static WakaTimeConfigFile _wakaTimeConfigFile;
+        private static SettingsForm _settingsForm;
 
         private static DTE2 _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
-        public static Boolean DEBUG = false;
+        public static bool Debug;
         public static string ApiKey;
         private static string _lastFile;
         private static string _solutionName = string.Empty;
@@ -42,19 +42,21 @@ namespace WakaTime
         #region Startup/Cleanup
         protected override void Initialize()
         {
-            var log = GetService(typeof(SVsActivityLog)) as IVsActivityLog;
-            Logger.Instance.Initialize(log);
+            _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
+
             try
             {
+                Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
+
                 base.Initialize();
 
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
                 _solutionEvents = _objDte.Events.SolutionEvents;
-                _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
                 _editorVersion = _objDte.Version;
-                Logger.Instance.Info("Initializing WakaTime v" + _version);
+                _settingsForm = new SettingsForm();
+                _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
 
                 // Make sure python is installed
@@ -75,8 +77,7 @@ namespace WakaTime
                     Downloader.DownloadCli(WakaTimeConstants.CliUrl, ConfigDir);
                 }
 
-                ApiKey = _wakaTimeConfigFile.ApiKey;
-                DEBUG = _wakaTimeConfigFile.Debug;
+                GetSettings();
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -97,13 +98,14 @@ namespace WakaTime
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
-                Logger.Instance.Info("Finished initializing WakaTime v" + _version);
+                Logger.Info(string.Format("Finished initializing WakaTime v{0}", _version));
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error(ex.Message);
+                Logger.Error("Error initializing Wakatime", ex);
             }
         }
+
         #endregion
 
         #region Event Handlers
@@ -115,7 +117,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("DocEventsOnDocumentOpened : " + ex.Message);
+                Logger.Error("DocEventsOnDocumentOpened", ex);
             }
         }
 
@@ -127,7 +129,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("DocEventsOnDocumentSaved : " + ex.Message);
+                Logger.Error("DocEventsOnDocumentSaved", ex);
             }
         }
 
@@ -141,7 +143,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("WindowEventsOnWindowActivated : " + ex.Message);
+                Logger.Error("WindowEventsOnWindowActivated", ex);
             }
         }
 
@@ -153,12 +155,24 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("SolutionEventsOnOpened : " + ex.Message);
+                Logger.Error("SolutionEventsOnOpened", ex);
             }
         }
         #endregion
 
         #region Methods
+
+        private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
+        {
+            _wakaTimeConfigFile.Read();
+            GetSettings();
+        }
+
+        private static void GetSettings()
+        {
+            ApiKey = _wakaTimeConfigFile.ApiKey;
+            Debug = _wakaTimeConfigFile.Debug;
+        }
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
@@ -221,25 +235,19 @@ namespace WakaTime
             var pythonBinary = PythonManager.GetPython();
             if (pythonBinary != null)
             {
-
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
-                if (DEBUG)
+                if (Debug)
                 {
-                    Logger.Instance.Info("[\"" + pythonBinary + "\", \"" + string.Join("\", ", arguments) + "\"]");
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", ", arguments)));
                     process.Run();
-                    Logger.Instance.Info("WakaTime CLI STDOUT:" + process.Output);
-                    Logger.Instance.Info("WakaTime CLI STDERR:" + process.Error);
+                    Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
+                    Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
                 }
                 else
-                {
                     process.RunInBackground();
-                }
-
             }
             else
-            {
-                Logger.Instance.Error("Could not send heartbeat because python is not installed.");
-            }
+                Logger.Error("Could not send heartbeat because python is not installed");
         }
 
         static bool DoesCliExist()
@@ -263,7 +271,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error("MenuItemCallback : " + ex.Message);
+                Logger.Error("MenuItemCallback", ex);
             }
         }
 
@@ -275,8 +283,7 @@ namespace WakaTime
 
         private static void SettingsPopup()
         {
-            var form = new SettingsForm();
-            form.ShowDialog();
+            _settingsForm.ShowDialog();
         }
 
         private static string GetProjectName()

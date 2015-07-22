@@ -6,6 +6,7 @@ namespace WakaTime.Forms
     public partial class SettingsForm : Form
     {
         private readonly WakaTimeConfigFile _wakaTimeConfigFile;
+        internal event EventHandler ConfigSaved;
 
         public SettingsForm()
         {
@@ -24,6 +25,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
+                Logger.Error("Error when loading form SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -40,7 +42,7 @@ namespace WakaTime.Forms
                     _wakaTimeConfigFile.Proxy = txtProxy.Text.Trim();
                     _wakaTimeConfigFile.Debug = chkDebugMode.Checked;
                     _wakaTimeConfigFile.Save();
-                    WakaTimePackage.ApiKey = apiKey.ToString();
+                    OnConfigSaved();                    
                 }
                 else
                 {
@@ -50,8 +52,15 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
+                Logger.Error("Error when saving data from SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        protected virtual void OnConfigSaved()
+        {
+            var handler = ConfigSaved;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
     }
 }
