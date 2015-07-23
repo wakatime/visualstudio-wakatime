@@ -44,85 +44,85 @@ namespace WakaTime
 
                 process.Run();
 
-                return !process.Success ? null : fullPath;
+                if (!process.Success)
+                    return null;
+
+                Logger.Debug("Python found by Microsoft Register: " + fullPath.ToString());
+                
+                return fullPath;
             }
             catch (Exception ex)
             {
                 Logger.Error("GetPathFromMicrosoftRegister:", ex);
                 return null;
             }
-            finally
-            {
-                Logger.Debug("Python found by Microsoft Register");
-            }
         }
 
         static string GetPathFromFixedPath()
         {
             string[] locations = {
-                    "pythonw",
-                    "python",
-                    "\\Python37\\pythonw",
-                    "\\Python36\\pythonw",
-                    "\\Python35\\pythonw",
-                    "\\Python34\\pythonw",
-                    "\\Python33\\pythonw",
-                    "\\Python32\\pythonw",
-                    "\\Python31\\pythonw",
-                    "\\Python30\\pythonw",
-                    "\\Python27\\pythonw",
-                    "\\Python26\\pythonw",
-                    "\\python37\\pythonw",
-                    "\\python36\\pythonw",
-                    "\\python35\\pythonw",
-                    "\\python34\\pythonw",
-                    "\\python33\\pythonw",
-                    "\\python32\\pythonw",
-                    "\\python31\\pythonw",
-                    "\\python30\\pythonw",
-                    "\\python27\\pythonw",
-                    "\\python26\\pythonw",
-                    "\\Python37\\python",
-                    "\\Python36\\python",
-                    "\\Python35\\python",
-                    "\\Python34\\python",
-                    "\\Python33\\python",
-                    "\\Python32\\python",
-                    "\\Python31\\python",
-                    "\\Python30\\python",
-                    "\\Python27\\python",
-                    "\\Python26\\python",
-                    "\\python37\\python",
-                    "\\python36\\python",
-                    "\\python35\\python",
-                    "\\python34\\python",
-                    "\\python33\\python",
-                    "\\python32\\python",
-                    "\\python31\\python",
-                    "\\python30\\python",
-                    "\\python27\\python",
-                    "\\python26\\python",
-                };
+                "pythonw",
+                "python",
+                "\\Python37\\pythonw",
+                "\\Python36\\pythonw",
+                "\\Python35\\pythonw",
+                "\\Python34\\pythonw",
+                "\\Python33\\pythonw",
+                "\\Python32\\pythonw",
+                "\\Python31\\pythonw",
+                "\\Python30\\pythonw",
+                "\\Python27\\pythonw",
+                "\\Python26\\pythonw",
+                "\\python37\\pythonw",
+                "\\python36\\pythonw",
+                "\\python35\\pythonw",
+                "\\python34\\pythonw",
+                "\\python33\\pythonw",
+                "\\python32\\pythonw",
+                "\\python31\\pythonw",
+                "\\python30\\pythonw",
+                "\\python27\\pythonw",
+                "\\python26\\pythonw",
+                "\\Python37\\python",
+                "\\Python36\\python",
+                "\\Python35\\python",
+                "\\Python34\\python",
+                "\\Python33\\python",
+                "\\Python32\\python",
+                "\\Python31\\python",
+                "\\Python30\\python",
+                "\\Python27\\python",
+                "\\Python26\\python",
+                "\\python37\\python",
+                "\\python36\\python",
+                "\\python35\\python",
+                "\\python34\\python",
+                "\\python33\\python",
+                "\\python32\\python",
+                "\\python31\\python",
+                "\\python30\\python",
+                "\\python27\\python",
+                "\\python26\\python",
+            };
 
-            try
+            foreach (var location in locations)
             {
-                foreach (var location in locations)
+                try
                 {
                     var process = new RunProcess(location, "--version");
-
                     process.Run();
-
                     if (!process.Success) continue;
-
-                    return location;
+                }
+                catch
+                {
                 }
 
-                return null;
-            }            
-            finally
-            {
-                Logger.Debug("Python found by Fixed Path");
-            }            
+                Logger.Debug("Python found by Fixed Path: " + location.ToString());
+
+                return location;
+            }
+
+            return null;       
         }
 
         internal static string GetPythonDownloadUrl()

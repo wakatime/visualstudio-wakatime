@@ -29,27 +29,27 @@ namespace WakaTime
 
         internal static void Debug(string message)
         {
-            WriteLine("Debug", message);
+            Log("Debug", message);
         }
 
         internal static void Error(string message, Exception ex = null)
         {
             var exceptionMessage = string.Format("{0}: {1}", message, ex);
 
-            WriteLine("Handled Exception", exceptionMessage);
+            Log("Handled Exception", exceptionMessage);
         }
 
         internal static void Warning(string message)
         {
-            WriteLine("Warning", message);
+            Log("Warning", message);
         }
 
         internal static void Info(string message)
         {
-            WriteLine("Info", message);
+            Log("Info", message);
         }
 
-        private static void WriteLine(string category, string message)
+        private static void Log(string category, string message)
         {
             var outputWindowPane = WakatimeOutputWindowPane;
             if (outputWindowPane == null) return;
