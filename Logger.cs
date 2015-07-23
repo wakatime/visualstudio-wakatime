@@ -29,6 +29,9 @@ namespace WakaTime
 
         internal static void Debug(string message)
         {
+            if (!WakaTimePackage.Debug)
+                return;
+
             Log("Debug", message);
         }
 
