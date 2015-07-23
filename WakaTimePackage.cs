@@ -46,7 +46,7 @@ namespace WakaTime
 
             try
             {
-                Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
+                Logger.Debug(string.Format("Initializing WakaTime v{0}", _version));
 
                 base.Initialize();
 
