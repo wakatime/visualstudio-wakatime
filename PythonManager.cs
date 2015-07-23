@@ -48,7 +48,7 @@ namespace WakaTime
                     return null;
 
                 Logger.Debug("Python found by Microsoft Register: " + fullPath.ToString());
-                
+
                 return fullPath;
             }
             catch (Exception ex)
@@ -113,16 +113,14 @@ namespace WakaTime
                     process.Run();
                     if (!process.Success) continue;
                 }
-                catch
-                {
-                }
+                catch{ /* ignored */ }
 
-                Logger.Debug("Python found by Fixed Path: " + location.ToString());
+                Logger.Debug(string.Format("Python found by Fixed Path: {0}", location));
 
                 return location;
             }
 
-            return null;       
+            return null;
         }
 
         internal static string GetPythonDownloadUrl()
