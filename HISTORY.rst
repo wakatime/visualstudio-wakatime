@@ -2,6 +2,12 @@
 History
 -------
 
+5.0.6 (2015-07-22)
+++++++++++++++++++
+
+- replaced logging into ActivityLog.xml to Output Window
+- more verbose logging added
+- bug fix when saving proxy into config file
 
 5.0.5 (2015-07-17)
 ++++++++++++++++++

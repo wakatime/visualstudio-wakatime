@@ -118,11 +118,7 @@ namespace WakaTime
                 }
 
                 return null;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("GetPathFromFixedPath:", ex);
-            }
+            }            
             finally
             {
                 Logger.Debug("Python found by Fixed Path");
