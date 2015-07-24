@@ -10,11 +10,13 @@ namespace WakaTime
         private readonly string _program;
         private readonly string[] _arguments;
         private bool _captureOutput;
+        private readonly string _workingDir;
 
-        internal RunProcess(string program, params string[] arguments)
+        internal RunProcess(string program, string workingDir, params string[] arguments)
         {
             _program = program;
             _arguments = arguments;
+            _workingDir = workingDir;
             _captureOutput = true;
         }
 
@@ -33,7 +35,7 @@ namespace WakaTime
             get { return Exception == null; }
         }
 
-        internal Exception Exception { get; private set; }        
+        internal Exception Exception { get; private set; }
 
         internal void Run()
         {
@@ -48,6 +50,10 @@ namespace WakaTime
                     CreateNoWindow = true,
                     Arguments = GetArgumentString()
                 };
+                if (!string.IsNullOrEmpty(_workingDir))
+                {
+                    procInfo.WorkingDirectory = _workingDir;
+                }
 
                 using (var process = Process.Start(procInfo))
                 {
