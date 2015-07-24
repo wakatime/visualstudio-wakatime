@@ -206,6 +206,11 @@ namespace WakaTime
 
         static string GetCli()
         {
+            return WakaTimeConstants.CliFile;
+        }
+
+        private static string GetCliDir()
+        {
             return Path.Combine(ConfigDir, WakaTimeConstants.CliFolder);
         }
 
@@ -235,10 +240,11 @@ namespace WakaTime
             var pythonBinary = PythonManager.GetPython();
             if (pythonBinary != null)
             {
-                var process = new RunProcess(pythonBinary, arguments.ToArray());
+                var workingDir = GetCliDir();
+                var process = new RunProcess(pythonBinary, workingDir, arguments.ToArray());
                 if (Debug)
                 {
-                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", arguments)));
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"] at \"{2}\"", pythonBinary, string.Join("\", \"", arguments), workingDir));
                     process.Run();
                     Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
                     Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
@@ -252,12 +258,12 @@ namespace WakaTime
 
         static bool DoesCliExist()
         {
-            return File.Exists(GetCli());
+            return File.Exists(Path.Combine(GetCliDir(), GetCli()));
         }
 
         static bool IsCliLatestVersion()
         {
-            var process = new RunProcess(PythonManager.GetPython(), GetCli(), "--version");
+            var process = new RunProcess(PythonManager.GetPython(), GetCliDir(), GetCli(), "--version");
             process.Run();
 
             return process.Success && process.Error.Equals(WakaTimeConstants.CurrentWakaTimeCliVersion);

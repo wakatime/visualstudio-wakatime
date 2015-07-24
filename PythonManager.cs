@@ -40,7 +40,7 @@ namespace WakaTime
 
                 var directory = match.Groups[1].Value;
                 var fullPath = Path.Combine(directory, "pythonw");
-                var process = new RunProcess(fullPath, "--version");
+                var process = new RunProcess(fullPath, null, "--version");
 
                 process.Run();
 
@@ -109,7 +109,7 @@ namespace WakaTime
             {
                 try
                 {
-                    var process = new RunProcess(location, "--version");
+                    var process = new RunProcess(location, null, "--version");
                     process.Run();
                     if (!process.Success) continue;
                 }
