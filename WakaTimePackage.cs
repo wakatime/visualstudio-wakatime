@@ -238,7 +238,7 @@ namespace WakaTime
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
                 if (Debug)
                 {
-                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", arguments)));
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", ObfuscateApiKey(arguments))));
                     process.Run();
                     Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
                     Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
@@ -248,6 +248,32 @@ namespace WakaTime
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
+        }
+
+        private static List<string> ObfuscateApiKey(List<string> args)
+        {
+            var obfuscated = new List<string> { };
+            bool should_obfuscate = false;
+            foreach (string arg in args)
+            {
+                if (should_obfuscate)
+                {
+                    var new_arg = "";
+                    if (arg.Length > 4)
+                    {
+                        new_arg = "********-****-****-****-********" + arg.Substring(arg.Length - 4);
+                    }
+                    obfuscated.Add(new_arg);
+                    should_obfuscate = false;
+                }
+                else
+                {
+                    obfuscated.Add(arg);
+                    if (arg == "--key")
+                        should_obfuscate = true;
+                }
+            }
+            return obfuscated;
         }
 
         static bool DoesCliExist()
