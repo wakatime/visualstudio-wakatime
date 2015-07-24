@@ -238,7 +238,7 @@ namespace WakaTime
                 var process = new RunProcess(pythonBinary, arguments.ToArray());
                 if (Debug)
                 {
-                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", ", arguments)));
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", arguments)));
                     process.Run();
                     Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
                     Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
