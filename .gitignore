@@ -41,6 +41,8 @@ FakesAssemblies/
 *.plg
 *.opt
 *.vsix
+*.vsixmanifest
+bin/
 
 # User-specific files
 *.suo
