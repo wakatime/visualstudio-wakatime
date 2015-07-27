@@ -162,8 +162,9 @@
     <Compile Include="Forms\ApiKeyForm.Designer.cs">
       <DependentUpon>ApiKeyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Constants.cs" />
+    <Compile Include="WakaTimeConstants.cs" />
     <Compile Include="ProcessorArchitectureHelper.cs" />
+    <Compile Include="PythonCliParameters.cs" />
     <Compile Include="PythonManager.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>

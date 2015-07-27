@@ -1,4 +1,6 @@
-﻿namespace WakaTime
+﻿using System.Windows.Forms;
+
+namespace WakaTime
 {
     internal static class WakaTimeConstants
     {
@@ -7,5 +9,6 @@
         internal const string PluginName = "visualstudio-wakatime";
         internal const string EditorName = "visualstudio";
         internal const string CliFolder = @"wakatime-master\wakatime\cli.py";
+        internal static string UserConfigDir = Application.UserAppDataPath;
     }
 }

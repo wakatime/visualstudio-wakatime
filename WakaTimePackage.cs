@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
@@ -33,6 +31,7 @@ namespace WakaTime
 
         public static bool Debug;
         public static string ApiKey;
+        static readonly PythonCliParameters PythonCliParameters = new PythonCliParameters();
         private static string _lastFile;
         private static string _solutionName = string.Empty;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
@@ -63,18 +62,18 @@ namespace WakaTime
                 if (!PythonManager.IsPythonInstalled())
                 {
                     var url = PythonManager.GetPythonDownloadUrl();
-                    Downloader.DownloadPython(url, ConfigDir);
+                    Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
                 }
 
                 if (!DoesCliExist() || !IsCliLatestVersion())
                 {
                     try
                     {
-                        Directory.Delete(ConfigDir + "\\wakatime-master", true);
+                        Directory.Delete(string.Format("{0}\\wakatime-master", WakaTimeConstants.UserConfigDir), true);
                     }
                     catch { /* ignored */ }
 
-                    Downloader.DownloadCli(WakaTimeConstants.CliUrl, ConfigDir);
+                    Downloader.DownloadCli(WakaTimeConstants.CliUrl, WakaTimeConstants.UserConfigDir);
                 }
 
                 GetSettings();
@@ -197,48 +196,23 @@ namespace WakaTime
         private bool EnoughTimePassed()
         {
             return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
-        }
-
-        static string ConfigDir
-        {
-            get { return Application.UserAppDataPath; }
-        }
-
-        static string GetCli()
-        {
-            return Path.Combine(ConfigDir, WakaTimeConstants.CliFolder);
-        }
+        }       
 
         public static void SendHeartbeat(string fileName, bool isWrite)
         {
-            var arguments = new List<string>
-            {
-                GetCli(),
-                "--key",
-                ApiKey,
-                "--file",
-                fileName,
-                "--plugin",
-                WakaTimeConstants.EditorName + "/" + _editorVersion + " " + WakaTimeConstants.PluginName + "/" + _version
-            };
-
-            if (isWrite)
-                arguments.Add("--write");
-
-            var projectName = GetProjectName();
-            if (!string.IsNullOrEmpty(projectName))
-            {
-                arguments.Add("--project");
-                arguments.Add(projectName);
-            }
+            PythonCliParameters.Key = ApiKey;
+            PythonCliParameters.File = fileName;
+            PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, _editorVersion, WakaTimeConstants.PluginName, _version);
+            PythonCliParameters.IsWrite = isWrite;
+            PythonCliParameters.Project = GetProjectName();
 
             var pythonBinary = PythonManager.GetPython();
             if (pythonBinary != null)
             {
-                var process = new RunProcess(pythonBinary, arguments.ToArray());
+                var process = new RunProcess(pythonBinary, PythonCliParameters.ToArray());
                 if (Debug)
                 {
-                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", ObfuscateApiKey(arguments))));
+                    Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", PythonCliParameters.ToArray(true))));
                     process.Run();
                     Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
                     Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
@@ -248,42 +222,16 @@ namespace WakaTime
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
-        }
-
-        private static List<string> ObfuscateApiKey(List<string> args)
-        {
-            var obfuscated = new List<string> { };
-            bool should_obfuscate = false;
-            foreach (string arg in args)
-            {
-                if (should_obfuscate)
-                {
-                    var new_arg = "";
-                    if (arg.Length > 4)
-                    {
-                        new_arg = "********-****-****-****-********" + arg.Substring(arg.Length - 4);
-                    }
-                    obfuscated.Add(new_arg);
-                    should_obfuscate = false;
-                }
-                else
-                {
-                    obfuscated.Add(arg);
-                    if (arg == "--key")
-                        should_obfuscate = true;
-                }
-            }
-            return obfuscated;
-        }
+        }        
 
         static bool DoesCliExist()
         {
-            return File.Exists(GetCli());
+            return File.Exists(PythonCliParameters.Cli);
         }
 
         static bool IsCliLatestVersion()
         {
-            var process = new RunProcess(PythonManager.GetPython(), GetCli(), "--version");
+            var process = new RunProcess(PythonManager.GetPython(), PythonCliParameters.Cli, "--version");
             process.Run();
 
             return process.Success && process.Error.Equals(WakaTimeConstants.CurrentWakaTimeCliVersion);
@@ -318,7 +266,7 @@ namespace WakaTime
                 ? Path.GetFileNameWithoutExtension(_solutionName)
                 : (_objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName))
                     ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
-                    : null;
+                    : string.Empty;
         }
         #endregion
 
