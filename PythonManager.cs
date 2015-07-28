@@ -47,7 +47,7 @@ namespace WakaTime
                 if (!process.Success)
                     return null;
 
-                Logger.Debug("Python found by Microsoft Register: " + fullPath.ToString());
+                Logger.Debug(string.Format("Python found by Microsoft Register: {0}", fullPath));
                 
                 return fullPath;
             }
@@ -111,13 +111,12 @@ namespace WakaTime
                 {
                     var process = new RunProcess(location, "--version");
                     process.Run();
+
                     if (!process.Success) continue;
                 }
-                catch
-                {
-                }
+                catch{ /*ignored*/ }
 
-                Logger.Debug("Python found by Fixed Path: " + location.ToString());
+                Logger.Debug(string.Format("Python found by Fixed Path: {0}", location));
 
                 return location;
             }
@@ -127,7 +126,7 @@ namespace WakaTime
 
         internal static string GetPythonDownloadUrl()
         {
-            var url = "https://www.python.org/ftp/python/" + CurrentPythonVersion + "/python-" + CurrentPythonVersion;
+            var url = string.Format("https://www.python.org/ftp/python/{0}/python-{0}", CurrentPythonVersion);
 
             if (ProcessorArchitectureHelper.Is64BitOperatingSystem)
                 url = url + ".amd64";

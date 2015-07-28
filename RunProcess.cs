@@ -53,7 +53,6 @@ namespace WakaTime
                 {
                     if (_captureOutput)
                     {
-
                         var stdOut = new StringBuilder();
                         var stdErr = new StringBuilder();
 
@@ -86,7 +85,7 @@ namespace WakaTime
 
         private string GetArgumentString()
         {
-            var args = _arguments.Aggregate("", (current, arg) => current + "\"" + arg + "\" ");
+            var args = _arguments.Aggregate(string.Empty, (current, arg) => current + "\"" + arg + "\" ");
             return args.TrimEnd(' ');
         }
     }
