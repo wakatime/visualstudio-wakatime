@@ -3,6 +3,12 @@ History
 -------
 
 
+5.0.8 (2015-07-29)
+++++++++++++++++++
+
+- bug fix when setting api key for the first time
+
+
 5.0.7 (2015-07-27)
 ++++++++++++++++++
 
