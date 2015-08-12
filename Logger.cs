@@ -1,9 +1,17 @@
 ﻿using System;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace WakaTime
 {
+    internal enum LogLevel
+    {
+        Debug = 1,
+        Info,
+        Warning,
+        HandledException
+    };
+
     static class Logger
     {
         private static IVsOutputWindowPane _wakatimeOutputWindowPane;
@@ -32,32 +40,32 @@ namespace WakaTime
             if (!WakaTimePackage.Debug)
                 return;
 
-            Log("Debug", message);
+            Log(LogLevel.Debug, message);
         }
 
         internal static void Error(string message, Exception ex = null)
         {
             var exceptionMessage = string.Format("{0}: {1}", message, ex);
 
-            Log("Handled Exception", exceptionMessage);
+            Log(LogLevel.HandledException, exceptionMessage);
         }
 
         internal static void Warning(string message)
         {
-            Log("Warning", message);
+            Log(LogLevel.Warning, message);
         }
 
         internal static void Info(string message)
         {
-            Log("Info", message);
+            Log(LogLevel.Info, message);
         }
 
-        private static void Log(string category, string message)
+        private static void Log(LogLevel level, string message)
         {
             var outputWindowPane = WakatimeOutputWindowPane;
             if (outputWindowPane == null) return;
 
-            var outputMessage = string.Format("[Wakatime {0} {1}] {2}{3}", category,
+            var outputMessage = string.Format("[Wakatime {0} {1}] {2}{3}", Enum.GetName(level.GetType(), level),
                 DateTime.Now.ToString("hh:mm:ss tt"), message, Environment.NewLine);
 
             outputWindowPane.OutputString(outputMessage);
