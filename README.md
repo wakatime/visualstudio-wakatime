@@ -28,6 +28,24 @@ Screen Shots
 ![Project Overview](https://wakatime.com/static/img/ScreenShots/ScreenShot-2014-10-29.png)
 
 
+Supported Visual Studio Editions
+--------------------------------
+
+* Visual Studio 2012 Professional
+* Visual Studio 2012 Premium
+* Visual Studio 2012 Ultimate
+* Visual Studio 2013 Professional
+* Visual Studio 2013 Premium
+* Visual Studio 2013 Ultimate
+* Visual Studio 2015 Community
+* Visual Studio 2015 Professional
+* Visual Studio 2015 Enterprise
+
+#### Visual Studio Express
+
+Microsoft [does not allow](https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx) extensions for Visual Studio Express edition in the gallery. To use WakaTime for Visual Studio Express, clone the github repo and build the extension using the `Express` build profile. The resulting `bin/Express/WakaTime.vsix` extension file will install into Visual Studio Express when run.
+
+
 Contributing
 ------------
 
