@@ -7,7 +7,7 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
-using Thread = System.Threading.Thread;
+using Task = System.Threading.Tasks.Task;
 
 namespace WakaTime
 {
@@ -41,11 +41,16 @@ namespace WakaTime
         #region Startup/Cleanup
         protected override void Initialize()
         {
+            Task.Factory.StartNew(InitializeAsync);
+        }
+
+        public void InitializeAsync()
+        {
             _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
 
             try
             {
-                Logger.Debug(string.Format("Initializing WakaTime v{0}", _version));
+                Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
 
                 base.Initialize();
 
@@ -61,7 +66,7 @@ namespace WakaTime
                 // Make sure python is installed
                 if (!PythonManager.IsPythonInstalled())
                 {
-                    var url = PythonManager.GetPythonDownloadUrl();
+                    var url = PythonManager.PythonDownloadUrl;
                     Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
                 }
 
@@ -103,7 +108,7 @@ namespace WakaTime
             {
                 Logger.Error("Error initializing Wakatime", ex);
             }
-        }
+        }        
 
         #endregion
 
@@ -177,26 +182,24 @@ namespace WakaTime
         {
             if (currentFile == null) return;
 
-            var thread = new Thread(
-                delegate()
+            Task.Factory.StartNew(() =>
+            {
+                lock (ThreadLock)
                 {
-                    lock (ThreadLock)
-                    {
-                        if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
-                            return;
+                    if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
+                        return;
 
-                        SendHeartbeat(currentFile, isWrite);
-                        _lastFile = currentFile;
-                        _lastHeartbeat = DateTime.UtcNow;
-                    }
-                });
-            thread.Start();
+                    SendHeartbeat(currentFile, isWrite);
+                    _lastFile = currentFile;
+                    _lastHeartbeat = DateTime.UtcNow;
+                }
+            });
         }
 
         private bool EnoughTimePassed()
         {
             return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
-        }       
+        }
 
         public static void SendHeartbeat(string fileName, bool isWrite)
         {
@@ -222,7 +225,7 @@ namespace WakaTime
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
-        }        
+        }
 
         static bool DoesCliExist()
         {
@@ -234,7 +237,9 @@ namespace WakaTime
             var process = new RunProcess(PythonManager.GetPython(), PythonCliParameters.Cli, "--version");
             process.Run();
 
-            return process.Success && process.Error.Equals(WakaTimeConstants.CurrentWakaTimeCliVersion);
+            var wakatimeVersion = WakaTimeConstants.CurrentWakaTimeCliVersion();
+
+            return process.Success && process.Error.Equals(wakatimeVersion);
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)
