@@ -11,7 +11,7 @@ namespace WakaTime
         internal const string PluginName = "visualstudio-wakatime";
         internal const string EditorName = "visualstudio";
         internal const string CliFolder = @"wakatime-master\wakatime\cli.py";
-        internal static string UserConfigDir = Application.UserAppDataPath;
+        internal static string UserConfigDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         internal static Func<string> CurrentWakaTimeCliVersion = () =>
         {
             var regex = new Regex(@"(__version_info__ = )(\(( ?\'[0-9]\'\,?){3}\))");
