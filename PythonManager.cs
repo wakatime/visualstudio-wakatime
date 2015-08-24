@@ -124,16 +124,19 @@ namespace WakaTime
             return null;       
         }
 
-        internal static string GetPythonDownloadUrl()
+        internal static string PythonDownloadUrl
         {
-            var url = string.Format("https://www.python.org/ftp/python/{0}/python-{0}", CurrentPythonVersion);
+            get
+            {
+                var url = string.Format("https://www.python.org/ftp/python/{0}/python-{0}", CurrentPythonVersion);
 
-            if (ProcessorArchitectureHelper.Is64BitOperatingSystem)
-                url = url + ".amd64";
+                if (ProcessorArchitectureHelper.Is64BitOperatingSystem)
+                    url = url + ".amd64";
 
-            url = url + ".msi";
+                url = url + ".msi";
 
-            return url;
+                return url;
+            }
         }
     }
 }

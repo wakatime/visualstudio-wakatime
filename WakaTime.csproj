@@ -30,6 +30,7 @@
     <DebugType>full</DebugType>
     <OutputPath>bin\Debug\</OutputPath>
     <DebugSymbols>true</DebugSymbols>
+    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -254,12 +255,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup>
-    <PreBuildEvent>del "$(ProjectDir)source.extension.vsixmanifest"
-if $(ConfigurationName) == Express (
-  copy "$(ProjectDir)source.extension.vsixmanifest-express" "$(ProjectDir)source.extension.vsixmanifest" /y
-) ELSE (
-  copy "$(ProjectDir)source.extension.vsixmanifest-default" "$(ProjectDir)source.extension.vsixmanifest" /y
-)</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
