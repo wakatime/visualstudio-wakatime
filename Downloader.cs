@@ -9,7 +9,7 @@ namespace WakaTime
         static public void DownloadCli(string url, string dir)
         {
             Logger.Debug("Downloading wakatime cli...");
-
+            
             var client = new WebClient();
             var localZipFile = dir + "\\wakatime-cli.zip";
 
