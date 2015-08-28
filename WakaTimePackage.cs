@@ -41,7 +41,7 @@ namespace WakaTime
         #region Startup/Cleanup
         protected override void Initialize()
         {
-            Task.Factory.StartNew(InitializeAsync);
+            Task.Run(() => { InitializeAsync(); });
         }
 
         public void InitializeAsync()
@@ -108,7 +108,7 @@ namespace WakaTime
             {
                 Logger.Error("Error initializing Wakatime", ex);
             }
-        }        
+        }
 
         #endregion
 
@@ -182,7 +182,7 @@ namespace WakaTime
         {
             if (currentFile == null) return;
 
-            Task.Factory.StartNew(() =>
+            Task.Run(() =>
             {
                 lock (ThreadLock)
                 {
