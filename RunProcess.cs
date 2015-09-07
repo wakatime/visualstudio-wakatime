@@ -78,7 +78,7 @@ namespace WakaTime
             catch (Exception ex)
             {
                 Output = null;
-                Error = null;
+                Error = ex.Message;
                 Exception = ex;
             }
         }
