@@ -8,7 +8,7 @@ namespace WakaTime
     static class PythonManager
     {
         private const string CurrentPythonVersion = "3.4.3";
-        private static string PythonBinaryLocation { get; set; }
+        private static string PythonBinaryLocation { get; set; }        
 
         internal static bool IsPythonInstalled()
         {
@@ -16,7 +16,7 @@ namespace WakaTime
         }
 
         internal static string GetPython()
-        {
+        {            
             if (PythonBinaryLocation != null)
                 return PythonBinaryLocation;
 
@@ -48,7 +48,7 @@ namespace WakaTime
                     return null;
 
                 Logger.Debug(string.Format("Python found by Microsoft Register: {0}", fullPath));
-                
+
                 return fullPath;
             }
             catch (Exception ex)
@@ -114,14 +114,14 @@ namespace WakaTime
 
                     if (!process.Success) continue;
                 }
-                catch{ /*ignored*/ }
+                catch { /*ignored*/ }
 
                 Logger.Debug(string.Format("Python found by Fixed Path: {0}", location));
 
                 return location;
             }
 
-            return null;       
+            return null;
         }
 
         internal static string PythonDownloadUrl

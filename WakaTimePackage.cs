@@ -3,6 +3,7 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
@@ -66,8 +67,17 @@ namespace WakaTime
                 // Make sure python is installed
                 if (!PythonManager.IsPythonInstalled())
                 {
-                    var url = PythonManager.PythonDownloadUrl;
-                    Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
+                    var dialogResult = MessageBox.Show(@"Let's download and install Python now?",
+                        @"WakaTime requires Python", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        var url = PythonManager.PythonDownloadUrl;
+                        Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
+                    }
+                    else
+                        MessageBox.Show(
+                            @"Please install Python (https://www.python.org/downloads/) and restart Visual Studio to enable the WakaTime plugin.",
+                            @"WakaTime", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
                 if (!DoesCliExist() || !IsCliLatestVersion())
@@ -222,6 +232,9 @@ namespace WakaTime
                 }
                 else
                     process.RunInBackground();
+
+                if(!process.Success)
+                    Logger.Error(string.Format("Could not send heartbeat: {0}", process.Error));
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
