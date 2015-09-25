@@ -43,7 +43,11 @@ Supported Visual Studio Editions
 
 #### Visual Studio Express
 
-Microsoft [does not allow](https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx) extensions for Visual Studio Express edition in the gallery. To use WakaTime for Visual Studio Express, clone the github repo and build the extension using the `Express` build profile. The resulting `bin/Express/WakaTime.vsix` extension file will install into Visual Studio Express when run.
+Microsoft [does not allow](https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx) extensions for Visual Studio Express edition in the gallery.
+To use WakaTime for Visual Studio Express, download and install [WakaTime for Express](https://github.com/wakatime/visualstudio-wakatime/releases/download/5.0.10/WakaTime-express-v5.0.10.vsix).
+
+Alternatively, you may clone the github repo and build the extension using the `Express` build profile.
+The resulting `bin/Express/WakaTime.vsix` extension file will install into Visual Studio Express when run.
 
 
 Contributing
