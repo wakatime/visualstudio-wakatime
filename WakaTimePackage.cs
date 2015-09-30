@@ -9,6 +9,7 @@ using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
 using Task = System.Threading.Tasks.Task;
+using System.Net;
 
 namespace WakaTime
 {
@@ -30,8 +31,11 @@ namespace WakaTime
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
+        // Settings
         public static bool Debug;
         public static string ApiKey;
+        public static string Proxy;
+
         static readonly PythonCliParameters PythonCliParameters = new PythonCliParameters();
         private static string _lastFile;
         private static string _solutionName = string.Empty;
@@ -55,14 +59,20 @@ namespace WakaTime
 
                 base.Initialize();
 
+                // VisualStudio Object
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
                 _solutionEvents = _objDte.Events.SolutionEvents;
                 _editorVersion = _objDte.Version;
+
+                // Settings Form
                 _settingsForm = new SettingsForm();
                 _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
+
+                // Load config file
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
+                GetSettings();
 
                 // Make sure python is installed
                 if (!PythonManager.IsPythonInstalled())
@@ -72,7 +82,7 @@ namespace WakaTime
                     if (dialogResult == DialogResult.Yes)
                     {
                         var url = PythonManager.PythonDownloadUrl;
-                        Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
+                        Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
                     }
                     else
                         MessageBox.Show(
@@ -90,8 +100,6 @@ namespace WakaTime
 
                     Downloader.DownloadCli(WakaTimeConstants.CliUrl, WakaTimeConstants.UserConfigDir);
                 }
-
-                GetSettings();
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -186,7 +194,9 @@ namespace WakaTime
         {
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
+            Proxy = _wakaTimeConfigFile.Proxy;
         }
+
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
@@ -285,6 +295,44 @@ namespace WakaTime
                 : (_objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName))
                     ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
                     : string.Empty;
+        }
+
+        public static WebProxy GetProxy()
+        {
+            // http://username:password@address:port
+
+            if (String.IsNullOrEmpty(WakaTimePackage.Proxy))
+                return null;
+
+            WebProxy proxy = null;
+
+            try
+            {
+                string proxyStr = WakaTimePackage.Proxy;
+
+                var proxySplit = proxyStr.Split('@');
+
+                var proxyCredentials = proxySplit[0].Split(':');
+                var a = proxyCredentials[0].Split(new string[] { "//" }, StringSplitOptions.None);
+                var protocol = a[0];
+                var username = proxyCredentials[1].Replace("/", String.Empty);
+                var password = proxyCredentials[2];
+
+                var proxySplit2 = proxySplit[1].Split(':');
+                var address = proxySplit2[0];
+                var port = proxySplit2[1];
+
+                NetworkCredential credentials = new NetworkCredential(username, password);
+
+                proxy = new WebProxy(String.Join(":", address, port), true, null, credentials);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Exception while parsing the proxy data from config file.", ex);
+            }
+
+            return proxy;
         }
         #endregion
 

@@ -1,20 +1,25 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
 namespace WakaTime
 {
     internal static class WakaTimeConstants
-    {        
-        internal const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
+    {
         internal const string PluginName = "visualstudio-wakatime";
         internal const string EditorName = "visualstudio";
+
+        internal const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
         internal const string CliFolder = @"wakatime-master\wakatime\cli.py";
+
         internal static string UserConfigDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
         internal static Func<string> CurrentWakaTimeCliVersion = () =>
         {
             var regex = new Regex(@"(__version_info__ = )(\(( ?\'[0-9]\'\,?){3}\))");
             var client = new WebClient();
+            client.Proxy = WakaTimePackage.GetProxy();
             try
             {
                 var about = client.DownloadString("https://raw.githubusercontent.com/wakatime/wakatime/master/wakatime/__about__.py");

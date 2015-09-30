@@ -12,7 +12,7 @@ namespace WakaTime.Forms
         {
             InitializeComponent();
 
-            _wakaTimeConfigFile = new WakaTimeConfigFile();            
+            _wakaTimeConfigFile = new WakaTimeConfigFile();
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
