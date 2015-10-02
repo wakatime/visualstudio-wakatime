@@ -310,24 +310,40 @@ namespace WakaTime
             {
                 string proxyStr = WakaTimePackage.Proxy;
 
-                Regex reg = new Regex(@"(http|https):\/\/(\S+):(\S+)@(\S+):(\d+)");
-                Match match = reg.Match(proxyStr);
+                // Regex that matches proxy address with authentication
+                Regex regProxyWithAuth = new Regex(@"(http|https):\/\/(\S+):(\S+)@(\S+):(\d+)");
+                Match match = regProxyWithAuth.Match(proxyStr);
 
-                if (!match.Success)
+                if (match.Success)
                 {
-                    Logger.Debug("No proxy will be used. It's either not set or badly formatted.");
+                    var username = match.Groups[2].Value;
+                    var password = match.Groups[3].Value;
+                    var address = match.Groups[4].Value;
+                    var port = match.Groups[5].Value;
+
+                    NetworkCredential credentials = new NetworkCredential(username, password);
+                    proxy = new WebProxy(String.Join(":", address, port), true, null, credentials);
+
+                    Logger.Debug("A proxy with authentication will be used.");
                     return proxy;
                 }
 
-                var username = match.Groups[2].Value;
-                var password = match.Groups[3].Value;
-                var address = match.Groups[4].Value;
-                var port = match.Groups[5].Value;
+                // Regex that matches proxy address and port(no authentication)
+                Regex regProxy = new Regex(@"(http|https):\/\/([\S-[@]]+):(\d+)");
+                match = regProxy.Match(proxyStr);
 
-                NetworkCredential credentials = new NetworkCredential(username, password);
+                if (match.Success)
+                {
+                    var address = match.Groups[2].Value;
+                    var port = Int32.Parse(match.Groups[3].Value);
 
-                proxy = new WebProxy(String.Join(":", address, port), true, null, credentials);
+                    proxy = new WebProxy(address, port);
 
+                    Logger.Debug("A proxy will be used.");
+                    return proxy;
+                }
+
+                Logger.Debug("No proxy will be used. It's either not set or badly formatted.");
             }
             catch (Exception ex)
             {
