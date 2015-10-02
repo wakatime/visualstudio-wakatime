@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
 using Task = System.Threading.Tasks.Task;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace WakaTime
 {
@@ -297,30 +298,31 @@ namespace WakaTime
                     : string.Empty;
         }
 
+        /// <summary>
+        /// Get a Proxy object by parsing the proxy string in the .wakatime.cfg file
+        /// </summary>
+        /// <returns>Proxy object set in .wakatime.cfg</returns>
         public static WebProxy GetProxy()
         {
-            // http://username:password@address:port
-
-            if (String.IsNullOrEmpty(WakaTimePackage.Proxy))
-                return null;
-
             WebProxy proxy = null;
 
             try
             {
                 string proxyStr = WakaTimePackage.Proxy;
 
-                var proxySplit = proxyStr.Split('@');
+                Regex reg = new Regex(@"(http|https):\/\/(\S+):(\S+)@(\S+):(\d+)");
+                Match match = reg.Match(proxyStr);
 
-                var proxyCredentials = proxySplit[0].Split(':');
-                var a = proxyCredentials[0].Split(new string[] { "//" }, StringSplitOptions.None);
-                var protocol = a[0];
-                var username = proxyCredentials[1].Replace("/", String.Empty);
-                var password = proxyCredentials[2];
+                if (!match.Success)
+                {
+                    Logger.Debug("No proxy will be used. It's either not set or badly formatted.");
+                    return proxy;
+                }
 
-                var proxySplit2 = proxySplit[1].Split(':');
-                var address = proxySplit2[0];
-                var port = proxySplit2[1];
+                var username = match.Groups[2].Value;
+                var password = match.Groups[3].Value;
+                var address = match.Groups[4].Value;
+                var port = match.Groups[5].Value;
 
                 NetworkCredential credentials = new NetworkCredential(username, password);
 
@@ -329,7 +331,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("Exception while parsing the proxy data from config file.", ex);
+                Logger.Error("Exception while parsing the proxy string from WakaTime config file. No proxy will be used.", ex);
             }
 
             return proxy;
