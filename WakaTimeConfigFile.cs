@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WakaTime
 {
-    class WakaTimeConfigFile
+    public class WakaTimeConfigFile
     {
         internal string ApiKey { get; set; }        
         internal string Proxy { get; set; }

@@ -18,8 +18,10 @@ namespace WakaTime
         internal static Func<string> CurrentWakaTimeCliVersion = () =>
         {
             var regex = new Regex(@"(__version_info__ = )(\(( ?\'[0-9]\'\,?){3}\))");
+
             var client = new WebClient();
             client.Proxy = WakaTimePackage.GetProxy();
+
             try
             {
                 var about = client.DownloadString("https://raw.githubusercontent.com/wakatime/wakatime/master/wakatime/__about__.py");
