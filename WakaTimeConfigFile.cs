@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 namespace WakaTime
 {
-    class WakaTimeConfigFile
+    public class WakaTimeConfigFile
     {
         internal string ApiKey { get; set; }        
         internal string Proxy { get; set; }
@@ -49,8 +50,7 @@ namespace WakaTime
 
         static string GetConfigFilePath()
         {
-            var userHomeDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            return userHomeDir + "\\.wakatime.cfg";
+            return Path.Combine(WakaTimeConstants.UserConfigDir, ".wakatime.cfg");
         }
     }
 }

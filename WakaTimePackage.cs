@@ -9,6 +9,8 @@ using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
 using Task = System.Threading.Tasks.Task;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace WakaTime
 {
@@ -30,8 +32,11 @@ namespace WakaTime
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
+        // Settings
         public static bool Debug;
         public static string ApiKey;
+        public static string Proxy;
+
         static readonly PythonCliParameters PythonCliParameters = new PythonCliParameters();
         private static string _lastFile;
         private static string _solutionName = string.Empty;
@@ -55,14 +60,20 @@ namespace WakaTime
 
                 base.Initialize();
 
+                // VisualStudio Object
                 _objDte = (DTE2)GetService(typeof(DTE));
                 _docEvents = _objDte.Events.DocumentEvents;
                 _windowEvents = _objDte.Events.WindowEvents;
                 _solutionEvents = _objDte.Events.SolutionEvents;
                 _editorVersion = _objDte.Version;
+
+                // Settings Form
                 _settingsForm = new SettingsForm();
                 _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
+
+                // Load config file
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
+                GetSettings();
 
                 // Make sure python is installed
                 if (!PythonManager.IsPythonInstalled())
@@ -72,7 +83,7 @@ namespace WakaTime
                     if (dialogResult == DialogResult.Yes)
                     {
                         var url = PythonManager.PythonDownloadUrl;
-                        Downloader.DownloadPython(url, WakaTimeConstants.UserConfigDir);
+                        Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
                     }
                     else
                         MessageBox.Show(
@@ -90,8 +101,6 @@ namespace WakaTime
 
                     Downloader.DownloadCli(WakaTimeConstants.CliUrl, WakaTimeConstants.UserConfigDir);
                 }
-
-                GetSettings();
 
                 if (string.IsNullOrEmpty(ApiKey))
                     PromptApiKey();
@@ -186,7 +195,9 @@ namespace WakaTime
         {
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
+            Proxy = _wakaTimeConfigFile.Proxy;
         }
+
 
         private void HandleActivity(string currentFile, bool isWrite)
         {
@@ -285,6 +296,61 @@ namespace WakaTime
                 : (_objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName))
                     ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
                     : string.Empty;
+        }
+
+        /// <summary>
+        /// Get a Proxy object by parsing the proxy string in the .wakatime.cfg file
+        /// </summary>
+        /// <returns>Proxy object set in .wakatime.cfg</returns>
+        public static WebProxy GetProxy()
+        {
+            WebProxy proxy = null;
+
+            try
+            {
+                string proxyStr = WakaTimePackage.Proxy;
+
+                // Regex that matches proxy address with authentication
+                Regex regProxyWithAuth = new Regex(@"(http|https):\/\/(\S+):(\S+)@(\S+):(\d+)");
+                Match match = regProxyWithAuth.Match(proxyStr);
+
+                if (match.Success)
+                {
+                    var username = match.Groups[2].Value;
+                    var password = match.Groups[3].Value;
+                    var address = match.Groups[4].Value;
+                    var port = match.Groups[5].Value;
+
+                    NetworkCredential credentials = new NetworkCredential(username, password);
+                    proxy = new WebProxy(String.Join(":", address, port), true, null, credentials);
+
+                    Logger.Debug("A proxy with authentication will be used.");
+                    return proxy;
+                }
+
+                // Regex that matches proxy address and port(no authentication)
+                Regex regProxy = new Regex(@"(http|https):\/\/([\S-[@]]+):(\d+)");
+                match = regProxy.Match(proxyStr);
+
+                if (match.Success)
+                {
+                    var address = match.Groups[2].Value;
+                    var port = Int32.Parse(match.Groups[3].Value);
+
+                    proxy = new WebProxy(address, port);
+
+                    Logger.Debug("A proxy will be used.");
+                    return proxy;
+                }
+
+                Logger.Debug("No proxy will be used. It's either not set or badly formatted.");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Exception while parsing the proxy string from WakaTime config file. No proxy will be used.", ex);
+            }
+
+            return proxy;
         }
         #endregion
 

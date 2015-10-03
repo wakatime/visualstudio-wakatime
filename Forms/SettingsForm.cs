@@ -12,7 +12,7 @@ namespace WakaTime.Forms
         {
             InitializeComponent();
 
-            _wakaTimeConfigFile = new WakaTimeConfigFile();            
+            _wakaTimeConfigFile = new WakaTimeConfigFile();
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
@@ -35,7 +35,8 @@ namespace WakaTime.Forms
             try
             {
                 Guid apiKey;
-                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out apiKey);                              
+                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out apiKey);         
+                                     
                 if (parse)
                 {
                     _wakaTimeConfigFile.ApiKey = apiKey.ToString();
