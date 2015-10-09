@@ -22,7 +22,7 @@ namespace WakaTime
             {
                 Cli,
                 "--key",
-                obfuscate ? string.Format("********-****-****-****-********{0}", Key.Substring(Key.Length - 4)) : Key,
+                obfuscate ? string.Format("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX{0}", Key.Substring(Key.Length - 4)) : Key,
                 "--file",
                 File,
                 "--plugin",
