@@ -311,7 +311,7 @@ namespace WakaTime
                 string proxyStr = WakaTimePackage.Proxy;
 
                 // Regex that matches proxy address with authentication
-                Regex regProxyWithAuth = new Regex(@"(http|https):\/\/(\S+):(\S+)@(\S+):(\d+)");
+                Regex regProxyWithAuth = new Regex(@"\s*(https?:\/\/)?([^\s:]+):([^\s:]+)@([^\s:]+):(\d+)\s*");
                 Match match = regProxyWithAuth.Match(proxyStr);
 
                 if (match.Success)
@@ -329,7 +329,7 @@ namespace WakaTime
                 }
 
                 // Regex that matches proxy address and port(no authentication)
-                Regex regProxy = new Regex(@"(http|https):\/\/([\S-[@]]+):(\d+)");
+                Regex regProxy = new Regex(@"\s*(https?:\/\/)?([^\s@]+):(\d+)\s*");
                 match = regProxy.Match(proxyStr);
 
                 if (match.Success)
