@@ -260,9 +260,26 @@ namespace WakaTime
             var process = new RunProcess(PythonManager.GetPython(), PythonCliParameters.Cli, "--version");
             process.Run();
 
-            var wakatimeVersion = WakaTimeConstants.CurrentWakaTimeCliVersion();
+            if (process.Success)
+            {
+                var currentVersion = process.Error.Trim();
+                Logger.Info(string.Format("Current wakatime-cli version is {0}", currentVersion));
 
-            return process.Success && process.Error.Equals(wakatimeVersion);
+                Logger.Info("Checking for updates to wakatime-cli...");
+                var latestVersion = WakaTimeConstants.LatestWakaTimeCliVersion();
+
+                if (currentVersion.Equals(latestVersion))
+                {
+                    Logger.Info("wakatime-cli is up to date.");
+                    return true;
+                }
+                else
+                {
+                    Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
+                }
+
+            }
+            return false;
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)
