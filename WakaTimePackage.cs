@@ -41,13 +41,15 @@ namespace WakaTime
         private static string _lastFile;
         private static string _solutionName = string.Empty;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
-        private static readonly object ThreadLock = new object();
         #endregion
 
         #region Startup/Cleanup
         protected override void Initialize()
         {
-            Task.Run(() => { InitializeAsync(); });
+            base.Initialize();
+            Task.Run(() => {
+                InitializeAsync();
+            });
         }
 
         public void InitializeAsync()
@@ -57,8 +59,6 @@ namespace WakaTime
             try
             {
                 Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
-
-                base.Initialize();
 
                 // VisualStudio Object
                 _objDte = (DTE2)GetService(typeof(DTE));
@@ -198,23 +198,22 @@ namespace WakaTime
             Proxy = _wakaTimeConfigFile.Proxy;
         }
 
-
         private void HandleActivity(string currentFile, bool isWrite)
         {
-            if (currentFile == null) return;
+            if (currentFile == null)
+                return;
+
+            if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
+                return;
 
             Task.Run(() =>
             {
-                lock (ThreadLock)
-                {
-                    if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
-                        return;
-
-                    SendHeartbeat(currentFile, isWrite);
-                    _lastFile = currentFile;
-                    _lastHeartbeat = DateTime.UtcNow;
-                }
+                SendHeartbeat(currentFile, isWrite);
             });
+
+
+            _lastFile = currentFile;
+            _lastHeartbeat = DateTime.UtcNow;
         }
 
         private bool EnoughTimePassed()
