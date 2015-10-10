@@ -20,11 +20,8 @@ namespace WakaTime
             if (PythonBinaryLocation != null)
                 return PythonBinaryLocation;
 
-            var path = GetPathFromMicrosoftRegister() ?? GetPathFromFixedPath();
-
-            PythonBinaryLocation = path;
-
-            return path;
+            PythonBinaryLocation = GetPathFromMicrosoftRegister() ?? GetPathFromFixedPath();
+            return PythonBinaryLocation;
         }
 
         static string GetPathFromMicrosoftRegister()
@@ -47,7 +44,7 @@ namespace WakaTime
                 if (!process.Success)
                     return null;
 
-                Logger.Debug(string.Format("Python found by Microsoft Register: {0}", fullPath));
+                Logger.Debug(string.Format("Python found from Microsoft Registery: {0}", fullPath));
 
                 return fullPath;
             }
