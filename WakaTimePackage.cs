@@ -47,9 +47,31 @@ namespace WakaTime
         protected override void Initialize()
         {
             base.Initialize();
-            Task.Run(() => {
+            
+            WarmUp();
+            Task.Run(() =>
+            {
                 InitializeAsync();
             });
+        }
+
+        private static void WarmUp()
+        {
+            // Make sure python is installed
+            if (!PythonManager.IsPythonInstalled())
+            {
+                var dialogResult = MessageBox.Show(@"Let's download and install Python now?",
+                    @"WakaTime requires Python", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    var url = PythonManager.PythonDownloadUrl;
+                    Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
+                }
+                else
+                    MessageBox.Show(
+                        @"Please install Python (https://www.python.org/downloads/) and restart Visual Studio to enable the WakaTime plugin.",
+                        @"WakaTime", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         public void InitializeAsync()
@@ -73,23 +95,7 @@ namespace WakaTime
 
                 // Load config file
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
-                GetSettings();
-
-                // Make sure python is installed
-                if (!PythonManager.IsPythonInstalled())
-                {
-                    var dialogResult = MessageBox.Show(@"Let's download and install Python now?",
-                        @"WakaTime requires Python", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (dialogResult == DialogResult.Yes)
-                    {
-                        var url = PythonManager.PythonDownloadUrl;
-                        Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
-                    }
-                    else
-                        MessageBox.Show(
-                            @"Please install Python (https://www.python.org/downloads/) and restart Visual Studio to enable the WakaTime plugin.",
-                            @"WakaTime", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                GetSettings();                
 
                 if (!DoesCliExist() || !IsCliLatestVersion())
                 {
@@ -243,7 +249,7 @@ namespace WakaTime
                 else
                     process.RunInBackground();
 
-                if(!process.Success)
+                if (!process.Success)
                     Logger.Error(string.Format("Could not send heartbeat: {0}", process.Error));
             }
             else
@@ -313,22 +319,18 @@ namespace WakaTime
                     ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
                     : string.Empty;
         }
-
-        /// <summary>
-        /// Get a Proxy object by parsing the proxy string in the .wakatime.cfg file
-        /// </summary>
-        /// <returns>Proxy object set in .wakatime.cfg</returns>
+        
         public static WebProxy GetProxy()
         {
             WebProxy proxy = null;
 
             try
             {
-                string proxyStr = WakaTimePackage.Proxy;
+                var proxyStr = Proxy;
 
                 // Regex that matches proxy address with authentication
-                Regex regProxyWithAuth = new Regex(@"\s*(https?:\/\/)?([^\s:]+):([^\s:]+)@([^\s:]+):(\d+)\s*");
-                Match match = regProxyWithAuth.Match(proxyStr);
+                var regProxyWithAuth = new Regex(@"\s*(https?:\/\/)?([^\s:]+):([^\s:]+)@([^\s:]+):(\d+)\s*");
+                var match = regProxyWithAuth.Match(proxyStr);
 
                 if (match.Success)
                 {
@@ -337,21 +339,21 @@ namespace WakaTime
                     var address = match.Groups[4].Value;
                     var port = match.Groups[5].Value;
 
-                    NetworkCredential credentials = new NetworkCredential(username, password);
-                    proxy = new WebProxy(String.Join(":", address, port), true, null, credentials);
+                    var credentials = new NetworkCredential(username, password);
+                    proxy = new WebProxy(string.Join(":", address, port), true, null, credentials);
 
                     Logger.Debug("A proxy with authentication will be used.");
                     return proxy;
                 }
 
                 // Regex that matches proxy address and port(no authentication)
-                Regex regProxy = new Regex(@"\s*(https?:\/\/)?([^\s@]+):(\d+)\s*");
+                var regProxy = new Regex(@"\s*(https?:\/\/)?([^\s@]+):(\d+)\s*");
                 match = regProxy.Match(proxyStr);
 
                 if (match.Success)
                 {
                     var address = match.Groups[2].Value;
-                    var port = Int32.Parse(match.Groups[3].Value);
+                    var port = int.Parse(match.Groups[3].Value);
 
                     proxy = new WebProxy(address, port);
 
