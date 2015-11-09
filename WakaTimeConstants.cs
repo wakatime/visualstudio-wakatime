@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -19,8 +18,7 @@ namespace WakaTime
         {
             var regex = new Regex(@"(__version_info__ = )(\(( ?\'[0-9]\'\,?){3}\))");
 
-            var client = new WebClient();
-            client.Proxy = WakaTimePackage.GetProxy();
+            var client = new WebClient { Proxy = WakaTimePackage.GetProxy() };
 
             try
             {
@@ -45,6 +43,5 @@ namespace WakaTime
             }
             return string.Empty;
         };
-
     }
 }

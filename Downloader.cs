@@ -12,16 +12,14 @@ namespace WakaTime
             Logger.Debug("Downloading wakatime cli...");
 
             // Check for proxy setting
-            WebProxy proxy = WakaTimePackage.GetProxy();
+            var proxy = WakaTimePackage.GetProxy();
 
             var localZipFile = destinationDir + "\\wakatime-cli.zip";
 
-            var client = new WebClient();
-            client.Proxy = proxy;
+            var client = new WebClient { Proxy = proxy };
 
             // Download wakatime cli
             client.DownloadFile(url, localZipFile);
-            
 
             Logger.Debug("Finished downloading wakatime cli.");
 
@@ -40,12 +38,11 @@ namespace WakaTime
             Logger.Debug("Downloading python...");
 
             // Check for proxy setting
-            WebProxy proxy = WakaTimePackage.GetProxy();
+            var proxy = WakaTimePackage.GetProxy();
 
             var localFile = destinationDir + "\\python.msi";
 
-            var client = new WebClient();
-            client.Proxy = proxy;
+            var client = new WebClient { Proxy = proxy };
             client.DownloadFile(url, localFile);
 
             Logger.Debug("Finished downloading python.");
@@ -70,7 +67,5 @@ namespace WakaTime
             }
             catch { /* ignored */ }
         }
-
-        
     }
 }
