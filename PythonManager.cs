@@ -7,7 +7,7 @@ namespace WakaTime
 {
     static class PythonManager
     {
-        private const string CurrentPythonVersion = "3.4.3";
+        private const string CurrentPythonVersion = "3.5.0";
         private static string PythonBinaryLocation { get; set; }        
 
         internal static bool IsPythonInstalled()
@@ -16,11 +16,16 @@ namespace WakaTime
         }
 
         internal static string GetPython()
-        {            
-            if (PythonBinaryLocation != null)
-                return PythonBinaryLocation;
+        {
+            if (PythonBinaryLocation == null)
+                PythonBinaryLocation = GetEmbeddedPath();
 
-            PythonBinaryLocation = GetPathFromMicrosoftRegister() ?? GetPathFromFixedPath();
+            if (PythonBinaryLocation == null)
+                PythonBinaryLocation = GetPathFromMicrosoftRegister();
+
+            if (PythonBinaryLocation == null)
+                PythonBinaryLocation = GetPathFromFixedPath();
+
             return PythonBinaryLocation;
         }
 
@@ -121,18 +126,37 @@ namespace WakaTime
             return null;
         }
 
+        internal static string GetEmbeddedPath()
+        {
+            var path = Path.Combine(WakaTimeConstants.UserConfigDir, "python", "pythonw");
+            try
+            {
+                var process = new RunProcess(path, "--version");
+
+                process.Run();
+
+                if (!process.Success)
+                    return null;
+
+                Logger.Debug(string.Format("Python found from embedded location: {0}", path));
+
+                return path;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("GetPathFromMicrosoftRegister:", ex);
+                return null;
+            }
+        }
+
         internal static string PythonDownloadUrl
         {
             get
             {
-                var url = string.Format("https://www.python.org/ftp/python/{0}/python-{0}", CurrentPythonVersion);
-
+                var arch = "win32";
                 if (ProcessorArchitectureHelper.Is64BitOperatingSystem)
-                    url = url + ".amd64";
-
-                url = url + ".msi";
-
-                return url;
+                    arch = "amd64";
+                return string.Format("https://www.python.org/ftp/python/{0}/python-{0}-embed-{1}.zip", CurrentPythonVersion, arch);
             }
         }
     }

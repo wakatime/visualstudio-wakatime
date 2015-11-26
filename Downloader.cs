@@ -40,26 +40,19 @@ namespace WakaTime
             // Check for proxy setting
             var proxy = WakaTimePackage.GetProxy();
 
-            var localFile = destinationDir + "\\python.msi";
+            var localFile = destinationDir + "\\python.zip";
 
             var client = new WebClient { Proxy = proxy };
+
+            // Download embeddable python
             client.DownloadFile(url, localFile);
 
             Logger.Debug("Finished downloading python.");
 
-            var arguments = "/i \"" + localFile + "\"";
-            arguments = arguments + " /norestart /qb!";
+            // Extract wakatime cli zip file
+            ZipFile.ExtractToDirectory(localFile, Path.Combine(destinationDir, "python"));
 
-            var procInfo = new ProcessStartInfo
-            {
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                FileName = "msiexec",
-                CreateNoWindow = true,
-                Arguments = arguments
-            };
-
-            Process.Start(procInfo);
+            Logger.Info(string.Format("Finished extracting python: {0}", destinationDir));
 
             try
             {
