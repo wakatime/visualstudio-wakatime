@@ -14,7 +14,7 @@ namespace WakaTime
             // Check for proxy setting
             var proxy = WakaTimePackage.GetProxy();
 
-            var localZipFile = destinationDir + "\\wakatime-cli.zip";
+            var localZipFile = Path.Combine(destinationDir, "wakatime-cli.zip");
 
             var client = new WebClient { Proxy = proxy };
 
@@ -40,7 +40,7 @@ namespace WakaTime
             // Check for proxy setting
             var proxy = WakaTimePackage.GetProxy();
 
-            var localFile = destinationDir + "\\python.zip";
+            var localFile = Path.Combine(destinationDir, "python.zip");
 
             var client = new WebClient { Proxy = proxy };
 
@@ -52,7 +52,7 @@ namespace WakaTime
             // Extract wakatime cli zip file
             ZipFile.ExtractToDirectory(localFile, Path.Combine(destinationDir, "python"));
 
-            Logger.Info(string.Format("Finished extracting python: {0}", destinationDir));
+            Logger.Debug(string.Format("Finished extracting python: {0}", Path.Combine(destinationDir, "python")));
 
             try
             {

@@ -101,7 +101,7 @@ namespace WakaTime
                 {
                     try
                     {
-                        Directory.Delete(string.Format("{0}\\wakatime-master", WakaTimeConstants.UserConfigDir), true);
+                        Directory.Delete(Path.Combine(WakaTimeConstants.UserConfigDir, "wakatime-master"), true);
                     }
                     catch { /* ignored */ }
 
