@@ -144,7 +144,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("GetPathFromMicrosoftRegister:", ex);
+                Logger.Error("GetEmbeddedPath:", ex);
                 return null;
             }
         }
