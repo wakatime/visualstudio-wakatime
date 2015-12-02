@@ -60,17 +60,8 @@ namespace WakaTime
             // Make sure python is installed
             if (!PythonManager.IsPythonInstalled())
             {
-                var dialogResult = MessageBox.Show(@"Let's download and install Python now?",
-                    @"WakaTime requires Python", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (dialogResult == DialogResult.Yes)
-                {
-                    var url = PythonManager.PythonDownloadUrl;
-                    Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
-                }
-                else
-                    MessageBox.Show(
-                        @"Please install Python (https://www.python.org/downloads/) and restart Visual Studio to enable the WakaTime plugin.",
-                        @"WakaTime", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                var url = PythonManager.PythonDownloadUrl;
+                Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
             }
         }
 
