@@ -3,6 +3,34 @@ History
 -------
 
 
+7.0.1 (2015-12-03)
+++++++++++++++++++
+
+- remove prompt before installing Python because using embeddable Python now
+
+
+7.0.0 (2015-11-26)
+++++++++++++++++++
+
+- use embeddable python to prevent installing failures
+
+
+6.0.0 (2015-10-10)
+++++++++++++++++++
+
+- improve detection of latest wakatime-cli version from GitHub repo
+- prevent locking inside background thread
+- better looking obfuscated api key
+
+
+5.0.11 (2015-10-02)
+++++++++++++++++++
+
+- ask user to authorize to download Python and other improvements
+- fixed issue when downloading Python and wakatime-cli using a proxy
+- support simple proxy addresses without authentication
+
+
 5.0.10 (2015-08-27)
 ++++++++++++++++++
 
