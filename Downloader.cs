@@ -7,9 +7,12 @@ namespace WakaTime
 {
     public class Downloader
     {
-        static public void DownloadCli(string url, string destinationDir)
+        static public void DownloadAndInstallCli()
         {
             Logger.Debug("Downloading wakatime cli...");
+
+            var url = WakaTimeConstants.CliUrl;
+            var destinationDir = WakaTimeConstants.UserConfigDir;
 
             // Check for proxy setting
             var proxy = WakaTimePackage.GetProxy();
@@ -33,9 +36,12 @@ namespace WakaTime
             catch { /* ignored */ }
         }
 
-        static public void DownloadAndInstallPython(string url, string destinationDir)
+        static public void DownloadAndInstallPython()
         {
             Logger.Debug("Downloading python...");
+
+            var url = PythonManager.PythonDownloadUrl;
+            var destinationDir = WakaTimeConstants.UserConfigDir;
 
             // Check for proxy setting
             var proxy = WakaTimePackage.GetProxy();

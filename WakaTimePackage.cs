@@ -47,21 +47,10 @@ namespace WakaTime
         {
             base.Initialize();
             
-            WarmUp();
             Task.Run(() =>
             {
                 InitializeAsync();
             });
-        }
-
-        private static void WarmUp()
-        {
-            // Make sure python is installed
-            if (!PythonManager.IsPythonInstalled())
-            {
-                var url = PythonManager.PythonDownloadUrl;
-                Downloader.DownloadAndInstallPython(url, WakaTimeConstants.UserConfigDir);
-            }
         }
 
         public void InitializeAsync()
@@ -83,7 +72,13 @@ namespace WakaTime
 
                 // Load config file
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
-                GetSettings();                
+                GetSettings();
+
+                // Make sure python is installed
+                if (!PythonManager.IsPythonInstalled())
+                {
+                    Downloader.DownloadAndInstallPython();
+                }
 
                 if (!DoesCliExist() || !IsCliLatestVersion())
                 {
@@ -93,7 +88,7 @@ namespace WakaTime
                     }
                     catch { /* ignored */ }
 
-                    Downloader.DownloadCli(WakaTimeConstants.CliUrl, WakaTimeConstants.UserConfigDir);
+                    Downloader.DownloadAndInstallCli();
                 }
 
                 if (string.IsNullOrEmpty(ApiKey))
