@@ -22,15 +22,14 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        private static string _version = string.Empty;
-        private static string _editorVersion = string.Empty;
         private static WakaTimeConfigFile _wakaTimeConfigFile;
         private static SettingsForm _settingsForm;
 
-        private static DTE2 _objDte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
+
+        public static DTE2 objDte = null;
 
         // Settings
         public static bool Debug;
@@ -67,18 +66,16 @@ namespace WakaTime
 
         public void InitializeAsync()
         {
-            _version = string.Format("{0}.{1}.{2}", CoreAssembly.Version.Major, CoreAssembly.Version.Minor, CoreAssembly.Version.Build);
 
             try
             {
-                Logger.Info(string.Format("Initializing WakaTime v{0}", _version));
+                Logger.Info(string.Format("Initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
 
                 // VisualStudio Object
-                _objDte = (DTE2)GetService(typeof(DTE));
-                _docEvents = _objDte.Events.DocumentEvents;
-                _windowEvents = _objDte.Events.WindowEvents;
-                _solutionEvents = _objDte.Events.SolutionEvents;
-                _editorVersion = _objDte.Version;
+                objDte = (DTE2)GetService(typeof(DTE));
+                _docEvents = objDte.Events.DocumentEvents;
+                _windowEvents = objDte.Events.WindowEvents;
+                _solutionEvents = objDte.Events.SolutionEvents;
 
                 // Settings Form
                 _settingsForm = new SettingsForm();
@@ -118,7 +115,7 @@ namespace WakaTime
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
-                Logger.Info(string.Format("Finished initializing WakaTime v{0}", _version));
+                Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
             }
             catch (Exception ex)
             {
@@ -157,7 +154,7 @@ namespace WakaTime
         {
             try
             {
-                var document = _objDte.ActiveWindow.Document;
+                var document = objDte.ActiveWindow.Document;
                 if (document != null)
                     HandleActivity(document.FullName, false);
             }
@@ -171,7 +168,7 @@ namespace WakaTime
         {
             try
             {
-                _solutionName = _objDte.Solution.FullName;
+                _solutionName = objDte.Solution.FullName;
             }
             catch (Exception ex)
             {
@@ -222,7 +219,7 @@ namespace WakaTime
         {
             PythonCliParameters.Key = ApiKey;
             PythonCliParameters.File = fileName;
-            PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, _editorVersion, WakaTimeConstants.PluginName, _version);
+            PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, WakaTimeConstants.EditorVersion, WakaTimeConstants.PluginName, WakaTimeConstants.PluginVersion);
             PythonCliParameters.IsWrite = isWrite;
             PythonCliParameters.Project = GetProjectName();
 
@@ -306,8 +303,8 @@ namespace WakaTime
         {
             return !string.IsNullOrEmpty(_solutionName)
                 ? Path.GetFileNameWithoutExtension(_solutionName)
-                : (_objDte.Solution != null && !string.IsNullOrEmpty(_objDte.Solution.FullName))
-                    ? Path.GetFileNameWithoutExtension(_objDte.Solution.FullName)
+                : (objDte.Solution != null && !string.IsNullOrEmpty(objDte.Solution.FullName))
+                    ? Path.GetFileNameWithoutExtension(objDte.Solution.FullName)
                     : string.Empty;
         }
         
@@ -363,7 +360,7 @@ namespace WakaTime
         }
         #endregion
 
-        static class CoreAssembly
+        public static class CoreAssembly
         {
             static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
             public static readonly Version Version = Reference.GetName().Version;

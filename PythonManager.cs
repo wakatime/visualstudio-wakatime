@@ -37,7 +37,7 @@ namespace WakaTime
                 var pythonKey = Registry.ClassesRoot.OpenSubKey(@"Python.File\shell\open\command");
                 if (pythonKey == null)
                 {
-                    Logger.Warning("Couldn't find python's path through Microsft Registry. Please try repairing your Python installation.");
+                    Logger.Debug("Couldn't find python's path through Microsft Registry. Please try repairing your Python installation.");
                     return null;
                 }
                 var python = pythonKey.GetValue(null).ToString();
