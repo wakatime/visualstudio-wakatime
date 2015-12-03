@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -66,7 +67,7 @@ namespace WakaTime
             if (outputWindowPane == null) return;
 
             var outputMessage = string.Format("[Wakatime {0} {1}] {2}{3}", Enum.GetName(level.GetType(), level),
-                DateTime.Now.ToString("hh:mm:ss tt"), message, Environment.NewLine);
+                DateTime.Now.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture), message, Environment.NewLine);
 
             outputWindowPane.OutputString(outputMessage);
         }

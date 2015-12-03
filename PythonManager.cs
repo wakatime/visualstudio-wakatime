@@ -21,7 +21,7 @@ namespace WakaTime
                 PythonBinaryLocation = GetEmbeddedPath();
 
             if (PythonBinaryLocation == null)
-                PythonBinaryLocation = GetPathFromMicrosoftRegister();
+                PythonBinaryLocation = GetPathFromMicrosoftRegistry();
 
             if (PythonBinaryLocation == null)
                 PythonBinaryLocation = GetPathFromFixedPath();
@@ -29,12 +29,17 @@ namespace WakaTime
             return PythonBinaryLocation;
         }
 
-        static string GetPathFromMicrosoftRegister()
+        static string GetPathFromMicrosoftRegistry()
         {
             try
             {
                 var regex = new Regex(@"""([^""]*)\\([^""\\]+(?:\.[^"".\\]+))""");
                 var pythonKey = Registry.ClassesRoot.OpenSubKey(@"Python.File\shell\open\command");
+                if (pythonKey == null)
+                {
+                    Logger.Warning("Couldn't find python's path through Microsft Registry. Please try repairing your Python installation.");
+                    return null;
+                }
                 var python = pythonKey.GetValue(null).ToString();
                 var match = regex.Match(python);
 
@@ -49,13 +54,13 @@ namespace WakaTime
                 if (!process.Success)
                     return null;
 
-                Logger.Debug(string.Format("Python found from Microsoft Registery: {0}", fullPath));
+                Logger.Debug(string.Format("Python found from Microsoft Registry: {0}", fullPath));
 
                 return fullPath;
             }
             catch (Exception ex)
             {
-                Logger.Error("GetPathFromMicrosoftRegister:", ex);
+                Logger.Error("GetPathFromMicrosoftRegistry:", ex);
                 return null;
             }
         }
