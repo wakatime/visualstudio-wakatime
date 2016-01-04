@@ -74,21 +74,29 @@ namespace WakaTime
                 _wakaTimeConfigFile = new WakaTimeConfigFile();
                 GetSettings();
 
-                // Make sure python is installed
-                if (!PythonManager.IsPythonInstalled())
+                try
                 {
-                    Downloader.DownloadAndInstallPython();
-                }
 
-                if (!DoesCliExist() || !IsCliLatestVersion())
-                {
-                    try
+                    // Make sure python is installed
+                    if (!PythonManager.IsPythonInstalled())
                     {
-                        Directory.Delete(Path.Combine(WakaTimeConstants.UserConfigDir, "wakatime-master"), true);
+                        Downloader.DownloadAndInstallPython();
                     }
-                    catch { /* ignored */ }
 
-                    Downloader.DownloadAndInstallCli();
+                    if (!DoesCliExist() || !IsCliLatestVersion())
+                    {
+                        try
+                        {
+                            Directory.Delete(Path.Combine(WakaTimeConstants.UserConfigDir, "wakatime-master"), true);
+                        }
+                        catch { /* ignored */ }
+
+                        Downloader.DownloadAndInstallCli();
+                    }
+                }
+                catch (System.Net.WebException ex)
+                {
+                    Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
                 }
 
                 if (string.IsNullOrEmpty(ApiKey))
@@ -111,10 +119,6 @@ namespace WakaTime
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
                 Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
-            }
-            catch (System.Net.WebException ex)
-            {
-                Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
             }
             catch (Exception ex)
             {
