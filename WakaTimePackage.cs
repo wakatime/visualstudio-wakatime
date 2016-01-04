@@ -112,6 +112,10 @@ namespace WakaTime
 
                 Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
             }
+            catch (System.Net.WebException ex)
+            {
+                Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
+            }
             catch (Exception ex)
             {
                 Logger.Error("Error initializing Wakatime", ex);
