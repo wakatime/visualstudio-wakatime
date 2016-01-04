@@ -3,6 +3,12 @@ History
 -------
 
 
+7.0.2 (2015-01-04)
+++++++++++++++++++
+
+- enable settings menu item even when dependency downloading fails, to allow setting a proxy
+
+
 7.0.1 (2015-12-03)
 ++++++++++++++++++
 
