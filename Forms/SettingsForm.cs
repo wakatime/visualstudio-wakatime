@@ -63,5 +63,10 @@ namespace WakaTime.Forms
             var handler = ConfigSaved;
             if (handler != null) handler(this, EventArgs.Empty);
         }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
