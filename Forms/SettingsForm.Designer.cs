@@ -87,7 +87,7 @@
             // 
             // txtProxy
             // 
-            this.txtProxy.Location = new System.Drawing.Point(124, 47);
+            this.txtProxy.Location = new System.Drawing.Point(124, 50);
             this.txtProxy.MaxLength = 255;
             this.txtProxy.Name = "txtProxy";
             this.txtProxy.Size = new System.Drawing.Size(363, 23);
@@ -96,7 +96,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 50);
+            this.label1.Location = new System.Drawing.Point(21, 53);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(97, 15);
             this.label1.TabIndex = 4;
@@ -115,7 +115,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(121, 73);
+            this.label2.Location = new System.Drawing.Point(121, 76);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(231, 15);
             this.label2.TabIndex = 7;
