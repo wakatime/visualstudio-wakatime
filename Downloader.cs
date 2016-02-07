@@ -26,6 +26,12 @@ namespace WakaTime
 
             Logger.Debug("Finished downloading wakatime cli.");
 
+            try
+            {
+                Directory.Delete(Path.Combine(destinationDir, "wakatime-master"), true);
+            }
+            catch { /* ignored */ }
+
             // Extract wakatime cli zip file
             ZipFile.ExtractToDirectory(localZipFile, destinationDir);
 

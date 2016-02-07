@@ -85,18 +85,16 @@ namespace WakaTime
 
                     if (!DoesCliExist() || !IsCliLatestVersion())
                     {
-                        try
-                        {
-                            Directory.Delete(Path.Combine(WakaTimeConstants.UserConfigDir, "wakatime-master"), true);
-                        }
-                        catch { /* ignored */ }
-
                         Downloader.DownloadAndInstallCli();
                     }
                 }
                 catch (System.Net.WebException ex)
                 {
                     Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error detecting dependencies. Exception Traceback:", ex);
                 }
 
                 if (string.IsNullOrEmpty(ApiKey))
