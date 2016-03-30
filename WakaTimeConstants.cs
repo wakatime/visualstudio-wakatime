@@ -14,9 +14,9 @@ namespace WakaTime
         internal static string EditorVersion {
             get
             {
-                if (WakaTimePackage.objDte == null)
+                if (WakaTimePackage.ObjDte == null)
                     return string.Empty;
-                return WakaTimePackage.objDte.Version;
+                return WakaTimePackage.ObjDte.Version;
             }
         }
 

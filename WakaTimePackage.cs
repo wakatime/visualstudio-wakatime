@@ -1,16 +1,15 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Text.RegularExpressions;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
 using Task = System.Threading.Tasks.Task;
-using System.Net;
-using System.Text.RegularExpressions;
 
 namespace WakaTime
 {
@@ -18,7 +17,7 @@ namespace WakaTime
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.GuidWakaTimePkgString)]
-    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
+    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]    
     public sealed class WakaTimePackage : Package
     {
         #region Fields
@@ -28,8 +27,9 @@ namespace WakaTime
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
+        private DTEEvents _dteEvents;
 
-        public static DTE2 objDte = null;
+        public static DTE2 ObjDte;
 
         // Settings
         public static bool Debug;
@@ -42,11 +42,15 @@ namespace WakaTime
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
         #endregion
 
-        #region Startup/Cleanup
+        #region Startup/Cleanup        
         protected override void Initialize()
         {
             base.Initialize();
-            
+
+            ObjDte = (DTE2)GetService(typeof(DTE));
+            _dteEvents = ObjDte.Events.DTEEvents;
+            _dteEvents.OnStartupComplete += OnOnStartupComplete;
+
             Task.Run(() =>
             {
                 InitializeAsync();
@@ -60,11 +64,10 @@ namespace WakaTime
             {
                 Logger.Info(string.Format("Initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
 
-                // VisualStudio Object
-                objDte = (DTE2)GetService(typeof(DTE));
-                _docEvents = objDte.Events.DocumentEvents;
-                _windowEvents = objDte.Events.WindowEvents;
-                _solutionEvents = objDte.Events.SolutionEvents;
+                // VisualStudio Object                
+                _docEvents = ObjDte.Events.DocumentEvents;
+                _windowEvents = ObjDte.Events.WindowEvents;
+                _solutionEvents = ObjDte.Events.SolutionEvents;                
 
                 // Settings Form
                 _settingsForm = new SettingsForm();
@@ -76,7 +79,6 @@ namespace WakaTime
 
                 try
                 {
-
                     // Make sure python is installed
                     if (!PythonManager.IsPythonInstalled())
                     {
@@ -88,17 +90,14 @@ namespace WakaTime
                         Downloader.DownloadAndInstallCli();
                     }
                 }
-                catch (System.Net.WebException ex)
+                catch (WebException ex)
                 {
                     Logger.Error("Are you behind a proxy? Try setting a proxy in WakaTime Settings with format https://user:pass@host:port. Exception Traceback:", ex);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error("Error detecting dependencies. Exception Traceback:", ex);
-                }
-
-                if (string.IsNullOrEmpty(ApiKey))
-                    PromptApiKey();
+                }                
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 var mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -114,7 +113,7 @@ namespace WakaTime
                 _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
-                _solutionEvents.Opened += SolutionEventsOnOpened;
+                _solutionEvents.Opened += SolutionEventsOnOpened;                
 
                 Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
             }
@@ -122,7 +121,7 @@ namespace WakaTime
             {
                 Logger.Error("Error initializing Wakatime", ex);
             }
-        }
+        }        
 
         #endregion
 
@@ -155,7 +154,7 @@ namespace WakaTime
         {
             try
             {
-                var document = objDte.ActiveWindow.Document;
+                var document = ObjDte.ActiveWindow.Document;
                 if (document != null)
                     HandleActivity(document.FullName, false);
             }
@@ -169,12 +168,18 @@ namespace WakaTime
         {
             try
             {
-                _solutionName = objDte.Solution.FullName;
+                _solutionName = ObjDte.Solution.FullName;
             }
             catch (Exception ex)
             {
                 Logger.Error("SolutionEventsOnOpened", ex);
             }
+        }
+
+        private void OnOnStartupComplete()
+        {
+            if (string.IsNullOrEmpty(ApiKey))
+                PromptApiKey();
         }
         #endregion
 
@@ -268,11 +273,8 @@ namespace WakaTime
                     Logger.Info("wakatime-cli is up to date.");
                     return true;
                 }
-                else
-                {
-                    Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
-                }
-
+                
+                Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
             }
             return false;
         }
@@ -291,8 +293,9 @@ namespace WakaTime
 
         private static void PromptApiKey()
         {
+            Logger.Info("Please input your api key into the wakatime window.");
             var form = new ApiKeyForm();
-            form.ShowDialog();
+            form.ShowDialog();            
         }
 
         private static void SettingsPopup()
@@ -304,8 +307,8 @@ namespace WakaTime
         {
             return !string.IsNullOrEmpty(_solutionName)
                 ? Path.GetFileNameWithoutExtension(_solutionName)
-                : (objDte.Solution != null && !string.IsNullOrEmpty(objDte.Solution.FullName))
-                    ? Path.GetFileNameWithoutExtension(objDte.Solution.FullName)
+                : (ObjDte.Solution != null && !string.IsNullOrEmpty(ObjDte.Solution.FullName))
+                    ? Path.GetFileNameWithoutExtension(ObjDte.Solution.FullName)
                     : string.Empty;
         }
         
