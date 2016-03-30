@@ -5,15 +5,10 @@ namespace WakaTime.Forms
 {
     public partial class ApiKeyForm : Form
     {
-        private readonly WakaTimeConfigFile _wakaTimeConfigFile;
-        private static Timer timer;
+        private readonly WakaTimeConfigFile _wakaTimeConfigFile;        
 
         public ApiKeyForm()
-        {
-            timer = new Timer();
-            timer.Interval = 1000;
-            timer.Tick += new EventHandler(TimerEventProcessor);
-
+        {            
             InitializeComponent();
 
             _wakaTimeConfigFile = new WakaTimeConfigFile();
@@ -28,21 +23,9 @@ namespace WakaTime.Forms
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-            }
-
-            // Make sure form is focused
-            timer.Start();
+            }            
         }
-
-        private void TimerEventProcessor(object sender, EventArgs e)
-        {
-            this.Focus();
-            if (this.Focused)
-            {
-                timer.Stop();
-            }
-        }
-
+        
         private void btnOk_Click(object sender, EventArgs e)
         {
             try
@@ -66,6 +49,5 @@ namespace WakaTime.Forms
                 MessageBox.Show(ex.Message);
             }
         }
-
     }
 }
