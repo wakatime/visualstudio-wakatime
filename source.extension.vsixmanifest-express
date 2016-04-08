@@ -1,30 +1,93 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Publisher="WakaTime" Language="en-US" Version="7.0.2" />
-    <DisplayName>WakaTime</DisplayName>
-    <Description xml:space="preserve" >Metrics, insights, and time tracking automatically generated from your programming activity.</Description>
-    <MoreInfo>https://github.com/wakatime/visualstudio-wakatime</MoreInfo>
+<Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
+  <Identifier Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47">
+    <Name>WakaTime</Name>
+    <Author>WakaTime</Author>
+    <Version>7.0.2</Version>
+    <Description xml:space="preserve">Metrics, insights, and time tracking automatically generated from your programming activity.</Description>
+    <Locale>1033</Locale>
+    <MoreInfoUrl>https://github.com/wakatime/visualstudio-wakatime</MoreInfoUrl>
     <License>LICENSE.txt</License>
     <Icon>Resources\wakatime-120.png</Icon>
     <PreviewImage>Resources\ScreenShot-2014-10-29.png</PreviewImage>
-  </Metadata>
-  <Installation InstalledByMsi="false">
-    <InstallationTarget Version="[12.0,15.0)" Id="Microsoft.VisualStudio.IntegratedShell" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.Community" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.Pro" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.Enterprise" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.Premium" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.Ultimate" />
-    <InstallationTarget Version="[12.0,15.0)" Id="Microsoft.VisualStudio.VSLS" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.VPDExpress" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.VWDExpress" />
-    <InstallationTarget Version="[11.0,15.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
-  </Installation>
-  <Dependencies>
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-  </Assets>
-</PackageManifest>
+    <InstalledByMsi>false</InstalledByMsi>
+    <SupportedProducts>
+      <VisualStudio Version="10.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>Community</Edition>
+        <Edition>IntegratedShell</Edition>
+        <Edition>Enterprise</Edition>
+        <Edition>VSLS</Edition>
+        <Edition>VSWinExpress</Edition>
+        <Edition>VPDExpress</Edition>
+        <Edition>VWDExpress</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="11.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>Community</Edition>
+        <Edition>IntegratedShell</Edition>
+        <Edition>Enterprise</Edition>
+        <Edition>VSLS</Edition>
+        <Edition>VSWinExpress</Edition>
+        <Edition>VPDExpress</Edition>
+        <Edition>VWDExpress</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="12.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>Community</Edition>
+        <Edition>IntegratedShell</Edition>
+        <Edition>Enterprise</Edition>
+        <Edition>VSLS</Edition>
+        <Edition>VSWinExpress</Edition>
+        <Edition>VPDExpress</Edition>
+        <Edition>VWDExpress</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="14.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>Community</Edition>
+        <Edition>IntegratedShell</Edition>
+        <Edition>Enterprise</Edition>
+        <Edition>VSLS</Edition>
+        <Edition>VSWinExpress</Edition>
+        <Edition>VPDExpress</Edition>
+        <Edition>VWDExpress</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+      </VisualStudio>
+      <VisualStudio Version="15.0">
+        <Edition>Ultimate</Edition>
+        <Edition>Premium</Edition>
+        <Edition>Pro</Edition>
+        <Edition>Community</Edition>
+        <Edition>IntegratedShell</Edition>
+        <Edition>Enterprise</Edition>
+        <Edition>VSLS</Edition>
+        <Edition>VSWinExpress</Edition>
+        <Edition>VPDExpress</Edition>
+        <Edition>VWDExpress</Edition>
+        <Edition>VSWinDesktopExpress</Edition>
+      </VisualStudio>
+      <IsolatedShell Version="6.0">AtmelStudio</IsolatedShell>
+    </SupportedProducts>
+    <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
+  </Identifier>
+  <References>
+    <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
+      <Name>Visual Studio MPF</Name>
+    </Reference>
+  </References>
+  <Content>
+    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
+    <MefComponent>|%CurrentProject%|</MefComponent>
+  </Content>
+</Vsix>
