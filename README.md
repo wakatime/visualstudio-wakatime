@@ -31,15 +31,11 @@ Screen Shots
 Supported Visual Studio Editions
 --------------------------------
 
-* Visual Studio 2012 Professional
-* Visual Studio 2012 Premium
-* Visual Studio 2012 Ultimate
-* Visual Studio 2013 Professional
-* Visual Studio 2013 Premium
-* Visual Studio 2013 Ultimate
-* Visual Studio 2015 Community
-* Visual Studio 2015 Professional
-* Visual Studio 2015 Enterprise
+* Visual Studio 2010
+* Visual Studio 2012
+* Visual Studio 2013
+* Visual Studio 2015
+* Visual Studio 15
 
 #### Visual Studio Express
 
