@@ -3,6 +3,14 @@ History
 -------
 
 
+7.0.3 (2016-04-09)
+++++++++++++++++++
+
+- Prevent deleting wakatime-core when IDE started while offline.
+- Make sure api key dialog prompt has focus.
+- Add support for Visual Studio 15.
+
+
 7.0.2 (2015-01-04)
 ++++++++++++++++++
 
