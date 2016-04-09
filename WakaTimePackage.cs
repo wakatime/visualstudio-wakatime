@@ -73,10 +73,6 @@ namespace WakaTime
                 _settingsForm = new SettingsForm();
                 _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
 
-                // Load config file
-                _wakaTimeConfigFile = new WakaTimeConfigFile();
-                GetSettings();
-
                 try
                 {
                     // Make sure python is installed
@@ -178,6 +174,12 @@ namespace WakaTime
 
         private void OnOnStartupComplete()
         {
+            
+            // Load config file
+            _wakaTimeConfigFile = new WakaTimeConfigFile();
+            GetSettings();
+
+            // Prompt for api key if not already set
             if (string.IsNullOrEmpty(ApiKey))
                 PromptApiKey();
         }
@@ -187,12 +189,12 @@ namespace WakaTime
 
         private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
         {
-            _wakaTimeConfigFile.Read();
             GetSettings();
         }
 
         private static void GetSettings()
         {
+            _wakaTimeConfigFile.Read();
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
             Proxy = _wakaTimeConfigFile.Proxy;
