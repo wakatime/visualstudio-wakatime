@@ -7,9 +7,9 @@ namespace WakaTime
 {
     internal class PythonCliParameters
     {
-        public string Cli
+        private string Cli
         {
-            get { return Path.Combine(WakaTimeConstants.UserConfigDir, WakaTimeConstants.CliFolder); }
+            get { return Dependencies.CliLocation; }
         }
         public string Key { get; set; }
         public string File { get; set; }

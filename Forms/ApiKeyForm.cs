@@ -5,13 +5,13 @@ namespace WakaTime.Forms
 {
     public partial class ApiKeyForm : Form
     {
-        private readonly WakaTimeConfigFile _wakaTimeConfigFile;        
+        private readonly ConfigFile _wakaTimeConfigFile;        
 
         public ApiKeyForm()
         {            
             InitializeComponent();
 
-            _wakaTimeConfigFile = new WakaTimeConfigFile();
+            _wakaTimeConfigFile = new ConfigFile();
         }
 
         private void ApiKeyForm_Load(object sender, EventArgs e)

@@ -10,20 +10,32 @@ namespace WakaTime
     {
         private readonly string _program;
         private readonly string[] _arguments;
-        private readonly string _extraHeartbeatsJSON;
+        private string _stdin;
         private bool _captureOutput;
 
-        internal RunProcess(string program, string extraHeartbeatsJSON, params string[] arguments)
+        internal RunProcess(string program, params string[] arguments)
         {
             _program = program;
             _arguments = arguments;
-            _extraHeartbeatsJSON = extraHeartbeatsJSON;
             _captureOutput = true;
         }
 
         internal void RunInBackground()
         {
             _captureOutput = false;
+            Run();
+        }
+
+        internal void RunInBackground(string stdin)
+        {
+            _captureOutput = false;
+            _stdin = stdin;
+            Run();
+        }
+
+        internal void Run(string stdin)
+        {
+            _stdin = stdin;
             Run();
         }
 
@@ -47,17 +59,18 @@ namespace WakaTime
                     UseShellExecute = false,
                     RedirectStandardError = _captureOutput,
                     RedirectStandardOutput = _captureOutput,
+                    RedirectStandardInput = _stdin != null,
                     FileName = _program,
                     CreateNoWindow = true,
                     Arguments = GetArgumentString()
                 };
-
+                
                 using (var process = Process.Start(procInfo))
                 {
 
-                    if (_extraHeartbeatsJSON != null)
+                    if (_stdin != null)
                     {
-                        process.StandardInput.WriteLine(_extraHeartbeatsJSON);
+                        process.StandardInput.WriteLine(string.Format("{0}\n", _stdin));
                     }
 
                     if (_captureOutput)

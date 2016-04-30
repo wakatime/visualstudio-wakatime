@@ -4,41 +4,63 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 
 namespace WakaTime
 {
     public class Dependencies
     {
-        private const string CurrentPythonVersion = "3.5.0";
+        private const string CurrentPythonVersion = "3.5.1";
         private static string PythonBinaryLocation { get; set; }
+        private static string PythonDownloadUrl
+        {
+            get
+            {
+                var arch = ProcessorArchitectureHelper.Is64BitOperatingSystem ? "amd64" : "win32";
+                return string.Format("https://www.python.org/ftp/python/{0}/python-{0}-embed-{1}.zip", CurrentPythonVersion, arch);
+            }
+        }
+        private static string AppDataDirectory {
+            get
+            {
+                string roamingFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string appFolder = Path.Combine(roamingFolder, "WakaTime");
+
+                // Create folder if it does not exist
+                if (!Directory.Exists(appFolder))
+                    Directory.CreateDirectory(appFolder);
+
+                return appFolder;
+            }
+        }
+        internal static string CliLocation
+        {
+            get
+            {
+                return Path.Combine(AppDataDirectory, Constants.CliFolder);
+            }
+        }
 
         static public void DownloadAndInstallCli()
         {
-            Logger.Debug("Downloading wakatime cli...");
-
-            var url = WakaTimeConstants.CliUrl;
-            var destinationDir = WakaTimeConstants.UserConfigDir;
-
-            // Check for proxy setting
-            var proxy = WakaTimePackage.GetProxy();
-
+            Logger.Debug("Downloading wakatime-cli...");
+            var url = Constants.CliUrl;
+            var destinationDir = AppDataDirectory;
             var localZipFile = Path.Combine(destinationDir, "wakatime-cli.zip");
 
+            // Download wakatime-cli
+            var proxy = WakaTimePackage.GetProxy();
             var client = new WebClient { Proxy = proxy };
-
-            // Download wakatime cli
             client.DownloadFile(url, localZipFile);
+            Logger.Debug("Finished downloading wakatime-cli.");
 
-            Logger.Debug("Finished downloading wakatime cli.");
+            // Remove old folder if it exists
+            RecursiveDelete(Path.Combine(destinationDir, "wakatime-master"));
 
-            try
-            {
-                Directory.Delete(Path.Combine(destinationDir, "wakatime-master"), true);
-            }
-            catch { /* ignored */ }
-
-            // Extract wakatime cli zip file
+            // Extract wakatime-cli zip file
+            Logger.Debug(string.Format("Extracting wakatime-cli to: {0}", destinationDir));
             ZipFile.ExtractToDirectory(localZipFile, destinationDir);
+            Logger.Debug("Finished extracting wakatime-cli.");
 
             try
             {
@@ -50,30 +72,28 @@ namespace WakaTime
         static public void DownloadAndInstallPython()
         {
             Logger.Debug("Downloading python...");
-
             var url = PythonDownloadUrl;
-            var destinationDir = WakaTimeConstants.UserConfigDir;
+            var destinationDir = AppDataDirectory;
+            var localZipFile = Path.Combine(destinationDir, "python.zip");
+            var extractToDir = Path.Combine(destinationDir, "python");
 
-            // Check for proxy setting
+            // Download python
             var proxy = WakaTimePackage.GetProxy();
-
-            var localFile = Path.Combine(destinationDir, "python.zip");
-
             var client = new WebClient { Proxy = proxy };
-
-            // Download embeddable python
-            client.DownloadFile(url, localFile);
-
+            client.DownloadFile(url, localZipFile);
             Logger.Debug("Finished downloading python.");
 
-            // Extract wakatime cli zip file
-            ZipFile.ExtractToDirectory(localFile, Path.Combine(destinationDir, "python"));
+            // Remove old python folder if it exists
+            RecursiveDelete(extractToDir);
 
-            Logger.Debug(string.Format("Finished extracting python: {0}", Path.Combine(destinationDir, "python")));
+            // Extract wakatime cli zip file
+            Logger.Debug(string.Format("Extracting python to: {0}", extractToDir));
+            ZipFile.ExtractToDirectory(localZipFile, extractToDir);
+            Logger.Debug("Finished extracting python.");
 
             try
             {
-                File.Delete(localFile);
+                File.Delete(localZipFile);
             }
             catch { /* ignored */ }
         }
@@ -86,28 +106,26 @@ namespace WakaTime
         internal static string GetPython()
         {
             if (PythonBinaryLocation == null)
-                PythonBinaryLocation = GetEmbeddedPath();
+                PythonBinaryLocation = GetEmbeddedPythonPath();
 
             if (PythonBinaryLocation == null)
-                PythonBinaryLocation = GetPathFromMicrosoftRegistry();
+                PythonBinaryLocation = GetPythonPathFromMicrosoftRegistry();
 
             if (PythonBinaryLocation == null)
-                PythonBinaryLocation = GetPathFromFixedPath();
+                PythonBinaryLocation = GetPythonPathFromFixedPath();
 
             return PythonBinaryLocation;
         }
 
-        static string GetPathFromMicrosoftRegistry()
+        internal static string GetPythonPathFromMicrosoftRegistry()
         {
             try
             {
                 var regex = new Regex(@"""([^""]*)\\([^""\\]+(?:\.[^"".\\]+))""");
                 var pythonKey = Registry.ClassesRoot.OpenSubKey(@"Python.File\shell\open\command");
                 if (pythonKey == null)
-                {
-                    Logger.Debug("Couldn't find python's path through Microsft Registry. Please try repairing your Python installation.");
                     return null;
-                }
+
                 var python = pythonKey.GetValue(null).ToString();
                 var match = regex.Match(python);
 
@@ -133,52 +151,14 @@ namespace WakaTime
             }
         }
 
-        static string GetPathFromFixedPath()
+        internal static string GetPythonPathFromFixedPath()
         {
-            string[] locations = {
-                "pythonw",
-                "python",
-                "\\Python37\\pythonw",
-                "\\Python36\\pythonw",
-                "\\Python35\\pythonw",
-                "\\Python34\\pythonw",
-                "\\Python33\\pythonw",
-                "\\Python32\\pythonw",
-                "\\Python31\\pythonw",
-                "\\Python30\\pythonw",
-                "\\Python27\\pythonw",
-                "\\Python26\\pythonw",
-                "\\python37\\pythonw",
-                "\\python36\\pythonw",
-                "\\python35\\pythonw",
-                "\\python34\\pythonw",
-                "\\python33\\pythonw",
-                "\\python32\\pythonw",
-                "\\python31\\pythonw",
-                "\\python30\\pythonw",
-                "\\python27\\pythonw",
-                "\\python26\\pythonw",
-                "\\Python37\\python",
-                "\\Python36\\python",
-                "\\Python35\\python",
-                "\\Python34\\python",
-                "\\Python33\\python",
-                "\\Python32\\python",
-                "\\Python31\\python",
-                "\\Python30\\python",
-                "\\Python27\\python",
-                "\\Python26\\python",
-                "\\python37\\python",
-                "\\python36\\python",
-                "\\python35\\python",
-                "\\python34\\python",
-                "\\python33\\python",
-                "\\python32\\python",
-                "\\python31\\python",
-                "\\python30\\python",
-                "\\python27\\python",
-                "\\python26\\python",
-            };
+            List<string> locations = new List<string>();
+            for (int i = 26; i <= 50; i++)
+            {
+                locations.Add(Path.Combine("\\python" + i, "pythonw"));
+                locations.Add(Path.Combine("\\Python" + i, "pythonw"));
+            }
 
             foreach (var location in locations)
             {
@@ -199,13 +179,12 @@ namespace WakaTime
             return null;
         }
 
-        internal static string GetEmbeddedPath()
+        internal static string GetEmbeddedPythonPath()
         {
-            var path = Path.Combine(WakaTimeConstants.UserConfigDir, "python", "pythonw");
+            var path = Path.Combine(AppDataDirectory, "python", "pythonw");
             try
             {
                 var process = new RunProcess(path, "--version");
-
                 process.Run();
 
                 if (!process.Success)
@@ -222,15 +201,47 @@ namespace WakaTime
             }
         }
 
-        internal static string PythonDownloadUrl
+        internal static bool DoesCliExist()
         {
-            get
+            return File.Exists(CliLocation);
+        }
+
+        internal static bool IsCliOld()
+        {
+            var process = new RunProcess(Dependencies.GetPython(), CliLocation, "--version");
+            process.Run();
+
+            if (process.Success)
             {
-                var arch = "win32";
-                if (ProcessorArchitectureHelper.Is64BitOperatingSystem)
-                    arch = "amd64";
-                return string.Format("https://www.python.org/ftp/python/{0}/python-{0}-embed-{1}.zip", CurrentPythonVersion, arch);
+                var currentVersion = process.Error.Trim();
+                Logger.Info(string.Format("Current wakatime-cli version is {0}", currentVersion));
+
+                Logger.Info("Checking for updates to wakatime-cli...");
+                var latestVersion = Constants.LatestWakaTimeCliVersion();
+
+                if (currentVersion.Equals(latestVersion))
+                {
+                    Logger.Info("wakatime-cli is up to date.");
+                    return true;
+                }
+
+                Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
             }
+            return false;
+        }
+
+        internal static void RecursiveDelete(string folder)
+        {
+            try
+            {
+                Directory.Delete(folder, true);
+            }
+            catch { /* ignored */ }
+            try
+            {
+                File.Delete(folder);
+            }
+            catch { /* ignored */ }
         }
     }
 }

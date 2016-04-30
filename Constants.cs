@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Text.RegularExpressions;
-using EnvDTE;
-using EnvDTE80;
 
 namespace WakaTime
 {
-    internal static class WakaTimeConstants
+    internal static class Constants
     {
         internal const string PluginName = "visualstudio-wakatime";
         internal static string PluginVersion = string.Format("{0}.{1}.{2}", WakaTimePackage.CoreAssembly.Version.Major, WakaTimePackage.CoreAssembly.Version.Minor, WakaTimePackage.CoreAssembly.Version.Build);
@@ -22,9 +20,7 @@ namespace WakaTime
 
         internal const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
         internal const string CliFolder = @"wakatime-master\wakatime\cli.py";
-
-        internal static string UserConfigDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
+        
         internal static Func<string> LatestWakaTimeCliVersion = () =>
         {
             var regex = new Regex(@"(__version_info__ = )(\(( ?\'[0-9]+\'\,?){3}\))");

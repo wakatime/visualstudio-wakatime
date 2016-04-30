@@ -179,19 +179,18 @@
     <Compile Include="Forms\ApiKeyForm.Designer.cs">
       <DependentUpon>ApiKeyForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="WakaTimeConstants.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ProcessorArchitectureHelper.cs" />
     <Compile Include="PythonCliParameters.cs" />
-    <Compile Include="PythonManager.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Downloader.cs" />
+    <Compile Include="Dependencies.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="WakaTimeConfigFile.cs" />
+    <Compile Include="ConfigFile.cs" />
     <Compile Include="GuidList.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="GlobalSuppressions.cs" />

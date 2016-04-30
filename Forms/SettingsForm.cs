@@ -5,14 +5,14 @@ namespace WakaTime.Forms
 {
     public partial class SettingsForm : Form
     {
-        private readonly WakaTimeConfigFile _wakaTimeConfigFile;
+        private readonly ConfigFile _wakaTimeConfigFile;
         internal event EventHandler ConfigSaved;
 
         public SettingsForm()
         {
             InitializeComponent();
 
-            _wakaTimeConfigFile = new WakaTimeConfigFile();
+            _wakaTimeConfigFile = new ConfigFile();
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)

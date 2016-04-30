@@ -25,7 +25,7 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package
     {
         #region Fields
-        private static WakaTimeConfigFile _wakaTimeConfigFile;
+        private static ConfigFile _wakaTimeConfigFile;
         private static SettingsForm _settingsForm;
 
         private DocumentEvents _docEvents;
@@ -70,7 +70,7 @@ namespace WakaTime
 
             try
             {
-                Logger.Info(string.Format("Initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
+                Logger.Info(string.Format("Initializing WakaTime v{0}", Constants.PluginVersion));
 
                 // VisualStudio Object                
                 _docEvents = ObjDte.Events.DocumentEvents;
@@ -89,7 +89,7 @@ namespace WakaTime
                         Dependencies.DownloadAndInstallPython();
                     }
 
-                    if (!DoesCliExist() || !IsCliLatestVersion())
+                    if (!Dependencies.DoesCliExist() || Dependencies.IsCliOld())
                     {
                         Dependencies.DownloadAndInstallCli();
                     }
@@ -124,7 +124,7 @@ namespace WakaTime
                 timer.Elapsed += ProcessHeartbeats;
                 timer.Start();
 
-                Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
+                Logger.Info(string.Format("Finished initializing WakaTime v{0}", Constants.PluginVersion));
             }
             catch (Exception ex)
             {
@@ -207,7 +207,7 @@ namespace WakaTime
         {
             
             // Load config file
-            _wakaTimeConfigFile = new WakaTimeConfigFile();
+            _wakaTimeConfigFile = new ConfigFile();
             GetSettings();
 
             // Prompt for api key if not already set
@@ -273,8 +273,7 @@ namespace WakaTime
                 bool hasExtraHeartbeats = extraHeartbeats.Count > 0;
 
                 PythonCliParameters.Key = ApiKey;
-                PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, WakaTimeConstants.EditorVersion, WakaTimeConstants.PluginName, WakaTimeConstants.PluginVersion);
-
+                PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", Constants.EditorName, Constants.EditorVersion, Constants.PluginName, Constants.PluginVersion);
                 PythonCliParameters.File = heartbeat.entity;
                 PythonCliParameters.Time = heartbeat.timestamp;
                 PythonCliParameters.IsWrite = heartbeat.is_write;
@@ -285,19 +284,27 @@ namespace WakaTime
                 if (hasExtraHeartbeats)
                     extraHeartbeatsJSON = new JavaScriptSerializer().Serialize(extraHeartbeats);
 
-                var process = new RunProcess(pythonBinary, extraHeartbeatsJSON, PythonCliParameters.ToArray());
+                var process = new RunProcess(pythonBinary, PythonCliParameters.ToArray());
                 if (Debug)
                 {
                     Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", PythonCliParameters.ToArray(true))));
-                    process.Run();
-                    Logger.Debug(string.Format("CLI STDOUT: {0}", process.Output));
-                    Logger.Debug(string.Format("CLI STDERR: {0}", process.Error));
+                    process.Run(extraHeartbeatsJSON);
+                    if (process.Output != null && process.Output != "")
+                        Logger.Debug(process.Output);
+                    if (process.Error != null && process.Error != "")
+                        Logger.Debug(process.Error);
                 }
                 else
-                    process.RunInBackground();
+                    process.RunInBackground(extraHeartbeatsJSON);
 
                 if (!process.Success)
-                    Logger.Error(string.Format("Could not send heartbeat: {0}", process.Error));
+                {
+                    Logger.Error("Could not send heartbeat.");
+                    if (process.Output != null && process.Output != "")
+                        Logger.Error(process.Output);
+                    if (process.Error != null && process.Error != "")
+                        Logger.Error(process.Error);
+                }
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
@@ -319,35 +326,6 @@ namespace WakaTime
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
             Proxy = _wakaTimeConfigFile.Proxy;
-        }
-
-        static bool DoesCliExist()
-        {
-            return File.Exists(PythonCliParameters.Cli);
-        }
-
-        static bool IsCliLatestVersion()
-        {
-            var process = new RunProcess(Dependencies.GetPython(), PythonCliParameters.Cli, "--version");
-            process.Run();
-
-            if (process.Success)
-            {
-                var currentVersion = process.Error.Trim();
-                Logger.Info(string.Format("Current wakatime-cli version is {0}", currentVersion));
-
-                Logger.Info("Checking for updates to wakatime-cli...");
-                var latestVersion = WakaTimeConstants.LatestWakaTimeCliVersion();
-
-                if (currentVersion.Equals(latestVersion))
-                {
-                    Logger.Info("wakatime-cli is up to date.");
-                    return true;
-                }
-                
-                Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
-            }
-            return false;
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)
