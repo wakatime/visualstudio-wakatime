@@ -171,6 +171,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Heartbeat.cs" />
     <Compile Include="Forms\ApiKeyForm.cs">
       <SubType>Form</SubType>
     </Compile>

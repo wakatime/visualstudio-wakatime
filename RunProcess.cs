@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,14 @@ namespace WakaTime
     {
         private readonly string _program;
         private readonly string[] _arguments;
+        private readonly string _extraHeartbeatsJSON;
         private bool _captureOutput;
 
-        internal RunProcess(string program, params string[] arguments)
+        internal RunProcess(string program, string extraHeartbeatsJSON, params string[] arguments)
         {
             _program = program;
             _arguments = arguments;
+            _extraHeartbeatsJSON = extraHeartbeatsJSON;
             _captureOutput = true;
         }
 
@@ -51,6 +54,12 @@ namespace WakaTime
 
                 using (var process = Process.Start(procInfo))
                 {
+
+                    if (_extraHeartbeatsJSON != null)
+                    {
+                        process.StandardInput.WriteLine(_extraHeartbeatsJSON);
+                    }
+
                     if (_captureOutput)
                     {
                         var stdOut = new StringBuilder();

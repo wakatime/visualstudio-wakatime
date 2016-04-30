@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -12,9 +13,11 @@ namespace WakaTime
         }
         public string Key { get; set; }
         public string File { get; set; }
+        public decimal Time { get; set; }
         public string Plugin { get; set; }
         public bool IsWrite { get; set; }
         public string Project { get; set; }
+        public bool HasExtraHeartbeats { get; set; }
 
         public string[] ToArray(bool obfuscate = false)
         {
@@ -23,8 +26,10 @@ namespace WakaTime
                 Cli,
                 "--key",
                 obfuscate ? string.Format("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX{0}", Key.Substring(Key.Length - 4)) : Key,
-                "--file",
+                "--entity",
                 File,
+                "--time",
+                Time.ToString(),
                 "--plugin",
                 Plugin
             };
@@ -38,6 +43,9 @@ namespace WakaTime
                 parameters.Add("--project");
                 parameters.Add(Project);
             }
+            
+            if (HasExtraHeartbeats)
+                parameters.Add("--extra-heartbeats");
 
             return parameters.ToArray();
         }

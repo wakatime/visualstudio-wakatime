@@ -5,11 +5,15 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Timers;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
 using Task = System.Threading.Tasks.Task;
+using System.Collections.Concurrent;
+using System.Collections;
+using System.Web.Script.Serialization;
 
 namespace WakaTime
 {
@@ -36,10 +40,14 @@ namespace WakaTime
         public static string ApiKey;
         public static string Proxy;
 
+        private static ConcurrentQueue<Heartbeat> heartbeatQueue = new ConcurrentQueue<Heartbeat>();
+        private static Timer timer = new Timer();
+
         static readonly PythonCliParameters PythonCliParameters = new PythonCliParameters();
         private static string _lastFile;
-        private static string _solutionName = string.Empty;
         DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
+        private static string _solutionName = string.Empty;
+        private static int heartbeatFrequency = 2; // minutes
         #endregion
 
         #region Startup/Cleanup        
@@ -109,16 +117,39 @@ namespace WakaTime
                 _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
-                _solutionEvents.Opened += SolutionEventsOnOpened;                
+                _solutionEvents.Opened += SolutionEventsOnOpened;
+
+                // setup timer to process queued heartbeats every 8 seconds
+                timer.Interval = 1000 * 8;
+                timer.Elapsed += ProcessHeartbeats;
+                timer.Start();
 
                 Logger.Info(string.Format("Finished initializing WakaTime v{0}", WakaTimeConstants.PluginVersion));
             }
             catch (Exception ex)
             {
-                Logger.Error("Error initializing Wakatime", ex);
+                Logger.Error("Error Initializing WakaTime", ex);
             }
-        }        
+        }
 
+        public void Dispose()
+        {
+            if (timer != null)
+            {
+                _docEvents.DocumentOpened -= DocEventsOnDocumentOpened;
+                _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
+                _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
+                _solutionEvents.Opened -= SolutionEventsOnOpened;
+
+                timer.Stop();
+                timer.Elapsed -= ProcessHeartbeats;
+                timer.Dispose();
+                timer = null;
+
+                // make sure the queue is empty
+                ProcessHeartbeats();
+            }
+        }
         #endregion
 
         #region Event Handlers
@@ -186,55 +217,75 @@ namespace WakaTime
         #endregion
 
         #region Methods
-
-        private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
-        {
-            GetSettings();
-        }
-
-        private static void GetSettings()
-        {
-            _wakaTimeConfigFile.Read();
-            ApiKey = _wakaTimeConfigFile.ApiKey;
-            Debug = _wakaTimeConfigFile.Debug;
-            Proxy = _wakaTimeConfigFile.Proxy;
-        }
-
         private void HandleActivity(string currentFile, bool isWrite)
         {
             if (currentFile == null)
                 return;
 
-            if (!isWrite && _lastFile != null && !EnoughTimePassed() && currentFile.Equals(_lastFile))
+            DateTime now = DateTime.UtcNow;
+
+            if (!isWrite && _lastFile != null && !EnoughTimePassed(now) && currentFile.Equals(_lastFile))
                 return;
 
+            _lastFile = currentFile;
+            _lastHeartbeat = now;
+            
+            AppendHeartbeat(currentFile, isWrite, now);
+        }
+
+        public static void AppendHeartbeat(string fileName, bool isWrite, DateTime time)
+        {
             Task.Run(() =>
             {
-                SendHeartbeat(currentFile, isWrite);
+                Heartbeat h = new Heartbeat();
+                h.entity = fileName;
+                h.timestamp = time.Ticks / (decimal)TimeSpan.TicksPerMillisecond;
+                h.is_write = isWrite;
+                h.project = GetProjectName();
+                heartbeatQueue.Enqueue(h);
             });
-
-
-            _lastFile = currentFile;
-            _lastHeartbeat = DateTime.UtcNow;
         }
 
-        private bool EnoughTimePassed()
+        private void ProcessHeartbeats(object sender, ElapsedEventArgs e)
         {
-            return _lastHeartbeat < DateTime.UtcNow.AddMinutes(-1);
+            Task.Run(() =>
+            {
+                ProcessHeartbeats();
+            });
         }
 
-        public static void SendHeartbeat(string fileName, bool isWrite)
+        private void ProcessHeartbeats()
         {
-            PythonCliParameters.Key = ApiKey;
-            PythonCliParameters.File = fileName;
-            PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, WakaTimeConstants.EditorVersion, WakaTimeConstants.PluginName, WakaTimeConstants.PluginVersion);
-            PythonCliParameters.IsWrite = isWrite;
-            PythonCliParameters.Project = GetProjectName();
-
             var pythonBinary = PythonManager.GetPython();
             if (pythonBinary != null)
             {
-                var process = new RunProcess(pythonBinary, PythonCliParameters.ToArray());
+                // get first heartbeat from queue
+                Heartbeat heartbeat;
+                bool gotOne = heartbeatQueue.TryDequeue(out heartbeat);
+                if (!gotOne)
+                    return;
+
+                // remove all extra heartbeats from queue
+                ArrayList extraHeartbeats = new ArrayList();
+                Heartbeat h;
+                while (heartbeatQueue.TryDequeue(out h))
+                    extraHeartbeats.Add(new Heartbeat(h));
+                bool hasExtraHeartbeats = extraHeartbeats.Count > 0;
+
+                PythonCliParameters.Key = ApiKey;
+                PythonCliParameters.Plugin = string.Format("{0}/{1} {2}/{3}", WakaTimeConstants.EditorName, WakaTimeConstants.EditorVersion, WakaTimeConstants.PluginName, WakaTimeConstants.PluginVersion);
+
+                PythonCliParameters.File = heartbeat.entity;
+                PythonCliParameters.Time = heartbeat.timestamp;
+                PythonCliParameters.IsWrite = heartbeat.is_write;
+                PythonCliParameters.Project = heartbeat.project;
+                PythonCliParameters.HasExtraHeartbeats = hasExtraHeartbeats;
+
+                string extraHeartbeatsJSON = null;
+                if (hasExtraHeartbeats)
+                    extraHeartbeatsJSON = new JavaScriptSerializer().Serialize(extraHeartbeats);
+
+                var process = new RunProcess(pythonBinary, extraHeartbeatsJSON, PythonCliParameters.ToArray());
                 if (Debug)
                 {
                     Logger.Debug(string.Format("[\"{0}\", \"{1}\"]", pythonBinary, string.Join("\", \"", PythonCliParameters.ToArray(true))));
@@ -250,6 +301,24 @@ namespace WakaTime
             }
             else
                 Logger.Error("Could not send heartbeat because python is not installed");
+        }
+
+        private bool EnoughTimePassed(DateTime now)
+        {
+            return _lastHeartbeat < now.AddMinutes(-1 * heartbeatFrequency);
+        }
+
+        private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
+        {
+            GetSettings();
+        }
+
+        private static void GetSettings()
+        {
+            _wakaTimeConfigFile.Read();
+            ApiKey = _wakaTimeConfigFile.ApiKey;
+            Debug = _wakaTimeConfigFile.Debug;
+            Proxy = _wakaTimeConfigFile.Proxy;
         }
 
         static bool DoesCliExist()
@@ -364,12 +433,12 @@ namespace WakaTime
 
             return proxy;
         }
-        #endregion
 
         public static class CoreAssembly
         {
             static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
             public static readonly Version Version = Reference.GetName().Version;
         }
+        #endregion
     }
 }
