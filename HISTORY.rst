@@ -3,6 +3,13 @@ History
 -------
 
 
+8.0.1 (2016-04-30)
+++++++++++++++++++
+
+- Minor bug fix to prevent downloading wakatime-cli when
+  already have current version.
+
+
 8.0.0 (2016-04-30)
 ++++++++++++++++++
 
