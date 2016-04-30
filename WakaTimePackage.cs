@@ -84,14 +84,14 @@ namespace WakaTime
                 try
                 {
                     // Make sure python is installed
-                    if (!PythonManager.IsPythonInstalled())
+                    if (!Dependencies.IsPythonInstalled())
                     {
-                        Downloader.DownloadAndInstallPython();
+                        Dependencies.DownloadAndInstallPython();
                     }
 
                     if (!DoesCliExist() || !IsCliLatestVersion())
                     {
-                        Downloader.DownloadAndInstallCli();
+                        Dependencies.DownloadAndInstallCli();
                     }
                 }
                 catch (WebException ex)
@@ -256,7 +256,7 @@ namespace WakaTime
 
         private void ProcessHeartbeats()
         {
-            var pythonBinary = PythonManager.GetPython();
+            var pythonBinary = Dependencies.GetPython();
             if (pythonBinary != null)
             {
                 // get first heartbeat from queue
@@ -328,7 +328,7 @@ namespace WakaTime
 
         static bool IsCliLatestVersion()
         {
-            var process = new RunProcess(PythonManager.GetPython(), PythonCliParameters.Cli, "--version");
+            var process = new RunProcess(Dependencies.GetPython(), PythonCliParameters.Cli, "--version");
             process.Run();
 
             if (process.Success)

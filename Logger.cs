@@ -30,7 +30,7 @@ namespace WakaTime
             var outputPaneGuid = new Guid(GuidList.GuidWakatimeOutputPane.ToByteArray());
             IVsOutputWindowPane windowPane;
 
-            outputWindow.CreatePane(ref outputPaneGuid, "Wakatime", 1, 1);
+            outputWindow.CreatePane(ref outputPaneGuid, "WakaTime", 1, 1);
             outputWindow.GetPane(ref outputPaneGuid, out windowPane);
 
             return windowPane;
@@ -66,7 +66,7 @@ namespace WakaTime
             var outputWindowPane = WakatimeOutputWindowPane;
             if (outputWindowPane == null) return;
 
-            var outputMessage = string.Format("[Wakatime {0} {1}] {2}{3}", Enum.GetName(level.GetType(), level),
+            var outputMessage = string.Format("[WakaTime {0} {1}] {2}{3}", Enum.GetName(level.GetType(), level),
                 DateTime.Now.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture), message, Environment.NewLine);
 
             outputWindowPane.OutputString(outputMessage);
