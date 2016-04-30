@@ -89,7 +89,7 @@ namespace WakaTime
                         Dependencies.DownloadAndInstallPython();
                     }
 
-                    if (!Dependencies.DoesCliExist() || Dependencies.IsCliOld())
+                    if (!Dependencies.DoesCliExist() || !Dependencies.IsCliUpToDate())
                     {
                         Dependencies.DownloadAndInstallCli();
                     }

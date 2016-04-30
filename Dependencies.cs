@@ -206,7 +206,7 @@ namespace WakaTime
             return File.Exists(CliLocation);
         }
 
-        internal static bool IsCliOld()
+        internal static bool IsCliUpToDate()
         {
             var process = new RunProcess(Dependencies.GetPython(), CliLocation, "--version");
             process.Run();
