@@ -234,11 +234,12 @@
     <None Include="source.extension.vsixmanifest" />
     <Resource Include="Resources\wakatime-16.png" />
     <Resource Include="Resources\wakatime-120.ico" />
+    <Resource Include="Resources\Screen-Shot-2016-03-21.png" />
     <Content Include="Resources\wakatime-120.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\ScreenShot-2014-10-29.png">
+	<Content Include="Resources\Screen-Shot-2016-03-21.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

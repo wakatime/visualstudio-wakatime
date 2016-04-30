@@ -3,6 +3,15 @@ History
 -------
 
 
+8.0.0 (2016-04-30)
+++++++++++++++++++
+
+- Queue heartbeats before sending to wakatime-cli to prevent
+  from forking too many python processes.
+- Improved dependency management and moved dependencies to
+  AppData\WakaTime folder.
+
+
 7.0.3 (2016-04-09)
 ++++++++++++++++++
 
