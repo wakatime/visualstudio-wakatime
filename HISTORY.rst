@@ -3,6 +3,12 @@ History
 -------
 
 
+8.0.3 (2016-05-01)
+++++++++++++++++++
+
+- Millisecond precision for heartbeat timestamps.
+
+
 8.0.2 (2016-05-01)
 ++++++++++++++++++
 
