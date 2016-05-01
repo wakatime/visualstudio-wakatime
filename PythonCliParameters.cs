@@ -13,7 +13,7 @@ namespace WakaTime
         }
         public string Key { get; set; }
         public string File { get; set; }
-        public decimal Time { get; set; }
+        public long Time { get; set; }
         public string Plugin { get; set; }
         public bool IsWrite { get; set; }
         public string Project { get; set; }

@@ -239,7 +239,7 @@ namespace WakaTime
             {
                 Heartbeat h = new Heartbeat();
                 h.entity = fileName;
-                h.timestamp = time.Ticks / (decimal)TimeSpan.TicksPerMillisecond;
+                h.timestamp = ToUnixEpoch(time);
                 h.is_write = isWrite;
                 h.project = GetProjectName();
                 heartbeatQueue.Enqueue(h);
@@ -410,6 +410,12 @@ namespace WakaTime
             }
 
             return proxy;
+        }
+
+        private static long ToUnixEpoch(this DateTime date)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return Convert.ToInt64((date - epoch).TotalSeconds);
         }
 
         public static class CoreAssembly
