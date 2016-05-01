@@ -366,7 +366,7 @@ namespace WakaTime
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan timestamp = date - epoch;
             long seconds = Convert.ToInt64(timestamp.TotalSeconds);
-            int milliseconds = timestamp.Milliseconds;
+            string milliseconds = timestamp.ToString("ffffff");
             string allTogetherNow = string.Format("{0}.{1}", seconds, milliseconds);
             return Decimal.Parse(allTogetherNow);
         }
