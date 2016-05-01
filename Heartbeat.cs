@@ -5,7 +5,7 @@ namespace WakaTime
     internal class Heartbeat
     {
         public string entity { get; set; }
-        public long timestamp { get; set; }
+        public decimal timestamp { get; set; }
         public string project { get; set; }
         public bool is_write { get; set; }
 
