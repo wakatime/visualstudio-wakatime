@@ -3,6 +3,13 @@ History
 -------
 
 
+8.0.4 (2016-05-03)
+++++++++++++++++++
+
+- Fix bug causing epoch timestamp to be created incorrectly as
+  milliseconds instead of seconds.
+
+
 8.0.3 (2016-05-01)
 ++++++++++++++++++
 
