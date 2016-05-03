@@ -361,14 +361,13 @@ namespace WakaTime
                     : string.Empty;
         }
 
-        private static decimal ToUnixEpoch(DateTime date)
+        private static string ToUnixEpoch(DateTime date)
         {
             DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan timestamp = date - epoch;
-            long seconds = Convert.ToInt64(timestamp.TotalSeconds);
+            long seconds = Convert.ToInt64(Math.Floor(timestamp.TotalSeconds));
             string milliseconds = timestamp.ToString("ffffff");
-            string allTogetherNow = string.Format("{0}.{1}", seconds, milliseconds);
-            return Decimal.Parse(allTogetherNow);
+            return string.Format("{0}.{1}", seconds, milliseconds);
         }
 
         public static WebProxy GetProxy()
