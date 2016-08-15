@@ -227,10 +227,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LICENSE.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="source.extension.vsixmanifest" />
     <Resource Include="Resources\wakatime-16.png" />
     <Resource Include="Resources\wakatime-120.ico" />
