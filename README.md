@@ -49,12 +49,12 @@ The resulting `bin/Express/WakaTime.vsix` extension file will install into Visua
 Contributing
 ------------
 
-To open and build this project, please use Visual Studio 2013 and install the Visual Studio 2013 SDK:
+To open and build this project, please use Visual Studio 2015 and install the Visual Studio 2015 SDK:
 
-https://www.microsoft.com/en-us/download/details.aspx?id=40758
+https://msdn.microsoft.com/en-us/library/mt683786.aspx
 
-To Debug follow this instructions:
+For debugging, configure the product to open in a new Visual Studio instance:
 
-1. Open Wakatime project properties (ALT + ENTER)
-2. Into Debug tab set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe```
+1. Open the project properties (ALT + ENTER)
+2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe```
 3. Add command line arguments: ```/rootsuffix Exp```
