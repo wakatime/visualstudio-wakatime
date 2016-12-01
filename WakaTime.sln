@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.25928.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WakaTime", "WakaTime\WakaTime.csproj", "{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}"
 EndProject
@@ -9,6 +9,7 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Express|Any CPU = Express|Any CPU
+		Legacy|Any CPU = Legacy|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
@@ -16,6 +17,8 @@ Global
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Express|Any CPU.ActiveCfg = Express|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Express|Any CPU.Build.0 = Express|Any CPU
+		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Legacy|Any CPU.ActiveCfg = Legacy|Any CPU
+		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Legacy|Any CPU.Build.0 = Legacy|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.Deploy.0 = Release|Any CPU
