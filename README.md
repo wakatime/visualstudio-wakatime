@@ -35,13 +35,12 @@ Supported Visual Studio Editions
 * Visual Studio 2012
 * Visual Studio 2013
 * Visual Studio 2015
-* Visual Studio 15
 * Visual Studio 2017
 
 
 #### Visual Studio 2010 ( Legacy )
 
-For legacy Visual Studio 2010, install the legacy WakaTime VSIX from the [latest release][latest release].
+For legacy Visual Studio 2010, use the [legacy WakaTime 2010 extension][legacy extension].
 
 
 #### Visual Studio Express
@@ -56,14 +55,13 @@ The resulting `bin/Express/WakaTime.vsix` extension file will install into Visua
 Contributing
 ------------
 
-To open and build this project, please use Visual Studio 2015 and install the Visual Studio 2015 SDK:
-
-https://msdn.microsoft.com/en-us/library/mt683786.aspx
+To open and build this project, please use Visual Studio 2017.
 
 For debugging, configure the product to open in a new Visual Studio instance:
 
 1. Open the project properties (ALT + ENTER)
-2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe```
+2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 15.0\Common7\IDE\devenv.exe```
 3. Add command line arguments: ```/rootsuffix Exp```
 
 [latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
+[legacy extension]: https://marketplace.visualstudio.com/vsgallery/f3f454bd-bc03-4dee-8093-281f21e2fa9e
