@@ -36,11 +36,18 @@ Supported Visual Studio Editions
 * Visual Studio 2013
 * Visual Studio 2015
 * Visual Studio 15
+* Visual Studio 2017
+
+
+#### Visual Studio 2010 ( Legacy )
+
+For legacy Visual Studio 2010, install the legacy WakaTime VSIX from the [latest release][latest release].
+
 
 #### Visual Studio Express
 
 Microsoft [does not allow](https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx) extensions for Visual Studio Express edition in the gallery.
-To use WakaTime for Visual Studio Express, download and install [WakaTime for Express](https://github.com/wakatime/visualstudio-wakatime/releases/download/7.0.1/WakaTime-express-v7.0.1.vsix).
+To use WakaTime for Visual Studio Express, download and install [WakaTime for Express][latest release].
 
 Alternatively, you may clone the github repo and build the extension using the `Express` build profile.
 The resulting `bin/Express/WakaTime.vsix` extension file will install into Visual Studio Express when run.
@@ -58,3 +65,5 @@ For debugging, configure the product to open in a new Visual Studio instance:
 1. Open the project properties (ALT + ENTER)
 2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.exe```
 3. Add command line arguments: ```/rootsuffix Exp```
+
+[latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
