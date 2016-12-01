@@ -45,7 +45,7 @@ For legacy Visual Studio 2010, use the [legacy WakaTime 2010 extension][legacy e
 
 #### Visual Studio Express
 
-Microsoft [does not allow](https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx) extensions for Visual Studio Express edition in the gallery.
+Microsoft [does not allow][express article] extensions for Visual Studio Express edition in the gallery.
 To use WakaTime for Visual Studio Express, download and install [WakaTime for Express][latest release].
 
 Alternatively, you may clone the github repo and build the extension using the `Express` build profile.
@@ -64,4 +64,5 @@ For debugging, configure the product to open in a new Visual Studio instance:
 3. Add command line arguments: ```/rootsuffix Exp```
 
 [latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
-[legacy extension]: https://marketplace.visualstudio.com/vsgallery/f3f454bd-bc03-4dee-8093-281f21e2fa9e
+[legacy extension]: https://marketplace.visualstudio.com/items?itemName=WakaTime.WakaTime2010
+[express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
