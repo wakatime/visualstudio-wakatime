@@ -10,7 +10,7 @@ namespace WakaTime
 {
     public class Dependencies
     {
-        private const string CurrentPythonVersion = "3.5.1";
+        private const string CurrentPythonVersion = "3.6.0";
         private static string PythonBinaryLocation { get; set; }
         private static string PythonDownloadUrl
         {
