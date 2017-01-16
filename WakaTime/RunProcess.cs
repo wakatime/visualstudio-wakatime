@@ -68,7 +68,11 @@ namespace WakaTime
                 using (var process = Process.Start(procInfo))
                 {
                     // run background process at lower priority to prevent lagging GUI
-                    process.PriorityClass = ProcessPriorityClass.BelowNormal;
+                    try
+                    {
+                        process.PriorityClass = ProcessPriorityClass.BelowNormal;
+                    }
+                    catch (Exception pass) { /* Might fail if not Admin */ }
 
                     if (_stdin != null)
                     {
