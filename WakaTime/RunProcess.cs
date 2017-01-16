@@ -62,11 +62,13 @@ namespace WakaTime
                     RedirectStandardInput = _stdin != null,
                     FileName = _program,
                     CreateNoWindow = true,
-                    Arguments = GetArgumentString()
+                    Arguments = GetArgumentString(),
                 };
                 
                 using (var process = Process.Start(procInfo))
                 {
+                    // run background process at lower priority to prevent lagging GUI
+                    process.PriorityClass = ProcessPriorityClass.BelowNormal;
 
                     if (_stdin != null)
                     {
