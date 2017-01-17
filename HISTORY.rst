@@ -3,6 +3,13 @@ History
 -------
 
 
+8.0.6 (2017-01-16)
+++++++++++++++++++
+
+- Run wakatime-cli in low priority background process to prevent
+  lagging GUI.
+
+
 8.0.5 (2016-11-30)
 ++++++++++++++++++
 
