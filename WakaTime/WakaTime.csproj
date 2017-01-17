@@ -18,6 +18,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Express|AnyCPU'">
+    <SchemaVersion>2.0</SchemaVersion>
     <DebugSymbols>false</DebugSymbols>
     <OutputPath>bin\Express\</OutputPath>
     <DefineConstants>
@@ -27,6 +28,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <DeployExtension>False</DeployExtension>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Legacy|AnyCPU'">
     <DebugSymbols>false</DebugSymbols>
@@ -229,7 +232,7 @@
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="source.extension.vsixmanifest-legacy" />
-    <None Include="source.extension.vsixmanifest-default">
+    <None Include="source.extension.vsixmanifest-release">
       <SubType>Designer</SubType>
     </None>
     <None Include="source.extension.vsixmanifest-express">
@@ -272,7 +275,7 @@
             if $(ConfigurationName) == Legacy (
               copy "$(ProjectDir)source.extension.vsixmanifest-legacy" "$(ProjectDir)source.extension.vsixmanifest" /y
             ) ELSE (
-              copy "$(ProjectDir)source.extension.vsixmanifest-default" "$(ProjectDir)source.extension.vsixmanifest" /y
+              copy "$(ProjectDir)source.extension.vsixmanifest-release" "$(ProjectDir)source.extension.vsixmanifest" /y
             )
           )</PreBuildEvent>
   </PropertyGroup>
