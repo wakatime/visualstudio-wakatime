@@ -59,7 +59,7 @@
             this.txtAPIKey.Location = new System.Drawing.Point(124, 13);
             this.txtAPIKey.MaxLength = 36;
             this.txtAPIKey.Name = "txtAPIKey";
-            this.txtAPIKey.Size = new System.Drawing.Size(270, 23);
+            this.txtAPIKey.Size = new System.Drawing.Size(363, 23);
             this.txtAPIKey.TabIndex = 1;
             // 
             // btnOk
@@ -117,16 +117,17 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(121, 76);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(231, 15);
+            this.label2.Size = new System.Drawing.Size(490, 15);
             this.label2.TabIndex = 7;
-            this.label2.Text = "Example: https://user:password@host:port";
+            this.label2.Text = "Example: https://user:pass@host:port or socks5://user:pass@host:port or domain\\us" +
+    "er:pass.";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(536, 183);
+            this.ClientSize = new System.Drawing.Size(626, 183);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chkDebugMode);
             this.Controls.Add(this.txtProxy);
