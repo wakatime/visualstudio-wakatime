@@ -7,7 +7,7 @@ Visual Studio extension to quantify your coding using https://wakatime.com/.
 Installation
 ------------
 
-1. Inside Visual Studio, navigate to `Tools` -> `Extensions and Updates...`
+1. Inside Visual Studio, navigate to `Tools` → `Extensions and Updates...`
 
 2. Click the `Online` category at the left, then search for `wakatime`.
 
