@@ -64,3 +64,24 @@ For debugging, configure the product to open in a new Visual Studio instance:
 [latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
 [legacy extension]: https://marketplace.visualstudio.com/items?itemName=WakaTime.WakaTime2010
 [express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
+
+
+Troubleshooting
+---------------
+
+Look for a `Tools` → `WakaTime Settings` menu in Visual Studio.
+If that menu doesn't exist, something prevented the WakaTime extension from loading.
+
+Turn on debug mode:
+
+`Tools` → `WakaTime Settings` or add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file.
+
+Next, open your `C:\Users\<user>\.wakatime.log` file and look for error messages.
+
+The [How to Debug Plugins][how to debug] guide shows how to check when coding activity was last received from your IDE using the [User Agents API][user agents api].
+For more general troubleshooting info, see the [wakatime-cli Troubleshooting Section][wakatime-cli-help].
+
+
+[wakatime-cli-help]: https://github.com/wakatime/wakatime#troubleshooting
+[how to debug]: https://wakatime.com/faq#debug-plugins
+[user agents api]: https://wakatime.com/developers#user_agents
