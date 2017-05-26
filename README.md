@@ -72,13 +72,9 @@ Troubleshooting
 Look for a `Tools` → `WakaTime Settings` menu in Visual Studio.
 If that menu doesn't exist, something prevented the WakaTime extension from loading.
 
-Turn on debug mode:
+Turn on debug mode from `Tools` → `WakaTime Settings`.
 
-`Tools` → `WakaTime Settings`
-
-or
-
-Add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file.
+Or add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file if you don't have the WakaTime Settings menu.
 
 Next, open your `C:\Users\<user>\.wakatime.log` file and look for error messages.
 
