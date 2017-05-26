@@ -74,7 +74,11 @@ If that menu doesn't exist, something prevented the WakaTime extension from load
 
 Turn on debug mode:
 
-`Tools` → `WakaTime Settings` or add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file.
+`Tools` → `WakaTime Settings`
+
+or
+
+Add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file.
 
 Next, open your `C:\Users\<user>\.wakatime.log` file and look for error messages.
 
