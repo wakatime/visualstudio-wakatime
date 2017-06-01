@@ -36,6 +36,11 @@ Supported Visual Studio Editions
 * Visual Studio 2017
 
 
+#### Visual Studio for Mac
+
+Visual Studio for Mac is supported with the [WakaTime for Monodevlop extension][monodevelop].
+
+
 #### Visual Studio 2010 ( Legacy )
 
 For legacy Visual Studio 2010, use the [legacy WakaTime 2010 extension][legacy extension].
@@ -85,3 +90,4 @@ For more general troubleshooting info, see the [wakatime-cli Troubleshooting Sec
 [wakatime-cli-help]: https://github.com/wakatime/wakatime#troubleshooting
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
+[monodevelop]: https://wakatime.com/help/plugins/monodevelop
