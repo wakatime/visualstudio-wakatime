@@ -77,11 +77,17 @@ Troubleshooting
 Look for a `Tools` → `WakaTime Settings` menu in Visual Studio.
 If that menu doesn't exist, something prevented the WakaTime extension from loading.
 
-Turn on debug mode from `Tools` → `WakaTime Settings`.
+Turn on debug mode from `Tools` → `WakaTime Settings`, or add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file if you don't have the WakaTime Settings menu.
 
-Or add `debug = true` to your `C:\Users\<user>\.wakatime.cfg` file if you don't have the WakaTime Settings menu.
+Are there error messages in your Visual Studio Output window? Open the Output window from `View` → `Output` (`ctrl` + `alt` + `O`).
 
-Next, open your `C:\Users\<user>\.wakatime.log` file and look for error messages.
+![Output Window](https://raw.githubusercontent.com/wakatime/visualstudio-wakatime/master/output-window.png)
+
+If there are no messages in your Visual Studio Output window, check your `.wakatime.log` file:
+
+`C:\Users\<user>\.wakatime.log`
+
+Lastly, uncaught exceptions go to [ActivityLog.xml][activitylog]. Uncaught exceptions are rare, so check your ActivityLog.xml only after checking your Output Window and `.wakatime.log` file.
 
 The [How to Debug Plugins][how to debug] guide shows how to check when coding activity was last received from your IDE using the [User Agents API][user agents api].
 For more general troubleshooting info, see the [wakatime-cli Troubleshooting Section][wakatime-cli-help].
@@ -91,3 +97,4 @@ For more general troubleshooting info, see the [wakatime-cli Troubleshooting Sec
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
 [monodevelop]: https://wakatime.com/help/plugins/monodevelop
+[activitylog]: http://blogs.msdn.com/b/visualstudio/archive/2010/02/24/troubleshooting-with-the-activity-log.aspx
