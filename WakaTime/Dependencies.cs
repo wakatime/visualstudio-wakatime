@@ -49,9 +49,7 @@ namespace WakaTime
             var localZipFile = Path.Combine(destinationDir, "wakatime-cli.zip");
 
             // Download wakatime-cli
-            var proxy = WakaTimePackage.GetProxy();
-            var client = new WebClient { Proxy = proxy };
-            client.DownloadFile(url, localZipFile);
+            DownloadFile(url, localZipFile);
             Logger.Debug("Finished downloading wakatime-cli.");
 
             // Remove old folder if it exists
@@ -78,9 +76,7 @@ namespace WakaTime
             var extractToDir = Path.Combine(destinationDir, "python");
 
             // Download python
-            var proxy = WakaTimePackage.GetProxy();
-            var client = new WebClient { Proxy = proxy };
-            client.DownloadFile(url, localZipFile);
+            DownloadFile(url, localZipFile);
             Logger.Debug("Finished downloading python.");
 
             // Remove old python folder if it exists
@@ -228,6 +224,17 @@ namespace WakaTime
                 Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
             }
             return false;
+        }
+
+        internal static void DownloadFile(string url, string saveAs)
+        {
+            if (!ServicePointManager.SecurityProtocol.HasFlag(SecurityProtocolType.Tls12))
+            {
+                ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol | SecurityProtocolType.Tls12;
+            }
+            var proxy = WakaTimePackage.GetProxy();
+            var client = new WebClient { Proxy = proxy };
+            client.DownloadFile(url, saveAs);
         }
 
         internal static void RecursiveDelete(string folder)
