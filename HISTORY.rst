@@ -3,6 +3,12 @@ History
 -------
 
 
+8.0.7 (2018-05-03)
+++++++++++++++++++
+
+- Support TLS 1.2 when downloading dependencies from GitHub.
+
+
 8.0.6 (2017-01-16)
 ++++++++++++++++++
 
