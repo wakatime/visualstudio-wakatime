@@ -150,7 +150,7 @@ namespace WakaTime
         internal static string GetPythonPathFromFixedPath()
         {
             List<string> locations = new List<string>();
-            for (int i = 26; i <= 50; i++)
+            for (int i = 27; i <= 50; i++)
             {
                 locations.Add(Path.Combine("\\python" + i, "pythonw"));
                 locations.Add(Path.Combine("\\Python" + i, "pythonw"));
