@@ -3,6 +3,13 @@ History
 -------
 
 
+8.1.0 (2018-10-27)
+++++++++++++++++++
+
+- Add setting and config to disable threading.
+- Drop support for Python 2.6.
+
+
 8.0.7 (2018-05-03)
 ++++++++++++++++++
 
