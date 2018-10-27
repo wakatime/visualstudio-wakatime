@@ -39,6 +39,7 @@ namespace WakaTime
         public static bool Debug;
         public static string ApiKey;
         public static string Proxy;
+        public static bool DisableThreading = false;
 
         private static ConcurrentQueue<Heartbeat> heartbeatQueue = new ConcurrentQueue<Heartbeat>();
         private static Timer timer = new Timer();
@@ -59,10 +60,19 @@ namespace WakaTime
             _dteEvents = ObjDte.Events.DTEEvents;
             _dteEvents.OnStartupComplete += OnOnStartupComplete;
 
-            Task.Run(() =>
+            if (DisableThreading)
             {
+                Logger.Debug("Initializing without threading.");
                 InitializeAsync();
-            });
+            }
+            else
+            {
+                Logger.Debug("Initializing in background thread.");
+                Task.Run(() =>
+                {
+                    InitializeAsync();
+                });
+            }
         }
 
         public void InitializeAsync()
@@ -235,23 +245,48 @@ namespace WakaTime
 
         public static void AppendHeartbeat(string fileName, bool isWrite, DateTime time)
         {
-            Task.Run(() =>
+            if (DisableThreading)
             {
+                Logger.Debug("Appending heartbeat to queue without threading.");
                 Heartbeat h = new Heartbeat();
                 h.entity = fileName;
                 h.timestamp = ToUnixEpoch(time);
                 h.is_write = isWrite;
                 h.project = GetProjectName();
                 heartbeatQueue.Enqueue(h);
-            });
+            }
+            else
+            {
+                Logger.Debug("Appending heartbeat to queue in background thread.");
+                Task.Run(() =>
+                {
+                    Heartbeat h = new Heartbeat();
+                    h.entity = fileName;
+                    h.timestamp = ToUnixEpoch(time);
+                    h.is_write = isWrite;
+                    h.project = GetProjectName();
+                    heartbeatQueue.Enqueue(h);
+                });
+            }
+                
         }
 
         private void ProcessHeartbeats(object sender, ElapsedEventArgs e)
         {
-            Task.Run(() =>
+            if (DisableThreading)
             {
+                Logger.Debug("Processing heartbeats queue without threading.");
                 ProcessHeartbeats();
-            });
+            }
+            else
+            {
+                Logger.Debug("Processing heartbeats queue in background thread.");
+                Task.Run(() =>
+                {
+                    ProcessHeartbeats();
+                });
+            }
+                
         }
 
         private void ProcessHeartbeats()
@@ -326,6 +361,7 @@ namespace WakaTime
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
             Proxy = _wakaTimeConfigFile.Proxy;
+            DisableThreading = _wakaTimeConfigFile.DisableThreading;
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)

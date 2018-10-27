@@ -9,6 +9,7 @@ namespace WakaTime
         internal string ApiKey { get; set; }        
         internal string Proxy { get; set; }
         internal bool Debug { get; set; }
+        internal bool DisableThreading { get; set; }
 
         private readonly string _configFilepath;
 
@@ -37,6 +38,13 @@ namespace WakaTime
                 if (bool.TryParse(ret.ToString(), out debug))
                     Debug = debug;
             }
+
+            if (NativeMethods.GetPrivateProfileString("settings", "disable_threading", "", ret, 2083, _configFilepath) > 0)
+            {
+                bool disable_threading;
+                if (bool.TryParse(ret.ToString(), out disable_threading))
+                    DisableThreading = disable_threading;
+            }
         }
 
         internal void Save()
@@ -46,6 +54,7 @@ namespace WakaTime
 
             NativeMethods.WritePrivateProfileString("settings", "proxy", Proxy.Trim(), _configFilepath);
             NativeMethods.WritePrivateProfileString("settings", "debug", Debug.ToString().ToLower(), _configFilepath);
+            NativeMethods.WritePrivateProfileString("settings", "disable_threading", DisableThreading.ToString().ToLower(), _configFilepath);
         }
 
         static string GetConfigFilePath()

@@ -22,6 +22,7 @@ namespace WakaTime.Forms
                 txtAPIKey.Text = _wakaTimeConfigFile.ApiKey;
                 txtProxy.Text = _wakaTimeConfigFile.Proxy;
                 chkDebugMode.Checked = _wakaTimeConfigFile.Debug;
+                chkDisableThreading.Checked = _wakaTimeConfigFile.DisableThreading;
             }
             catch (Exception ex)
             {
@@ -42,8 +43,9 @@ namespace WakaTime.Forms
                     _wakaTimeConfigFile.ApiKey = apiKey.ToString();
                     _wakaTimeConfigFile.Proxy = txtProxy.Text.Trim();
                     _wakaTimeConfigFile.Debug = chkDebugMode.Checked;
+                    _wakaTimeConfigFile.DisableThreading = chkDisableThreading.Checked;
                     _wakaTimeConfigFile.Save();
-                    OnConfigSaved();                    
+                    OnConfigSaved();
                 }
                 else
                 {
@@ -65,6 +67,21 @@ namespace WakaTime.Forms
         }
 
         private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtProxy_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtAPIKey_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkDisableThreading_CheckedChanged(object sender, EventArgs e)
         {
 
         }
