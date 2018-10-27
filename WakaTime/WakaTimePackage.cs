@@ -245,30 +245,12 @@ namespace WakaTime
 
         public static void AppendHeartbeat(string fileName, bool isWrite, DateTime time)
         {
-            if (DisableThreading)
-            {
-                Logger.Debug("Appending heartbeat to queue without threading.");
-                Heartbeat h = new Heartbeat();
-                h.entity = fileName;
-                h.timestamp = ToUnixEpoch(time);
-                h.is_write = isWrite;
-                h.project = GetProjectName();
-                heartbeatQueue.Enqueue(h);
-            }
-            else
-            {
-                Logger.Debug("Appending heartbeat to queue in background thread.");
-                Task.Run(() =>
-                {
-                    Heartbeat h = new Heartbeat();
-                    h.entity = fileName;
-                    h.timestamp = ToUnixEpoch(time);
-                    h.is_write = isWrite;
-                    h.project = GetProjectName();
-                    heartbeatQueue.Enqueue(h);
-                });
-            }
-                
+            Heartbeat h = new Heartbeat();
+            h.entity = fileName;
+            h.timestamp = ToUnixEpoch(time);
+            h.is_write = isWrite;
+            h.project = GetProjectName();
+            heartbeatQueue.Enqueue(h);
         }
 
         private void ProcessHeartbeats(object sender, ElapsedEventArgs e)
