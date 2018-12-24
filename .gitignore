@@ -64,6 +64,18 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+# Backup & report files from converting an old project file
+# to a newer Visual Studio version. Backup files are not needed,
+# because we have git ;-)
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+ServiceFabricBackup/
+*.rptproj.bak
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
 
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
