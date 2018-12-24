@@ -12,10 +12,10 @@
 	</Metadata>
 
 	<Installation>
-		<InstallationTarget Version="[11.0,16.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
-		<InstallationTarget Version="[11.0,16.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
-		<InstallationTarget Version="[11.0,16.0)" Id="Microsoft.VisualStudio.VPDExpress" />
-		<InstallationTarget Version="[11.0,16.0)" Id="Microsoft.VisualStudio.VWDExpress" />
+		<InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.VSWinExpress" />
+		<InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.VSWinDesktopExpress" />
+		<InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.VPDExpress" />
+		<InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.VWDExpress" />
 	</Installation>
 
 	<Dependencies>
@@ -28,6 +28,6 @@
 	</Assets>
 
 	<Prerequisites>
-		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+		<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,17.0)" DisplayName="Visual Studio core editor" />
 	</Prerequisites>
 </PackageManifest>
