@@ -3,6 +3,13 @@ History
 -------
 
 
+9.0.0 (2019-03-09)
+++++++++++++++++++
+
+- Add support for Visual Studio 2019.
+  `#84 <https://github.com/wakatime/visualstudio-wakatime/pull/84>`_
+
+
 8.1.0 (2018-10-27)
 ++++++++++++++++++
 
