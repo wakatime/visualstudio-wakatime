@@ -4,7 +4,7 @@ using System;
 
 namespace WakaTime
 {
-    static class GuidList
+    internal static class GuidList
     {
         public const string GuidWakaTimePkgString = "52d9c3ff-c893-408e-95e4-d7484ec7fa47";
 

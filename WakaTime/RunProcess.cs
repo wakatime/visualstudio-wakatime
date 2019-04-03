@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace WakaTime
 {
-    class RunProcess
+    internal class RunProcess
     {
         private readonly string _program;
         private readonly string[] _arguments;
@@ -43,10 +42,7 @@ namespace WakaTime
 
         internal string Error { get; private set; }
 
-        internal bool Success
-        {
-            get { return Exception == null; }
-        }
+        internal bool Success => Exception == null;
 
         internal Exception Exception { get; private set; }        
 
@@ -70,13 +66,13 @@ namespace WakaTime
                     // run background process at lower priority to prevent lagging GUI
                     try
                     {
-                        process.PriorityClass = ProcessPriorityClass.BelowNormal;
+                        if (process != null) process.PriorityClass = ProcessPriorityClass.BelowNormal;
                     }
-                    catch (Exception pass) { /* Might fail if not Admin */ }
+                    catch (Exception) { /* Might fail if not Admin */ }
 
                     if (_stdin != null)
                     {
-                        process.StandardInput.WriteLine(string.Format("{0}\n", _stdin));
+                        process?.StandardInput.WriteLine($"{_stdin}\n");
                     }
 
                     if (_captureOutput)

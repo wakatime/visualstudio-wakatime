@@ -34,16 +34,14 @@ namespace WakaTime
             // ReSharper disable once InvertIf
             if (NativeMethods.GetPrivateProfileString("settings", "debug", "", ret, 2083, _configFilepath) > 0)
             {
-                bool debug;
-                if (bool.TryParse(ret.ToString(), out debug))
+                if (bool.TryParse(ret.ToString(), out var debug))
                     Debug = debug;
             }
 
             if (NativeMethods.GetPrivateProfileString("settings", "disable_threading", "", ret, 2083, _configFilepath) > 0)
             {
-                bool disable_threading;
-                if (bool.TryParse(ret.ToString(), out disable_threading))
-                    DisableThreading = disable_threading;
+                if (bool.TryParse(ret.ToString(), out var disableThreading))
+                    DisableThreading = disableThreading;
             }
         }
 

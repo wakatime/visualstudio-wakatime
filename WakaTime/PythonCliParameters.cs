@@ -1,16 +1,11 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace WakaTime
 {
     internal class PythonCliParameters
     {
-        private string Cli
-        {
-            get { return Dependencies.CliLocation; }
-        }
+        private static string Cli => Dependencies.CliLocation;
         public string Key { get; set; }
         public string File { get; set; }
         public string Time { get; set; }
@@ -25,11 +20,11 @@ namespace WakaTime
             {
                 Cli,
                 "--key",
-                obfuscate ? string.Format("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX{0}", Key.Substring(Key.Length - 4)) : Key,
+                obfuscate ? $"XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX{Key.Substring(Key.Length - 4)}" : Key,
                 "--entity",
                 File,
                 "--time",
-                Time.ToString(),
+                Time,
                 "--plugin",
                 Plugin
             };

@@ -7,16 +7,11 @@ namespace WakaTime
     internal static class Constants
     {
         internal const string PluginName = "visualstudio-wakatime";
-        internal static string PluginVersion = string.Format("{0}.{1}.{2}", WakaTimePackage.CoreAssembly.Version.Major, WakaTimePackage.CoreAssembly.Version.Minor, WakaTimePackage.CoreAssembly.Version.Build);
+
+        internal static string PluginVersion =
+            $"{WakaTimePackage.CoreAssembly.Version.Major}.{WakaTimePackage.CoreAssembly.Version.Minor}.{WakaTimePackage.CoreAssembly.Version.Build}";
         internal const string EditorName = "visualstudio";
-        internal static string EditorVersion {
-            get
-            {
-                if (WakaTimePackage.ObjDte == null)
-                    return string.Empty;
-                return WakaTimePackage.ObjDte.Version;
-            }
-        }
+        internal static string EditorVersion => WakaTimePackage.ObjDte == null ? string.Empty : WakaTimePackage.ObjDte.Version;
 
         internal const string CliUrl = "https://github.com/wakatime/wakatime/archive/master.zip";
         internal const string CliFolder = @"wakatime-master\wakatime\cli.py";
@@ -41,7 +36,7 @@ namespace WakaTime
                     var grp1 = match.Groups[2];
                     var regexVersion = new Regex("([0-9]+)");
                     var match2 = regexVersion.Matches(grp1.Value);
-                    return string.Format("{0}.{1}.{2}", match2[0].Value, match2[1].Value, match2[2].Value);
+                    return $"{match2[0].Value}.{match2[1].Value}.{match2[2].Value}";
                 }
                 else
                 {
@@ -52,6 +47,7 @@ namespace WakaTime
             {
                 Logger.Error("Exception when checking current wakatime cli version: ", ex);
             }
+
             return string.Empty;
         };
     }
