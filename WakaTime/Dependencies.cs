@@ -23,8 +23,8 @@ namespace WakaTime
         private static string AppDataDirectory {
             get
             {
-                string roamingFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string appFolder = Path.Combine(roamingFolder, "WakaTime");
+                var roamingFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var appFolder = Path.Combine(roamingFolder, "WakaTime");
 
                 // Create folder if it does not exist
                 if (!Directory.Exists(appFolder))
@@ -33,18 +33,12 @@ namespace WakaTime
                 return appFolder;
             }
         }
-        internal static string CliLocation
-        {
-            get
-            {
-                return Path.Combine(AppDataDirectory, Constants.CliFolder);
-            }
-        }
+        internal static string CliLocation => Path.Combine(AppDataDirectory, Constants.CliFolder);
 
-        static public void DownloadAndInstallCli()
+        public static void DownloadAndInstallCli()
         {
             Logger.Debug("Downloading wakatime-cli...");
-            var url = Constants.CliUrl;
+            const string url = Constants.CliUrl;
             var destinationDir = AppDataDirectory;
             var localZipFile = Path.Combine(destinationDir, "wakatime-cli.zip");
 
@@ -56,7 +50,7 @@ namespace WakaTime
             RecursiveDelete(Path.Combine(destinationDir, "wakatime-master"));
 
             // Extract wakatime-cli zip file
-            Logger.Debug(string.Format("Extracting wakatime-cli to: {0}", destinationDir));
+            Logger.Debug($"Extracting wakatime-cli to: {destinationDir}");
             ZipFile.ExtractToDirectory(localZipFile, destinationDir);
             Logger.Debug("Finished extracting wakatime-cli.");
 
@@ -67,7 +61,7 @@ namespace WakaTime
             catch { /* ignored */ }
         }
 
-        static public void DownloadAndInstallPython()
+        public static void DownloadAndInstallPython()
         {
             Logger.Debug("Downloading python...");
             var url = PythonDownloadUrl;
@@ -83,7 +77,7 @@ namespace WakaTime
             RecursiveDelete(extractToDir);
 
             // Extract wakatime cli zip file
-            Logger.Debug(string.Format("Extracting python to: {0}", extractToDir));
+            Logger.Debug($"Extracting python to: {extractToDir}");
             ZipFile.ExtractToDirectory(localZipFile, extractToDir);
             Logger.Debug("Finished extracting python.");
 
@@ -107,10 +101,7 @@ namespace WakaTime
             if (PythonBinaryLocation == null)
                 PythonBinaryLocation = GetPythonPathFromMicrosoftRegistry();
 
-            if (PythonBinaryLocation == null)
-                PythonBinaryLocation = GetPythonPathFromFixedPath();
-
-            return PythonBinaryLocation;
+            return PythonBinaryLocation ?? (PythonBinaryLocation = GetPythonPathFromFixedPath());
         }
 
         internal static string GetPythonPathFromMicrosoftRegistry()
@@ -136,7 +127,7 @@ namespace WakaTime
                 if (!process.Success)
                     return null;
 
-                Logger.Debug(string.Format("Python found from Microsoft Registry: {0}", fullPath));
+                Logger.Debug($"Python found from Microsoft Registry: {fullPath}");
 
                 return fullPath;
             }
@@ -149,8 +140,8 @@ namespace WakaTime
 
         internal static string GetPythonPathFromFixedPath()
         {
-            List<string> locations = new List<string>();
-            for (int i = 27; i <= 50; i++)
+            var locations = new List<string>();
+            for (var i = 27; i <= 50; i++)
             {
                 locations.Add(Path.Combine("\\python" + i, "pythonw"));
                 locations.Add(Path.Combine("\\Python" + i, "pythonw"));
@@ -167,7 +158,7 @@ namespace WakaTime
                 }
                 catch { /*ignored*/ }
 
-                Logger.Debug(string.Format("Python found by Fixed Path: {0}", location));
+                Logger.Debug($"Python found by Fixed Path: {location}");
 
                 return location;
             }
@@ -186,7 +177,7 @@ namespace WakaTime
                 if (!process.Success)
                     return null;
 
-                Logger.Debug(string.Format("Python found from embedded location: {0}", path));
+                Logger.Debug($"Python found from embedded location: {path}");
 
                 return path;
             }
@@ -210,7 +201,7 @@ namespace WakaTime
             if (process.Success)
             {
                 var currentVersion = process.Error.Trim();
-                Logger.Info(string.Format("Current wakatime-cli version is {0}", currentVersion));
+                Logger.Info($"Current wakatime-cli version is {currentVersion}");
 
                 Logger.Info("Checking for updates to wakatime-cli...");
                 var latestVersion = Constants.LatestWakaTimeCliVersion();
@@ -221,7 +212,7 @@ namespace WakaTime
                     return true;
                 }
 
-                Logger.Info(string.Format("Found an updated wakatime-cli v{0}", latestVersion));
+                Logger.Info($"Found an updated wakatime-cli v{latestVersion}");
             }
             return false;
         }

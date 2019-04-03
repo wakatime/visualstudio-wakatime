@@ -68,7 +68,7 @@
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnOk.Location = new System.Drawing.Point(124, 270);
+            this.btnOk.Location = new System.Drawing.Point(124, 160);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(87, 27);
             this.btnOk.TabIndex = 2;
@@ -80,7 +80,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(234, 270);
+            this.btnCancel.Location = new System.Drawing.Point(234, 160);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(87, 27);
             this.btnCancel.TabIndex = 3;
@@ -108,11 +108,11 @@
             // chkDebugMode
             // 
             this.chkDebugMode.AutoSize = true;
-            this.chkDebugMode.Location = new System.Drawing.Point(124, 116);
+            this.chkDebugMode.Location = new System.Drawing.Point(124, 105);
             this.chkDebugMode.Name = "chkDebugMode";
-            this.chkDebugMode.Size = new System.Drawing.Size(149, 19);
+            this.chkDebugMode.Size = new System.Drawing.Size(61, 19);
             this.chkDebugMode.TabIndex = 6;
-            this.chkDebugMode.Text = "Debugging WakaTime?";
+            this.chkDebugMode.Text = "Debug";
             this.chkDebugMode.UseVisualStyleBackColor = true;
             // 
             // label2
@@ -129,19 +129,19 @@
             // chkDisableThreading
             // 
             this.chkDisableThreading.AutoSize = true;
-            this.chkDisableThreading.Location = new System.Drawing.Point(124, 153);
+            this.chkDisableThreading.Location = new System.Drawing.Point(124, 129);
             this.chkDisableThreading.Name = "chkDisableThreading";
-            this.chkDisableThreading.Size = new System.Drawing.Size(178, 19);
+            this.chkDisableThreading.Size = new System.Drawing.Size(185, 19);
             this.chkDisableThreading.TabIndex = 8;
-            this.chkDisableThreading.Text = "Disable background threading?";
+            this.chkDisableThreading.Text = "Disable background threading";
             this.chkDisableThreading.UseVisualStyleBackColor = true;
             this.chkDisableThreading.CheckedChanged += new System.EventHandler(this.chkDisableThreading_CheckedChanged);
             // 
             // SettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(987, 309);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(742, 199);
             this.Controls.Add(this.chkDisableThreading);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chkDebugMode);

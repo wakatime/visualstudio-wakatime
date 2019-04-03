@@ -17,21 +17,17 @@ namespace WakaTime
     {
         private static IVsOutputWindowPane _wakatimeOutputWindowPane;
 
-        private static IVsOutputWindowPane WakatimeOutputWindowPane
-        {
-            get { return _wakatimeOutputWindowPane ?? (_wakatimeOutputWindowPane = GetWakatimeOutputWindowPane()); }
-        }
+        private static IVsOutputWindowPane WakatimeOutputWindowPane =>
+            _wakatimeOutputWindowPane ?? (_wakatimeOutputWindowPane = GetWakatimeOutputWindowPane());
 
         private static IVsOutputWindowPane GetWakatimeOutputWindowPane()
         {
-            var outputWindow = Package.GetGlobalService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-            if (outputWindow == null) return null;
+            if (!(Package.GetGlobalService(typeof(SVsOutputWindow)) is IVsOutputWindow outputWindow)) return null;
 
             var outputPaneGuid = new Guid(GuidList.GuidWakatimeOutputPane.ToByteArray());
-            IVsOutputWindowPane windowPane;
 
             outputWindow.CreatePane(ref outputPaneGuid, "WakaTime", 1, 1);
-            outputWindow.GetPane(ref outputPaneGuid, out windowPane);
+            outputWindow.GetPane(ref outputPaneGuid, out var windowPane);
 
             return windowPane;
         }
@@ -46,7 +42,7 @@ namespace WakaTime
 
         internal static void Error(string message, Exception ex = null)
         {
-            var exceptionMessage = string.Format("{0}: {1}", message, ex);
+            var exceptionMessage = $"{message}: {ex}";
 
             Log(LogLevel.HandledException, exceptionMessage);
         }
@@ -66,8 +62,8 @@ namespace WakaTime
             var outputWindowPane = WakatimeOutputWindowPane;
             if (outputWindowPane == null) return;
 
-            var outputMessage = string.Format("[WakaTime {0} {1}] {2}{3}", Enum.GetName(level.GetType(), level),
-                DateTime.Now.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture), message, Environment.NewLine);
+            var outputMessage =
+                $"[WakaTime {Enum.GetName(level.GetType(), level)} {DateTime.Now.ToString("hh:mm:ss tt", CultureInfo.InvariantCulture)}] {message}{Environment.NewLine}";
 
             outputWindowPane.OutputString(outputMessage);
         }

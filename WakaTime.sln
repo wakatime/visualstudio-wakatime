@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WakaTime", "WakaTime\WakaTime.csproj", "{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}"
 EndProject
@@ -21,7 +21,6 @@ Global
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Legacy|Any CPU.Build.0 = Legacy|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B05537E5-6B8D-419D-B470-B6FA57BB1C2E}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

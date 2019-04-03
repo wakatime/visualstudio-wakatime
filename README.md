@@ -34,6 +34,7 @@ Supported Visual Studio Editions
 * Visual Studio 2013
 * Visual Studio 2015
 * Visual Studio 2017
+* Visual Studio 2019
 
 
 #### Visual Studio for Mac
@@ -63,8 +64,15 @@ To open and build this project, please use Visual Studio 2017.
 For debugging, configure the product to open in a new Visual Studio instance:
 
 1. Open the project properties (ALT + ENTER)
-2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio 15.0\Common7\IDE\devenv.exe```
+2. In the Debug tab, set to Start external program. e.g: ```C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\devenv.exe```
 3. Add command line arguments: ```/rootsuffix Exp```
+4. Change the solution according to the version of Visual Studio you're targeting:
+	* Express - Visual Studio Express
+	* Legacy - Visual Studio 2010
+	* Release - Visual Studio 2012+ Community, Pro, Enterprise, etc..
+	
+	Note: The Debug solution is only for including debugger symbols.
+
 
 [latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
 [legacy extension]: https://marketplace.visualstudio.com/items?itemName=WakaTime.WakaTime2010

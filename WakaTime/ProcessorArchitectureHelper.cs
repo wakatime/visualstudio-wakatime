@@ -3,9 +3,9 @@ using System.Diagnostics;
 
 namespace WakaTime
 {
-    static class ProcessorArchitectureHelper
+    internal static class ProcessorArchitectureHelper
     {
-        static readonly bool Is64BitProcess = (IntPtr.Size == 8);
+        private static readonly bool Is64BitProcess = IntPtr.Size == 8;
         internal static bool Is64BitOperatingSystem = Is64BitProcess || InternalCheckIsWow64();
 
         public static bool InternalCheckIsWow64()
@@ -15,8 +15,7 @@ namespace WakaTime
 
             using (var p = Process.GetCurrentProcess())
             {
-                bool retVal;
-                return NativeMethods.IsWow64Process(p.Handle, out retVal) && retVal;
+                return NativeMethods.IsWow64Process(p.Handle, out var retVal) && retVal;
             }
         }
     }
