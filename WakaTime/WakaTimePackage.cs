@@ -13,15 +13,17 @@ using System.Collections.Concurrent;
 using System.Collections;
 using System.Web.Script.Serialization;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell.Interop;
+using WakaTime.AsyncPackageHelpers;
+using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider;
+using PackageAutoLoadFlags = WakaTime.AsyncPackageHelpers.PackageAutoLoadFlags;
 
 namespace WakaTime
-{
-    [PackageRegistration(UseManagedResourcesOnly = true)]
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-    [ProvideMenuResource("Menus.ctmenu", 1)]
+{    
     [Guid(GuidList.GuidWakaTimePkgString)]
-    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]    
-    public sealed class WakaTimePackage : Package
+    [AsyncPackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [AsyncPackageHelpers.ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]
+    public sealed class WakaTimePackage : Package, IAsyncLoadablePackageInitialize
     {
         #region Fields
         private static ConfigFile _wakaTimeConfigFile;
@@ -33,7 +35,7 @@ namespace WakaTime
         private DTEEvents _dteEvents;
 
         public static DTE ObjDte;
-       
+
         // Settings
         public static bool Debug;
         public static string ApiKey;
@@ -41,7 +43,7 @@ namespace WakaTime
         public static bool DisableThreading;
 
         private static readonly ConcurrentQueue<Heartbeat> HeartbeatQueue = new ConcurrentQueue<Heartbeat>();
-        private static Timer _timer = new Timer();
+        private static readonly Timer Timer = new Timer();
 
         private static readonly PythonCliParameters PythonCliParameters = new PythonCliParameters();
         private static string _lastFile;
@@ -49,6 +51,7 @@ namespace WakaTime
         private static string _solutionName = string.Empty;
         private const int HeartbeatFrequency = 2; // minutes
 
+        private bool _isAsyncLoadSupported;
         #endregion
 
         #region Startup/Cleanup        
@@ -60,22 +63,37 @@ namespace WakaTime
             _dteEvents = ObjDte.Events.DTEEvents;
             _dteEvents.OnStartupComplete += OnOnStartupComplete;
 
-            if (DisableThreading)
+            _isAsyncLoadSupported = this.IsAsyncPackageSupported();
+
+            // Only perform initialization if async package framework is not supported
+            if (!_isAsyncLoadSupported)
             {
-                Logger.Debug("Initializing without threading.");
-                InitializeAsync();
-            }
-            else
-            {
+                // Try force initializing in brackground
                 Logger.Debug("Initializing in background thread.");
                 Task.Run(() =>
                 {
                     InitializeAsync();
                 });
-            }
+            }            
         }
 
-        public void InitializeAsync()
+        public IVsTask Initialize(IAsyncServiceProvider pServiceProvider, IProfferAsyncService pProfferService,
+            IAsyncProgressCallback pProgressCallback)
+        {
+            if (!_isAsyncLoadSupported)
+            {
+                throw new InvalidOperationException("Async Initialize method should not be called when async load is not supported.");
+            }
+
+            return ThreadHelper.JoinableTaskFactory.RunAsync<object>(async () =>
+            {
+                InitializeAsync();
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                return null;
+            }).AsVsTask();
+        }
+
+        private void InitializeAsync()
         {
             try
             {
@@ -84,7 +102,7 @@ namespace WakaTime
                 // VisualStudio Object                
                 _docEvents = ObjDte.Events.DocumentEvents;
                 _windowEvents = ObjDte.Events.WindowEvents;
-                _solutionEvents = ObjDte.Events.SolutionEvents;                
+                _solutionEvents = ObjDte.Events.SolutionEvents;
 
                 // Settings Form
                 _settingsForm = new SettingsForm();
@@ -110,7 +128,7 @@ namespace WakaTime
                 catch (Exception ex)
                 {
                     Logger.Error("Error detecting dependencies. Exception Traceback:", ex);
-                }                
+                }
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
@@ -128,9 +146,9 @@ namespace WakaTime
                 _solutionEvents.Opened += SolutionEventsOnOpened;
 
                 // setup timer to process queued heartbeats every 8 seconds
-                _timer.Interval = 1000 * 8;
-                _timer.Elapsed += ProcessHeartbeats;
-                _timer.Start();
+                Timer.Interval = 1000 * 8;
+                Timer.Elapsed += ProcessHeartbeats;
+                Timer.Start();
 
                 Logger.Info($"Finished initializing WakaTime v{Constants.PluginVersion}");
             }
@@ -138,26 +156,7 @@ namespace WakaTime
             {
                 Logger.Error("Error Initializing WakaTime", ex);
             }
-        }
-
-        public void Dispose()
-        {
-            if (_timer != null)
-            {
-                _docEvents.DocumentOpened -= DocEventsOnDocumentOpened;
-                _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
-                _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
-                _solutionEvents.Opened -= SolutionEventsOnOpened;
-
-                _timer.Stop();
-                _timer.Elapsed -= ProcessHeartbeats;
-                _timer.Dispose();
-                _timer = null;
-
-                // make sure the queue is empty
-                ProcessHeartbeats();
-            }
-        }
+        }        
         #endregion
 
         #region Event Handlers
@@ -212,7 +211,7 @@ namespace WakaTime
         }
 
         private static void OnOnStartupComplete()
-        {            
+        {
             // Load config file
             _wakaTimeConfigFile = new ConfigFile();
             GetSettings();
@@ -236,11 +235,11 @@ namespace WakaTime
 
             _lastFile = currentFile;
             _lastHeartbeat = now;
-            
+
             AppendHeartbeat(currentFile, isWrite, now);
         }
 
-        public static void AppendHeartbeat(string fileName, bool isWrite, DateTime time)
+        private static void AppendHeartbeat(string fileName, bool isWrite, DateTime time)
         {
             var h = new Heartbeat
             {
@@ -360,7 +359,7 @@ namespace WakaTime
         {
             Logger.Info("Please input your api key into the wakatime window.");
             var form = new ApiKeyForm();
-            form.ShowDialog();            
+            form.ShowDialog();
         }
 
         private static void SettingsPopup()
@@ -448,6 +447,6 @@ namespace WakaTime
             private static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
             public static readonly Version Version = Reference.GetName().Version;
         }
-        #endregion
+        #endregion        
     }
 }
