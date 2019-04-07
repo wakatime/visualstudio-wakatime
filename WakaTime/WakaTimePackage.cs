@@ -212,6 +212,8 @@ namespace WakaTime
 
         private static void OnOnStartupComplete()
         {
+            // TODO: _dteEvents.OnStartupComplete -= OnOnStartupComplete;
+
             // Load config file
             _wakaTimeConfigFile = new ConfigFile();
             GetSettings();
