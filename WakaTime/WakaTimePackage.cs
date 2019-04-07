@@ -93,6 +93,7 @@ namespace WakaTime
 
             return ThreadHelper.JoinableTaskFactory.RunAsync<object>(async () =>
             {
+                Logger.Debug("Initializing async.");
                 InitializeAsync();
 
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
