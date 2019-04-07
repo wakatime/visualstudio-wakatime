@@ -61,13 +61,17 @@ namespace WakaTime
         {
             base.Initialize();
 
+            // Load config file
+            _wakaTimeConfigFile = new ConfigFile();
+            GetSettings();
+
             ObjDte = (DTE)GetService(typeof(DTE));
             _dteEvents = ObjDte.Events.DTEEvents;
             _dteEvents.OnStartupComplete += OnOnStartupComplete;
 
             _isAsyncLoadSupported = this.IsAsyncPackageSupported();
 
-            // Only perform initialization if async package framework is not supported
+            // Only perform initialization if async package framework not supported
             if (!_isAsyncLoadSupported)
             {
                 // Try force initializing in brackground
@@ -218,12 +222,6 @@ namespace WakaTime
 
         private static void OnOnStartupComplete()
         {
-            // TODO: _dteEvents.OnStartupComplete -= OnOnStartupComplete;
-
-            // Load config file
-            _wakaTimeConfigFile = new ConfigFile();
-            GetSettings();
-
             // Prompt for api key if not already set
             if (string.IsNullOrEmpty(ApiKey))
                 PromptApiKey();
@@ -460,6 +458,7 @@ namespace WakaTime
             _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
             _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
             _solutionEvents.Opened -= SolutionEventsOnOpened;
+            _dteEvents.OnStartupComplete -= OnOnStartupComplete;
 
             Timer.Stop();
             Timer.Elapsed -= ProcessHeartbeats;
