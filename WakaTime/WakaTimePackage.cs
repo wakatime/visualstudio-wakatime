@@ -19,7 +19,7 @@ using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.Interop.IAsyncService
 using PackageAutoLoadFlags = WakaTime.AsyncPackageHelpers.PackageAutoLoadFlags;
 
 namespace WakaTime
-{    
+{
     [Guid(GuidList.GuidWakaTimePkgString)]
     [AsyncPackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [AsyncPackageHelpers.ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]
