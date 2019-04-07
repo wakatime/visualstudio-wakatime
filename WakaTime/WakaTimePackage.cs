@@ -88,7 +88,15 @@ namespace WakaTime
             return ThreadHelper.JoinableTaskFactory.RunAsync<object>(async () =>
             {
                 InitializeAsync();
+
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                ObjDte = (DTE)GetService(typeof(DTE));
+                _dteEvents = ObjDte.Events.DTEEvents;
+                _dteEvents.OnStartupComplete += OnOnStartupComplete;
+
+                _isAsyncLoadSupported = this.IsAsyncPackageSupported();
+
                 return null;
             }).AsVsTask();
         }
