@@ -3,6 +3,15 @@ History
 -------
 
 
+10.0.0 (2019-04-07)
+++++++++++++++++++
+
+- Load package async on startup, fixing warning about depreciated APIs.
+  `#90 <https://github.com/wakatime/visualstudio-wakatime/pull/90>`_
+- Prevent deadlocks when reading process output.
+  `#80 <https://github.com/wakatime/visualstudio-wakatime/pull/80>`_
+
+
 9.0.0 (2019-03-09)
 ++++++++++++++++++
 
