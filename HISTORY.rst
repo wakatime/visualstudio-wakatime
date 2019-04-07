@@ -3,6 +3,14 @@ History
 -------
 
 
+10.0.2 (2019-04-07)
+++++++++++++++++++
+
+- Fix missing WakaTime menu item.
+  `#91 <https://github.com/wakatime/visualstudio-wakatime/pull/91>`_
+- Load configs from wakatime.cfg before initializing plugin.
+
+
 10.0.1 (2019-04-07)
 ++++++++++++++++++
 
