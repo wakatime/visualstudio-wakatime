@@ -79,19 +79,11 @@ namespace WakaTime
                     {
                         var stdOut = new StringBuilder();
                         var stdErr = new StringBuilder();
-
-                        while (process != null && !process.HasExited)
-                        {
-                            stdOut.Append(process.StandardOutput.ReadToEnd());
-                            stdErr.Append(process.StandardError.ReadToEnd());
-                        }
-
-                        if (process != null)
-                        {
-                            stdOut.Append(process.StandardOutput.ReadToEnd());
-                            stdErr.Append(process.StandardError.ReadToEnd());
-                        }
-
+                        process.OutputDataReceived += (s, e) => stdOut.Append(e.Data);
+                        process.ErrorDataReceived += (s, e) => stdErr.Append(e.Data);
+                        process.BeginOutputReadLine();
+                        process.BeginErrorReadLine();
+                        process.WaitForExit(1000 * 60 * 10); // 10 minutes
                         Output = stdOut.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
                         Error = stdErr.ToString().Trim(Environment.NewLine.ToCharArray()).Trim('\r', '\n');
                     }
