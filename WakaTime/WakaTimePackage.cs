@@ -442,6 +442,25 @@ namespace WakaTime
             return proxy;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (Timer == null) return;
+
+            _docEvents.DocumentOpened -= DocEventsOnDocumentOpened;
+            _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
+            _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
+            _solutionEvents.Opened -= SolutionEventsOnOpened;
+
+            Timer.Stop();
+            Timer.Elapsed -= ProcessHeartbeats;
+            Timer.Dispose();
+
+            // make sure the queue is empty	
+            ProcessHeartbeats();
+        }
+
         public static class CoreAssembly
         {
             private static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
