@@ -23,6 +23,8 @@ namespace WakaTime
     [Guid(GuidList.GuidWakaTimePkgString)]
     [AsyncPackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [AsyncPackageHelpers.ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]
+    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
     public sealed class WakaTimePackage : Package, IAsyncLoadablePackageInitialize
     {
         #region Fields

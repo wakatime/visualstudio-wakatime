@@ -34,6 +34,7 @@
         priority="0x0100" type="Menu">
         <Parent guid="guidWakaTimeCmdSet" id="MyMenuGroup"/>        
         <Strings>
+          <ButtonText>WakaTime</ButtonText>
           <CommandName>WakaTime</CommandName>
         </Strings>
       </Menu>
