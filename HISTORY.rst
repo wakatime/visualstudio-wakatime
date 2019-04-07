@@ -3,6 +3,12 @@ History
 -------
 
 
+10.0.1 (2019-04-07)
+++++++++++++++++++
+
+- Run syncronous startup code after async initialize.
+
+
 10.0.0 (2019-04-07)
 ++++++++++++++++++
 
