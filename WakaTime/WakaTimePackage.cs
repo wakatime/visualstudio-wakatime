@@ -67,7 +67,6 @@ namespace WakaTime
 
             ObjDte = (DTE)GetService(typeof(DTE));
             _dteEvents = ObjDte.Events.DTEEvents;
-            _dteEvents.OnStartupComplete += OnOnStartupComplete;
 
             _isAsyncLoadSupported = this.IsAsyncPackageSupported();
 
@@ -99,6 +98,8 @@ namespace WakaTime
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 _isAsyncLoadSupported = this.IsAsyncPackageSupported();
+
+                OnOnStartupComplete();
 
                 return null;
             }).AsVsTask();
@@ -457,7 +458,6 @@ namespace WakaTime
             _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
             _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
             _solutionEvents.Opened -= SolutionEventsOnOpened;
-            _dteEvents.OnStartupComplete -= OnOnStartupComplete;
 
             Timer.Stop();
             Timer.Elapsed -= ProcessHeartbeats;
