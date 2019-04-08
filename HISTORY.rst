@@ -3,6 +3,14 @@ History
 -------
 
 
+10.0.3 (2019-04-07)
+++++++++++++++++++
+
+- Bugfix: Prompt for api key first time plugin loaded.
+- Remove disable threading config setting.
+- Bugfix: Only one config instance needed for whole extension.
+
+
 10.0.2 (2019-04-07)
 ++++++++++++++++++
 
