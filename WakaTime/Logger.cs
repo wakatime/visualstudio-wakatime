@@ -34,7 +34,7 @@ namespace WakaTime
 
         internal static void Debug(string message)
         {
-            if (!WakaTimePackage.Debug)
+            if (!WakaTimePackage.Config.Debug)
                 return;
 
             Log(LogLevel.Debug, message);

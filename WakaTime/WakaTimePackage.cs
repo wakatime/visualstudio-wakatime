@@ -28,7 +28,7 @@ namespace WakaTime
     public sealed class WakaTimePackage : Package, IAsyncLoadablePackageInitialize
     {
         #region Fields
-        private static ConfigFile _wakaTimeConfigFile;
+        internal static ConfigFile Config;
         private static SettingsForm _settingsForm;
 
         private DocumentEvents _docEvents;
@@ -37,11 +37,6 @@ namespace WakaTime
         private DTEEvents _dteEvents;
 
         public static DTE ObjDte;
-
-        // Settings
-        public static bool Debug;
-        public static string ApiKey;
-        public static string Proxy;
 
         private static readonly ConcurrentQueue<Heartbeat> HeartbeatQueue = new ConcurrentQueue<Heartbeat>();
         private static readonly Timer Timer = new Timer();
@@ -61,8 +56,8 @@ namespace WakaTime
             base.Initialize();
 
             // Load config file
-            _wakaTimeConfigFile = new ConfigFile();
-            GetSettings();
+            Config = new ConfigFile();
+            Config.Read();
 
             ObjDte = (DTE)GetService(typeof(DTE));
             _dteEvents = ObjDte.Events.DTEEvents;
@@ -224,7 +219,7 @@ namespace WakaTime
         private static void OnOnStartupComplete()
         {
             // Prompt for api key if not already set
-            if (string.IsNullOrEmpty(ApiKey))
+            if (string.IsNullOrEmpty(Config.ApiKey))
                 PromptApiKey();
         }
         #endregion
@@ -282,7 +277,7 @@ namespace WakaTime
                     extraHeartbeats.Add(new Heartbeat(h));
                 var hasExtraHeartbeats = extraHeartbeats.Count > 0;
 
-                PythonCliParameters.Key = ApiKey;
+                PythonCliParameters.Key = Config.ApiKey;
                 PythonCliParameters.Plugin =
                     $"{Constants.EditorName}/{Constants.EditorVersion} {Constants.PluginName}/{Constants.PluginVersion}";
                 PythonCliParameters.File = heartbeat.entity;
@@ -296,7 +291,7 @@ namespace WakaTime
                     extraHeartbeatsJson = new JavaScriptSerializer().Serialize(extraHeartbeats);
 
                 var process = new RunProcess(pythonBinary, PythonCliParameters.ToArray());
-                if (Debug)
+                if (Config.Debug)
                 {
                     Logger.Debug(
                         $"[\"{pythonBinary}\", \"{string.Join("\", \"", PythonCliParameters.ToArray(true))}\"]");
@@ -329,15 +324,7 @@ namespace WakaTime
 
         private static void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
         {
-            GetSettings();
-        }
-
-        private static void GetSettings()
-        {
-            _wakaTimeConfigFile.Read();
-            ApiKey = _wakaTimeConfigFile.ApiKey;
-            Debug = _wakaTimeConfigFile.Debug;
-            Proxy = _wakaTimeConfigFile.Proxy;
+            Config.Read();
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)
@@ -388,13 +375,13 @@ namespace WakaTime
 
             try
             {
-                if (string.IsNullOrEmpty(Proxy))
+                if (string.IsNullOrEmpty(Config.Proxy))
                 {
                     Logger.Debug("No proxy will be used. It's either not set or badly formatted.");
                     return null;
                 }
 
-                var proxyStr = Proxy;
+                var proxyStr = Config.Proxy;
 
                 // Regex that matches proxy address with authentication
                 var regProxyWithAuth = new Regex(@"\s*(https?:\/\/)?([^\s:]+):([^\s:]+)@([^\s:]+):(\d+)\s*");
