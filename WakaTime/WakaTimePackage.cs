@@ -42,7 +42,6 @@ namespace WakaTime
         public static bool Debug;
         public static string ApiKey;
         public static string Proxy;
-        public static bool DisableThreading;
 
         private static readonly ConcurrentQueue<Heartbeat> HeartbeatQueue = new ConcurrentQueue<Heartbeat>();
         private static readonly Timer Timer = new Timer();
@@ -261,17 +260,10 @@ namespace WakaTime
 
         private static void ProcessHeartbeats(object sender, ElapsedEventArgs e)
         {
-            if (DisableThreading)
+            Task.Run(() =>
             {
                 ProcessHeartbeats();
-            }
-            else
-            {
-                Task.Run(() =>
-                {
-                    ProcessHeartbeats();
-                });
-            }
+            });
         }
 
         private static void ProcessHeartbeats()
@@ -346,7 +338,6 @@ namespace WakaTime
             ApiKey = _wakaTimeConfigFile.ApiKey;
             Debug = _wakaTimeConfigFile.Debug;
             Proxy = _wakaTimeConfigFile.Proxy;
-            DisableThreading = _wakaTimeConfigFile.DisableThreading;
         }
 
         private static void MenuItemCallback(object sender, EventArgs e)

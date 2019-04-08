@@ -43,7 +43,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkDebugMode = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.chkDisableThreading = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblAPIKey
@@ -126,23 +125,11 @@
     "er:pass.";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
-            // chkDisableThreading
-            // 
-            this.chkDisableThreading.AutoSize = true;
-            this.chkDisableThreading.Location = new System.Drawing.Point(124, 129);
-            this.chkDisableThreading.Name = "chkDisableThreading";
-            this.chkDisableThreading.Size = new System.Drawing.Size(185, 19);
-            this.chkDisableThreading.TabIndex = 8;
-            this.chkDisableThreading.Text = "Disable background threading";
-            this.chkDisableThreading.UseVisualStyleBackColor = true;
-            this.chkDisableThreading.CheckedChanged += new System.EventHandler(this.chkDisableThreading_CheckedChanged);
-            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(742, 199);
-            this.Controls.Add(this.chkDisableThreading);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chkDebugMode);
             this.Controls.Add(this.txtProxy);
@@ -171,6 +158,5 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkDebugMode;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox chkDisableThreading;
     }
 }
