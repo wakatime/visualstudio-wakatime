@@ -262,12 +262,10 @@ namespace WakaTime
         {
             if (DisableThreading)
             {
-                Logger.Debug("Processing heartbeats queue without threading.");
                 ProcessHeartbeats();
             }
             else
             {
-                Logger.Debug("Processing heartbeats queue in background thread.");
                 Task.Run(() =>
                 {
                     ProcessHeartbeats();
