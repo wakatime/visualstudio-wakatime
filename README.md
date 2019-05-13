@@ -7,7 +7,7 @@ Visual Studio extension to quantify your coding using https://wakatime.com/.
 Installation
 ------------
 
-1. Inside Visual Studio, navigate to `Tools` → `Extensions and Updates...`
+1. Inside Visual Studio, navigate to `Tools` → `Extensions...`
 
 2. Click the `Online` category at the left, then search for `wakatime`.
 
@@ -70,7 +70,7 @@ For debugging, configure the product to open in a new Visual Studio instance:
 	* Express - Visual Studio Express
 	* Legacy - Visual Studio 2010
 	* Release - Visual Studio 2012+ Community, Pro, Enterprise, etc..
-	
+
 	Note: The Debug solution is only for including debugger symbols.
 
 
