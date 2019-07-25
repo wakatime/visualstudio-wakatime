@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using WakaTime.Shared.ExtensionUtils;
 
 namespace WakaTime.Forms
 {
@@ -31,8 +32,7 @@ namespace WakaTime.Forms
         {
             try
             {
-                Guid apiKey;
-                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out apiKey);         
+                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);         
                                      
                 if (parse)
                 {
@@ -58,27 +58,7 @@ namespace WakaTime.Forms
         protected virtual void OnConfigSaved()
         {
             var handler = ConfigSaved;
-            if (handler != null) handler(this, EventArgs.Empty);
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtProxy_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtAPIKey_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void chkDisableThreading_CheckedChanged(object sender, EventArgs e)
-        {
-
+            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }

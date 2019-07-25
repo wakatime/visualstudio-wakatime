@@ -61,7 +61,6 @@
             this.txtAPIKey.Name = "txtAPIKey";
             this.txtAPIKey.Size = new System.Drawing.Size(589, 23);
             this.txtAPIKey.TabIndex = 1;
-            this.txtAPIKey.TextChanged += new System.EventHandler(this.txtAPIKey_TextChanged);
             // 
             // btnOk
             // 
@@ -93,7 +92,6 @@
             this.txtProxy.Name = "txtProxy";
             this.txtProxy.Size = new System.Drawing.Size(589, 23);
             this.txtProxy.TabIndex = 5;
-            this.txtProxy.TextChanged += new System.EventHandler(this.txtProxy_TextChanged);
             // 
             // label1
             // 
@@ -123,7 +121,6 @@
             this.label2.TabIndex = 7;
             this.label2.Text = "Example: https://user:pass@host:port or socks5://user:pass@host:port or domain\\us" +
     "er:pass.";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // SettingsForm
             // 

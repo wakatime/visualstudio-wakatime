@@ -27,8 +27,7 @@ namespace WakaTime.Forms
         {
             try
             {
-                Guid apiKey;
-                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out apiKey);                              
+                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);                              
                 if (parse)
                 {
                     WakaTimePackage.Config.ApiKey = apiKey.ToString();
@@ -37,7 +36,7 @@ namespace WakaTime.Forms
                 }
                 else
                 {
-                    MessageBox.Show("Please enter valid Api Key.");
+                    MessageBox.Show(@"Please enter valid Api Key.");
                     DialogResult = DialogResult.None; // do not close dialog box
                 }
             }
