@@ -32,10 +32,7 @@ namespace WakaTime
 
         public static DTE ObjDte;
 
-        //private static string _lastFile;
-        //private DateTime _lastHeartbeat = DateTime.UtcNow.AddMinutes(-3);
         private static string _solutionName = string.Empty;
-        //private const int HeartbeatFrequency = 2; // minutes
 
         private Shared.ExtensionUtils.WakaTime _wakaTime;
         #endregion
