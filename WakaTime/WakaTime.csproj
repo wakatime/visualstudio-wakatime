@@ -97,9 +97,8 @@
     <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <HintPath>..\packages\Microsoft.VisualStudio.OLE.Interop.7.10.6071\lib\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.Shell.12.0, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.1.0.1\lib\net40\Microsoft.VisualStudio.Shell.12.0.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.Shell.12.0">
+      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.1.0.3\lib\net40\Microsoft.VisualStudio.Shell.12.0.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Framework, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.VisualStudio.Shell.Framework.15.0.26201\lib\net45\Microsoft.VisualStudio.Shell.Framework.dll</HintPath>
@@ -164,8 +163,9 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=1.0.1.0, Culture=neutral, PublicKeyToken=14e819aa3460e894, processorArchitecture=MSIL">
-      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.1.0.1\lib\net48\WakaTime.Shared.ExtensionUtils.dll</HintPath>
+    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=1.0.3.0, Culture=neutral, PublicKeyToken=202d1174b8524eea, processorArchitecture=MSIL">
+      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.1.0.3\lib\net48\WakaTime.Shared.ExtensionUtils.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -46,15 +46,16 @@ namespace WakaTime
             var configuration = new Configuration
             {
                 EditorName = "visualstudio",
+                PluginName = "visualstudio-wakatime",
                 EditorVersion = ObjDte == null ? string.Empty : ObjDte.Version
             };
-            _wakaTime = new Shared.ExtensionUtils.WakaTime(this, configuration);
+            _wakaTime = new Shared.ExtensionUtils.WakaTime(this, configuration, new Logger());
 
             // Only perform initialization if async package framework not supported
             if (_wakaTime.IsAsyncLoadSupported) return;
 
             // Try force initializing in brackground
-            Logger.Debug("Initializing in background thread.");
+            _wakaTime.Logger.Debug("Initializing in background thread.");
             Task.Run(() =>
             {
                 InitializeAsync();
@@ -71,7 +72,7 @@ namespace WakaTime
 
             return ThreadHelper.JoinableTaskFactory.RunAsync<object>(async () =>
             {
-                Logger.Debug("Initializing async.");
+                _wakaTime.Logger.Debug("Initializing async.");
                 InitializeAsync();
 
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -114,7 +115,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("Error Initializing WakaTime", ex);
+                _wakaTime.Logger.Error("Error Initializing WakaTime", ex);
             }
         }        
         #endregion
@@ -128,7 +129,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("DocEventsOnDocumentOpened", ex);
+                _wakaTime.Logger.Error("DocEventsOnDocumentOpened", ex);
             }
         }
 
@@ -140,7 +141,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("DocEventsOnDocumentSaved", ex);
+                _wakaTime.Logger.Error("DocEventsOnDocumentSaved", ex);
             }
         }
 
@@ -154,11 +155,11 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("WindowEventsOnWindowActivated", ex);
+                _wakaTime.Logger.Error("WindowEventsOnWindowActivated", ex);
             }
         }
 
-        private static void SolutionEventsOnOpened()
+        private void SolutionEventsOnOpened()
         {
             try
             {
@@ -166,7 +167,7 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("SolutionEventsOnOpened", ex);
+                _wakaTime.Logger.Error("SolutionEventsOnOpened", ex);
             }
         }
 
@@ -185,7 +186,7 @@ namespace WakaTime
             Config.Read();
         }
 
-        private static void MenuItemCallback(object sender, EventArgs e)
+        private void MenuItemCallback(object sender, EventArgs e)
         {
             try
             {
@@ -193,13 +194,13 @@ namespace WakaTime
             }
             catch (Exception ex)
             {
-                Logger.Error("MenuItemCallback", ex);
+                _wakaTime.Logger.Error("MenuItemCallback", ex);
             }
         }
 
-        private static void PromptApiKey()
+        private void PromptApiKey()
         {
-            Logger.Info("Please input your api key into the wakatime window.");
+            _wakaTime.Logger.Info("Please input your api key into the wakatime window.");
             var form = new ApiKeyForm();
             form.ShowDialog();
         }

@@ -7,9 +7,11 @@ namespace WakaTime.Forms
     public partial class SettingsForm : Form
     {
         internal event EventHandler ConfigSaved;
+        private readonly ILogger _logger;
 
         public SettingsForm()
         {
+            _logger = new Logger();
             InitializeComponent();
         }
 
@@ -23,7 +25,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
-                Logger.Error("Error when loading form SettingsForm:", ex);
+                _logger.Error("Error when loading form SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -50,7 +52,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
-                Logger.Error("Error when saving data from SettingsForm:", ex);
+                _logger.Error("Error when saving data from SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
