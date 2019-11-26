@@ -1,6 +1,8 @@
 visualstudio-wakatime
 =====================
 
+[![Coding time tracker](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime.svg)](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime)
+
 Visual Studio extension to quantify your coding using https://wakatime.com/.
 
 
