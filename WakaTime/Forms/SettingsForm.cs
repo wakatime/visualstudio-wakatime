@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Windows.Forms;
-using WakaTime.Shared.ExtensionUtils;
 
 namespace WakaTime.Forms
 {
     public partial class SettingsForm : Form
     {
+        private readonly Shared.ExtensionUtils.WakaTime _wakaTime;
         internal event EventHandler ConfigSaved;
-        private readonly ILogger _logger;
 
-        public SettingsForm()
+        public SettingsForm(ref Shared.ExtensionUtils.WakaTime wakaTime)
         {
-            _logger = new Logger();
+            _wakaTime = wakaTime;
             InitializeComponent();
         }
 
@@ -19,13 +18,14 @@ namespace WakaTime.Forms
         {
             try
             {
-                txtAPIKey.Text = WakaTimePackage.Config.ApiKey;
-                txtProxy.Text = WakaTimePackage.Config.Proxy;
-                chkDebugMode.Checked = WakaTimePackage.Config.Debug;
+                txtAPIKey.Text = _wakaTime.Config.ApiKey;
+                txtProxy.Text = _wakaTime.Config.Proxy;
+                chkDebugMode.Checked = _wakaTime.Config.Debug;
+                chkStandalone.Checked = _wakaTime.Config.Standalone;
             }
             catch (Exception ex)
             {
-                _logger.Error("Error when loading form SettingsForm:", ex);
+                _wakaTime.Logger.Error("Error when loading form SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -38,10 +38,11 @@ namespace WakaTime.Forms
                                      
                 if (parse)
                 {
-                    WakaTimePackage.Config.ApiKey = apiKey.ToString();
-                    WakaTimePackage.Config.Proxy = txtProxy.Text.Trim();
-                    WakaTimePackage.Config.Debug = chkDebugMode.Checked;
-                    WakaTimePackage.Config.Save();
+                    _wakaTime.Config.ApiKey = apiKey.ToString();
+                    _wakaTime.Config.Proxy = txtProxy.Text.Trim();
+                    _wakaTime.Config.Debug = chkDebugMode.Checked;
+                    _wakaTime.Config.Standalone = chkStandalone.Checked;
+                    _wakaTime.Config.Save();
                     OnConfigSaved();
                 }
                 else
@@ -52,7 +53,7 @@ namespace WakaTime.Forms
             }
             catch (Exception ex)
             {
-                _logger.Error("Error when saving data from SettingsForm:", ex);
+                _wakaTime.Logger.Error("Error when saving data from SettingsForm:", ex);
                 MessageBox.Show(ex.Message);
             }
         }
