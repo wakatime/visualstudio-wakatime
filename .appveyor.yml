@@ -23,13 +23,6 @@ before_build:
 build:
   project: WakaTime.sln
   verbosity: minimal
-
-dotnet_csproj:
-  patch: true
-  file: 'WakaTime\**\*.csproj'
-  assembly_version: $(VersionPrefix)
-  file_version: $(VersionPrefix)
-  informational_version: '{version}'
   
 nuget:
   project_feed: true
