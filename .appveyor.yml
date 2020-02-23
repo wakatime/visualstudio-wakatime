@@ -10,7 +10,6 @@ configuration: Release
 init:
   - ps: |
       $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
-      appveyor UpdateBuild -Version "$($Env:VersionPrefix)"
 
 before_build:
   - ps: |
