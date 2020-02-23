@@ -22,10 +22,6 @@ before_build:
 build:
   project: WakaTime.sln
   verbosity: minimal
-  
-nuget:
-  project_feed: true
-  disable_publish_on_pr: true
 
 artifacts:
     - path: 'WakaTime\**\*.vsix'
