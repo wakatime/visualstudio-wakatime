@@ -21,7 +21,6 @@ namespace WakaTime.Forms
                 txtAPIKey.Text = _wakaTime.Config.ApiKey;
                 txtProxy.Text = _wakaTime.Config.Proxy;
                 chkDebugMode.Checked = _wakaTime.Config.Debug;
-                chkStandalone.Checked = _wakaTime.Config.Standalone;
             }
             catch (Exception ex)
             {
@@ -41,7 +40,6 @@ namespace WakaTime.Forms
                     _wakaTime.Config.ApiKey = apiKey.ToString();
                     _wakaTime.Config.Proxy = txtProxy.Text.Trim();
                     _wakaTime.Config.Debug = chkDebugMode.Checked;
-                    _wakaTime.Config.Standalone = chkStandalone.Checked;
                     _wakaTime.Config.Save();
                     OnConfigSaved();
                 }

@@ -43,7 +43,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkDebugMode = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.chkStandalone = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblAPIKey
@@ -61,7 +60,7 @@
             this.txtAPIKey.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAPIKey.Location = new System.Drawing.Point(310, 32);
-            this.txtAPIKey.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.txtAPIKey.Margin = new System.Windows.Forms.Padding(8);
             this.txtAPIKey.MaxLength = 36;
             this.txtAPIKey.Name = "txtAPIKey";
             this.txtAPIKey.Size = new System.Drawing.Size(1213, 47);
@@ -72,7 +71,7 @@
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOk.Location = new System.Drawing.Point(310, 353);
-            this.btnOk.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.btnOk.Margin = new System.Windows.Forms.Padding(8);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(218, 68);
             this.btnOk.TabIndex = 2;
@@ -85,7 +84,7 @@
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(585, 353);
-            this.btnCancel.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.btnCancel.Margin = new System.Windows.Forms.Padding(8);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(218, 68);
             this.btnCancel.TabIndex = 3;
@@ -97,7 +96,7 @@
             this.txtProxy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtProxy.Location = new System.Drawing.Point(310, 125);
-            this.txtProxy.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.txtProxy.Margin = new System.Windows.Forms.Padding(8);
             this.txtProxy.MaxLength = 255;
             this.txtProxy.Name = "txtProxy";
             this.txtProxy.Size = new System.Drawing.Size(1213, 47);
@@ -117,7 +116,7 @@
             // 
             this.chkDebugMode.AutoSize = true;
             this.chkDebugMode.Location = new System.Drawing.Point(310, 262);
-            this.chkDebugMode.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.chkDebugMode.Margin = new System.Windows.Forms.Padding(8);
             this.chkDebugMode.Name = "chkDebugMode";
             this.chkDebugMode.Size = new System.Drawing.Size(146, 45);
             this.chkDebugMode.TabIndex = 6;
@@ -135,23 +134,11 @@
             this.label2.Text = "Example: https://user:pass@host:port or socks5://user:pass@host:port or domain\\us" +
     "er:pass.";
             // 
-            // chkStandalone
-            // 
-            this.chkStandalone.AutoSize = true;
-            this.chkStandalone.Location = new System.Drawing.Point(585, 262);
-            this.chkStandalone.Margin = new System.Windows.Forms.Padding(8);
-            this.chkStandalone.Name = "chkStandalone";
-            this.chkStandalone.Size = new System.Drawing.Size(204, 45);
-            this.chkStandalone.TabIndex = 8;
-            this.chkStandalone.Text = "Standalone";
-            this.chkStandalone.UseVisualStyleBackColor = true;
-            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1562, 451);
-            this.Controls.Add(this.chkStandalone);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chkDebugMode);
             this.Controls.Add(this.txtProxy);
@@ -163,7 +150,7 @@
             this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(8, 8, 8, 8);
+            this.Margin = new System.Windows.Forms.Padding(8);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SettingsForm";
@@ -181,6 +168,5 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkDebugMode;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox chkStandalone;
     }
 }

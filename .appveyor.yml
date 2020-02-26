@@ -1,0 +1,28 @@
+image: Visual Studio 2019
+
+environment:  
+  major: 10
+  minor: 1
+  patch: 0
+
+configuration: Release
+
+init:
+  - ps: |
+      $Env:VersionPrefix = "$($Env:major).$($Env:minor).$($Env:patch)"
+
+before_build:
+  - ps: |
+      $manifestPath = (Get-ChildItem .\*WakaTime\*.vsixmanifest-release).FullName
+      $manifestXml = [xml](Get-Content $manifestPath)
+      $manifestXml.PackageManifest.Metadata.Identity.Version = "$($Env:VersionPrefix)"
+      $manifestXml.Save($manifestPath)
+  - nuget restore
+
+build:
+  project: WakaTime.sln
+  verbosity: minimal
+
+artifacts:
+    - path: 'WakaTime\**\*.vsix'
+      name: vsix
