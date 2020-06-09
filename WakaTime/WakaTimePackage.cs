@@ -29,6 +29,9 @@ namespace WakaTime
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
 
+        private string _workFolder;
+        private bool _useWorkFolder = false;
+
         public static DTE ObjDte;
 
         private static string _solutionName = string.Empty;
@@ -49,6 +52,10 @@ namespace WakaTime
                 EditorVersion = ObjDte == null ? string.Empty : ObjDte.Version
             };
             WakaTime = new Shared.ExtensionUtils.WakaTime(this, configuration, new Logger());
+
+            // Check if workFolder has been set
+            _workFolder = Environment.GetEnvironmentVariable("WAKATIME_WORKFOLDER")?.ToLower();
+            _useWorkFolder = _workFolder != null;
 
             // Only perform initialization if async package framework not supported
             if (WakaTime.IsAsyncLoadSupported) return;
@@ -123,7 +130,8 @@ namespace WakaTime
         {
             try
             {
-                WakaTime.HandleActivity(document.FullName, false, GetProjectName());
+                if (!_useWorkFolder || IsProjectInWorkFolder())
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName());
             }
             catch (Exception ex)
             {
@@ -135,7 +143,8 @@ namespace WakaTime
         {
             try
             {
-                WakaTime.HandleActivity(document.FullName, true, GetProjectName());
+                if (!_useWorkFolder || IsProjectInWorkFolder())
+                    WakaTime.HandleActivity(document.FullName, true, GetProjectName());
             }
             catch (Exception ex)
             {
@@ -149,7 +158,8 @@ namespace WakaTime
             {
                 var document = ObjDte.ActiveWindow.Document;
                 if (document != null)
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName());
+                    if (!_useWorkFolder || IsProjectInWorkFolder())
+                        WakaTime.HandleActivity(document.FullName, false, GetProjectName());
             }
             catch (Exception ex)
             {
@@ -217,6 +227,16 @@ namespace WakaTime
                     : string.Empty;
         }
 
+        private bool IsProjectInWorkFolder()
+        {
+            if (!string.IsNullOrEmpty(_solutionName) && _solutionName.ToLower().StartsWith(_workFolder))
+                return true;
+            if (ObjDte.Solution != null
+                && !string.IsNullOrEmpty(ObjDte.Solution.FullName)
+                && ObjDte.Solution.FullName.ToLower().StartsWith(_workFolder))
+                return true;
+            return false;
+        }
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
