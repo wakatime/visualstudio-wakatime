@@ -55,7 +55,7 @@ namespace WakaTime
 
             // Check if workFolder has been set
             _workFolder = Environment.GetEnvironmentVariable("WAKATIME_WORKFOLDER")?.ToLower();
-            _useWorkFolder = _workFolder != null;
+            _useWorkFolder = !string.IsNullOrEmpty(_workFolder);
 
             // Only perform initialization if async package framework not supported
             if (WakaTime.IsAsyncLoadSupported) return;
