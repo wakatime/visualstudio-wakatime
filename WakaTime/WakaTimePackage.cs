@@ -141,11 +141,11 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.debugging : HeartbeatCategory.coding;
+                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
                 WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
 
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -157,11 +157,11 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.debugging : HeartbeatCategory.coding;
-                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), HeartbeatCategory.debugging); //eventType defaults to "file"
+                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
+                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
 
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -173,12 +173,12 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.debugging : HeartbeatCategory.coding;
+                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
                 var document = ObjDte.ActiveWindow.Document;
                 if (document != null)
                     WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -203,7 +203,7 @@ namespace WakaTime
             try
             {
                 var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.debugging); //eventType defaults to "file"
+                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -216,7 +216,7 @@ namespace WakaTime
             try
             {
                 var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.debugging); //eventType defaults to "file"
+                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -229,7 +229,7 @@ namespace WakaTime
             try
             {
                 var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.debugging); //eventType defaults to "file"
+                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -244,7 +244,7 @@ namespace WakaTime
                 _isBuildRunning = true;
                 var fullOutputName = GetProjectOutputForConfiguration(Project, Platform, ProjectConfig);
                 _runningBuildOutput = fullOutputName;
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -258,7 +258,7 @@ namespace WakaTime
             {
                 _isBuildRunning = false;
                 var fullOutputName = GetProjectOutputForConfiguration(Project, Platform, ProjectConfig);
-                WakaTime.HandleActivity(fullOutputName, Success, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                WakaTime.HandleActivity(fullOutputName, Success, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
             }
             catch (Exception ex)
             {
@@ -273,11 +273,11 @@ namespace WakaTime
                 var document = StartPoint.Parent.Parent;
                 if (document != null)
                 {
-                    var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.debugging : HeartbeatCategory.coding;
+                    var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
                     WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
 
                     if (_isBuildRunning)
-                        WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.building); //eventType defaults to "file"
+                        WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
                 }
             }
             catch (Exception ex)

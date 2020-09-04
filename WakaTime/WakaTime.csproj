@@ -165,8 +165,8 @@
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=2.0.0.0, Culture=neutral, PublicKeyToken=202d1174b8524eea, processorArchitecture=MSIL">
-      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.2.0.0\lib\net48\WakaTime.Shared.ExtensionUtils.dll</HintPath>
+    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=2.2.0.0, Culture=neutral, PublicKeyToken=202d1174b8524eea, processorArchitecture=MSIL">
+      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.2.2.0\lib\net48\WakaTime.Shared.ExtensionUtils.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
