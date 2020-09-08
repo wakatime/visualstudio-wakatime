@@ -33,7 +33,7 @@ namespace WakaTime
         private BuildEvents _buildEvents;
         private TextEditorEvents _textEditorEvents;
 
-        private bool _isBuildRunning = false;
+        private bool _isBuildRunning;
         private string _runningBuildOutput;
 
         public static DTE ObjDte;
@@ -113,8 +113,7 @@ namespace WakaTime
                     mcs.AddCommand(menuItem);
                 }
 
-                // setup event handlers
-                
+                // setup event handlers                
                 _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
@@ -141,11 +140,14 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
-                WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
+                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                    ? HeartbeatCategory.Debugging 
+                    : HeartbeatCategory.Coding;
+
+                WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
 
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -157,11 +159,14 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
-                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
+                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                    ? HeartbeatCategory.Debugging
+                    : HeartbeatCategory.Coding;
+
+                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), category);
 
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -173,12 +178,16 @@ namespace WakaTime
         {
             try
             {
-                var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
                 var document = ObjDte.ActiveWindow.Document;
+                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                    ? HeartbeatCategory.Debugging
+                    : HeartbeatCategory.Coding;
+
                 if (document != null)
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
+
                 if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -198,12 +207,12 @@ namespace WakaTime
             }
         }
 
-        private void DebuggerEventsOnEnterRunMode(dbgEventReason Reason)
+        private void DebuggerEventsOnEnterRunMode(dbgEventReason reason)
         {
             try
             {
-                var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
             {
@@ -211,12 +220,12 @@ namespace WakaTime
             }
         }
 
-        private void DebuggerEventsOnEnterDesignMode(dbgEventReason Reason)
+        private void DebuggerEventsOnEnterDesignMode(dbgEventReason reason)
         {
             try
             {
-                var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
             {
@@ -224,12 +233,12 @@ namespace WakaTime
             }
         }
 
-        private void DebuggerEventsOnEnterBreakMode(dbgEventReason Reason, ref dbgExecutionAction ExecutionAction)
+        private void DebuggerEventsOnEnterBreakMode(dbgEventReason reason, ref dbgExecutionAction executionAction)
         {
             try
             {
-                var fullOutputName = GetCurrentProjectOutputForCurrentConfiguration();
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Debugging); //eventType defaults to "file"
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
             {
@@ -237,14 +246,14 @@ namespace WakaTime
             }
         }
 
-        private void BuildEventsOnBuildProjConfigBegin(string Project, string ProjectConfig, string Platform, string SolutionConfig)
+        private void BuildEventsOnBuildProjConfigBegin(string project, string projectConfig, string platform, string solutionConfig)
         {
             try
             {
                 _isBuildRunning = true;
-                var fullOutputName = GetProjectOutputForConfiguration(Project, Platform, ProjectConfig);
-                _runningBuildOutput = fullOutputName;
-                WakaTime.HandleActivity(fullOutputName, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+                _runningBuildOutput = outputFile;
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -252,13 +261,13 @@ namespace WakaTime
             }
         }
 
-        private void BuildEventsOnBuildProjConfigDone(string Project, string ProjectConfig, string Platform, string SolutionConfig, bool Success)
+        private void BuildEventsOnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
         {
             try
             {
                 _isBuildRunning = false;
-                var fullOutputName = GetProjectOutputForConfiguration(Project, Platform, ProjectConfig);
-                WakaTime.HandleActivity(fullOutputName, Success, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+                WakaTime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -266,18 +275,21 @@ namespace WakaTime
             }
         }
 
-        private void TextEditorEventsLineChanged(TextPoint StartPoint, TextPoint EndPoint, int Hint)
+        private void TextEditorEventsLineChanged(TextPoint startPoint, TextPoint endPoint, int hint)
         {
             try
             {
-                var document = StartPoint.Parent.Parent;
+                var document = startPoint.Parent.Parent;
                 if (document != null)
                 {
-                    var activity = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode ? HeartbeatCategory.Debugging : HeartbeatCategory.Coding;
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), activity); //eventType defaults to "file"
+                    var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                        ? HeartbeatCategory.Debugging
+                        : HeartbeatCategory.Coding;
+
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
 
                     if (_isBuildRunning)
-                        WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building); //eventType defaults to "file"
+                        WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
                 }
             }
             catch (Exception ex)
@@ -334,26 +346,47 @@ namespace WakaTime
                     : string.Empty;
         }
 
-        private string GetProjectOutputForConfiguration(string Project, string Platform, string ProjectConfig)
+        private static string GetProjectOutputForConfiguration(string projectName, string platform, string projectConfig)
         {
-            var project = ObjDte.Solution.Projects.Cast<Project>().Where(proj => proj.UniqueName == Project).FirstOrDefault();
-            var config = project.ConfigurationManager.Cast<EnvDTE.Configuration>().Where(conf => conf.PlatformName == Platform && conf.ConfigurationName == ProjectConfig).FirstOrDefault();
-            var outputPath = config.Properties.Item("OutputPath");
-            var outputFileName = project.Properties.Item("OutputFileName");
-            var projectPath = project.Properties.Item("FullPath");
+            try
+            {
+                var project = ObjDte.Solution.Projects.Cast<Project>()
+                                .FirstOrDefault(proj => proj.UniqueName == projectName);
 
-            return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+                var config = project.ConfigurationManager.Cast<EnvDTE.Configuration>()
+                                .FirstOrDefault(conf => conf.PlatformName == platform && conf.ConfigurationName == projectConfig);
+
+                var outputPath = config.Properties.Item("OutputPath");
+                var outputFileName = project.Properties.Item("OutputFileName");
+                var projectPath = project.Properties.Item("FullPath");
+
+                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+            }
+            catch(Exception)
+            {
+                return null;
+            }
         }
 
-        private string GetCurrentProjectOutputForCurrentConfiguration()
+        private static string GetCurrentProjectOutputForCurrentConfiguration()
         {
-            var project = (Project)((object[])ObjDte.ActiveSolutionProjects)[0];
-            var config = project.ConfigurationManager.ActiveConfiguration;
-            var outputPath = config.Properties.Item("OutputPath");
-            var outputFileName = project.Properties.Item("OutputFileName");
-            var projectPath = project.Properties.Item("FullPath");
+            try
+            {
+                var activeProjects = (object[])ObjDte.ActiveSolutionProjects;
+                if (ObjDte.Solution == null || activeProjects.Length < 1)
+                    return null;
+                var project = (Project)((object[])ObjDte.ActiveSolutionProjects)[0];
+                var config = project.ConfigurationManager.ActiveConfiguration;
+                var outputPath = config.Properties.Item("OutputPath");
+                var outputFileName = project.Properties.Item("OutputFileName");
+                var projectPath = project.Properties.Item("FullPath");
 
-            return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+            }
+            catch(Exception)
+            {
+                return null;
+            }
         }
 
         protected override void Dispose(bool disposing)
