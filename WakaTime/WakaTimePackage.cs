@@ -140,14 +140,13 @@ namespace WakaTime
         {
             try
             {
-                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                    ? HeartbeatCategory.Debugging 
-                    : HeartbeatCategory.Coding;
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
 
                 WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
-
-                if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -159,14 +158,13 @@ namespace WakaTime
         {
             try
             {
-                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                    ? HeartbeatCategory.Debugging
-                    : HeartbeatCategory.Coding;
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
 
                 WakaTime.HandleActivity(document.FullName, true, GetProjectName(), category);
-
-                if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
             {
@@ -179,15 +177,16 @@ namespace WakaTime
             try
             {
                 var document = ObjDte.ActiveWindow.Document;
-                var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                    ? HeartbeatCategory.Debugging
-                    : HeartbeatCategory.Coding;
-
                 if (document != null)
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                {
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
 
-                if (_isBuildRunning)
-                    WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                }
             }
             catch (Exception ex)
             {
@@ -282,14 +281,13 @@ namespace WakaTime
                 var document = startPoint.Parent.Parent;
                 if (document != null)
                 {
-                    var category = ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                        ? HeartbeatCategory.Debugging
-                        : HeartbeatCategory.Coding;
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
 
                     WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
-
-                    if (_isBuildRunning)
-                        WakaTime.HandleActivity(_runningBuildOutput, false, GetProjectName(), HeartbeatCategory.Building);
                 }
             }
             catch (Exception ex)
