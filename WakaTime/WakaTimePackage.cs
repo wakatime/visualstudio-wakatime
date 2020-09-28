@@ -113,7 +113,7 @@ namespace WakaTime
                     mcs.AddCommand(menuItem);
                 }
 
-                // setup event handlers                
+                // setup event handlers
                 _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
@@ -211,6 +211,7 @@ namespace WakaTime
             try
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
                 WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
@@ -224,6 +225,7 @@ namespace WakaTime
             try
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
                 WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
@@ -237,6 +239,7 @@ namespace WakaTime
             try
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
                 WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
             }
             catch (Exception ex)
@@ -250,8 +253,11 @@ namespace WakaTime
             try
             {
                 _isBuildRunning = true;
+
                 var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
                 _runningBuildOutput = outputFile;
+
                 WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
@@ -265,7 +271,9 @@ namespace WakaTime
             try
             {
                 _isBuildRunning = false;
+
                 var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
                 WakaTime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
             }
             catch (Exception ex)
@@ -279,6 +287,7 @@ namespace WakaTime
             try
             {
                 var document = startPoint.Parent.Parent;
+
                 if (document != null)
                 {
                     var category = _isBuildRunning
@@ -373,6 +382,7 @@ namespace WakaTime
                 var activeProjects = (object[])ObjDte.ActiveSolutionProjects;
                 if (ObjDte.Solution == null || activeProjects.Length < 1)
                     return null;
+
                 var project = (Project)((object[])ObjDte.ActiveSolutionProjects)[0];
                 var config = project.ConfigurationManager.ActiveConfiguration;
                 var outputPath = config.Properties.Item("OutputPath");
