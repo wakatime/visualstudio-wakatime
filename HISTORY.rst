@@ -2,6 +2,13 @@
 History
 -------
 
+10.3.0 (2020-10-01)
+++++++++++++++++++
+
+- Add new IDE events.
+- Identify either debugging or building.
+- Minor bug fixes.
+
 
 10.2.0 (2020-02-25)
 ++++++++++++++++++
