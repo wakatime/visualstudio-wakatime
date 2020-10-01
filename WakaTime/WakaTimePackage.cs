@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -28,6 +29,12 @@ namespace WakaTime
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
+        private DebuggerEvents _debuggerEvents;
+        private BuildEvents _buildEvents;
+        private TextEditorEvents _textEditorEvents;
+
+        private bool _isBuildRunning;
+        private string _runningBuildOutput;
 
         public static DTE ObjDte;
 
@@ -89,6 +96,9 @@ namespace WakaTime
                 _docEvents = ObjDte.Events.DocumentEvents;
                 _windowEvents = ObjDte.Events.WindowEvents;
                 _solutionEvents = ObjDte.Events.SolutionEvents;
+                _debuggerEvents = ObjDte.Events.DebuggerEvents;
+                _buildEvents = ObjDte.Events.BuildEvents;
+                _textEditorEvents = ObjDte.Events.TextEditorEvents;
 
                 // Settings Form
                 _settingsForm = new SettingsForm(ref WakaTime);
@@ -108,6 +118,12 @@ namespace WakaTime
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
+                _debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
+                _debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
+                _debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
+                _buildEvents.OnBuildProjConfigBegin += BuildEventsOnBuildProjConfigBegin;
+                _buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
+                _textEditorEvents.LineChanged += TextEditorEventsLineChanged;
 
                 WakaTime.InitializeAsync();
             }
@@ -115,15 +131,22 @@ namespace WakaTime
             {
                 WakaTime.Logger.Error("Error Initializing WakaTime", ex);
             }
-        }        
+        }
         #endregion
 
         #region Event Handlers
+
         private void DocEventsOnDocumentOpened(Document document)
         {
             try
             {
-                WakaTime.HandleActivity(document.FullName, false, GetProjectName());
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
             }
             catch (Exception ex)
             {
@@ -135,7 +158,13 @@ namespace WakaTime
         {
             try
             {
-                WakaTime.HandleActivity(document.FullName, true, GetProjectName());
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), category);
             }
             catch (Exception ex)
             {
@@ -149,7 +178,15 @@ namespace WakaTime
             {
                 var document = ObjDte.ActiveWindow.Document;
                 if (document != null)
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName());
+                {
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                }
             }
             catch (Exception ex)
             {
@@ -168,6 +205,105 @@ namespace WakaTime
                 WakaTime.Logger.Error("SolutionEventsOnOpened", ex);
             }
         }
+
+        private void DebuggerEventsOnEnterRunMode(dbgEventReason reason)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("DebuggerEventsOnEnterRunMode", ex);
+            }
+        }
+
+        private void DebuggerEventsOnEnterDesignMode(dbgEventReason reason)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("DebuggerEventsOnEnterDesignMode", ex);
+            }
+        }
+
+        private void DebuggerEventsOnEnterBreakMode(dbgEventReason reason, ref dbgExecutionAction executionAction)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("DebuggerEventsOnEnterBreakMode", ex);
+            }
+        }
+
+        private void BuildEventsOnBuildProjConfigBegin(string project, string projectConfig, string platform, string solutionConfig)
+        {
+            try
+            {
+                _isBuildRunning = true;
+
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
+                _runningBuildOutput = outputFile;
+
+                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("BuildEventsOnBuildProjConfigBegin", ex);
+            }
+        }
+
+        private void BuildEventsOnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
+        {
+            try
+            {
+                _isBuildRunning = false;
+
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
+                WakaTime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("BuildEventsOnBuildProjConfigDone", ex);
+            }
+        }
+
+        private void TextEditorEventsLineChanged(TextPoint startPoint, TextPoint endPoint, int hint)
+        {
+            try
+            {
+                var document = startPoint.Parent.Parent;
+
+                if (document != null)
+                {
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                }
+            }
+            catch (Exception ex)
+            {
+                WakaTime.Logger.Error("TextEditorEventsLineChanged", ex);
+            }
+        }        
 
         private void OnStartupComplete()
         {
@@ -217,6 +353,50 @@ namespace WakaTime
                     : string.Empty;
         }
 
+        private static string GetProjectOutputForConfiguration(string projectName, string platform, string projectConfig)
+        {
+            try
+            {
+                var project = ObjDte.Solution.Projects.Cast<Project>()
+                                .FirstOrDefault(proj => proj.UniqueName == projectName);
+
+                var config = project.ConfigurationManager.Cast<EnvDTE.Configuration>()
+                                .FirstOrDefault(conf => conf.PlatformName == platform && conf.ConfigurationName == projectConfig);
+
+                var outputPath = config.Properties.Item("OutputPath");
+                var outputFileName = project.Properties.Item("OutputFileName");
+                var projectPath = project.Properties.Item("FullPath");
+
+                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+            }
+            catch(Exception)
+            {
+                return null;
+            }
+        }
+
+        private static string GetCurrentProjectOutputForCurrentConfiguration()
+        {
+            try
+            {
+                var activeProjects = (object[])ObjDte.ActiveSolutionProjects;
+                if (ObjDte.Solution == null || activeProjects.Length < 1)
+                    return null;
+
+                var project = (Project)((object[])ObjDte.ActiveSolutionProjects)[0];
+                var config = project.ConfigurationManager.ActiveConfiguration;
+                var outputPath = config.Properties.Item("OutputPath");
+                var outputFileName = project.Properties.Item("OutputFileName");
+                var projectPath = project.Properties.Item("FullPath");
+
+                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+            }
+            catch(Exception)
+            {
+                return null;
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -225,6 +405,12 @@ namespace WakaTime
             _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
             _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
             _solutionEvents.Opened -= SolutionEventsOnOpened;
+            _debuggerEvents.OnEnterRunMode -= DebuggerEventsOnEnterRunMode;
+            _debuggerEvents.OnEnterDesignMode -= DebuggerEventsOnEnterDesignMode;
+            _debuggerEvents.OnEnterBreakMode -= DebuggerEventsOnEnterBreakMode;
+            _buildEvents.OnBuildProjConfigBegin -= BuildEventsOnBuildProjConfigBegin;
+            _buildEvents.OnBuildProjConfigDone -= BuildEventsOnBuildProjConfigDone;
+            _textEditorEvents.LineChanged -= TextEditorEventsLineChanged;
 
             WakaTime.Dispose();
         }
