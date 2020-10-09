@@ -2,6 +2,13 @@
 History
 -------
 
+
+10.3.1 (2020-10-09)
+++++++++++++++++++
+
+- Get correct version of installed wakatime plugin.
+
+
 10.3.0 (2020-10-01)
 ++++++++++++++++++
 
