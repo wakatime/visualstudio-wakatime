@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 using WakaTime.Forms;
@@ -53,7 +54,8 @@ namespace WakaTime
             {
                 EditorName = "visualstudio",
                 PluginName = "visualstudio-wakatime",
-                EditorVersion = ObjDte == null ? string.Empty : ObjDte.Version
+                EditorVersion = ObjDte == null ? string.Empty : ObjDte.Version,
+                PluginVersion = Constants.PluginVersion
             };
             WakaTime = new Shared.ExtensionUtils.WakaTime(this, configuration, new Logger());
 
@@ -415,5 +417,19 @@ namespace WakaTime
             WakaTime.Dispose();
         }
         #endregion        
+    }
+
+    internal static class CoreAssembly
+    {
+        private static readonly Assembly Reference = typeof(CoreAssembly).Assembly;
+        public static readonly Version Version = Reference.GetName().Version;
+    }
+
+    internal static class Constants
+    {
+        internal static readonly string PluginVersion =
+            $"{CoreAssembly.Version.Major}" +
+            $".{CoreAssembly.Version.Minor}" +
+            $".{CoreAssembly.Version.Build}";
     }
 }
