@@ -221,7 +221,7 @@ History
 5.0.4 (2015-07-01)
 ++++++++++++++++++
 
-- support for VS2012 by changing the version o Microsoft.VisualStudio.Shell
+- support for VS2012 by changing the version of Microsoft.VisualStudio.Shell
 - correct priority for project detection
 - fix offline logging
 - limit language detection to known file extensions, unless file contents has a vim modeline
