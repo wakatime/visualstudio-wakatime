@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Windows.Forms;
+using WakaTime.Shared.ExtensionUtils;
 
 namespace WakaTime.Forms
 {
     public partial class ApiKeyForm : Form
     {
-        private readonly Shared.ExtensionUtils.WakaTime _wakaTime;
+        private readonly ConfigFile _configFile;
+        private readonly ILogger _logger;
 
-        public ApiKeyForm(ref Shared.ExtensionUtils.WakaTime wakaTime)
+        public ApiKeyForm(ConfigFile configFile, ILogger logger)
         {
-            _wakaTime = wakaTime;
+            _configFile = configFile;
+            _logger = logger;
+            
             InitializeComponent();
         }
 
@@ -17,7 +21,7 @@ namespace WakaTime.Forms
         {
             try
             {
-                txtAPIKey.Text = _wakaTime.Config.ApiKey;
+                txtAPIKey.Text = _configFile.ApiKey;
             }
             catch (Exception ex)
             {
@@ -32,18 +36,21 @@ namespace WakaTime.Forms
                 var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);                              
                 if (parse)
                 {
-                    _wakaTime.Config.ApiKey = apiKey.ToString();
-                    _wakaTime.Config.Save();
-                    _wakaTime.Config.ApiKey = apiKey.ToString();
+                    _configFile.ApiKey = apiKey.ToString();
+                    _configFile.Save();
+                    _configFile.ApiKey = apiKey.ToString();
                 }
                 else
                 {
                     MessageBox.Show(@"Please enter valid Api Key.");
+
                     DialogResult = DialogResult.None; // do not close dialog box
                 }
             }
             catch (Exception ex)
             {
+                _logger.Error($"Error saving data from ApiKeyForm: {ex}");
+
                 MessageBox.Show(ex.Message);
             }
         }

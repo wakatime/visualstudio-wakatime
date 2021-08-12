@@ -1,116 +1,124 @@
-﻿using System;
-using System.Linq;
+﻿using EnvDTE;
+using Microsoft.VisualStudio.Shell;
+using System;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
+using System.Threading;
+using WakaTime.ExtensionUtils;
 using WakaTime.Forms;
-using Task = System.Threading.Tasks.Task;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell.Interop;
 using WakaTime.Shared.ExtensionUtils;
-using WakaTime.Shared.ExtensionUtils.AsyncPackageHelpers;
-using Configuration = WakaTime.Shared.ExtensionUtils.Configuration;
-using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.Interop.IAsyncServiceProvider;
-using PackageAutoLoadFlags = WakaTime.Shared.ExtensionUtils.AsyncPackageHelpers.PackageAutoLoadFlags;
+using Task = System.Threading.Tasks.Task;
 
 namespace WakaTime
 {
+    /// <summary>
+    /// This is the class that implements the package exposed by this assembly.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The minimum requirement for a class to be considered a valid package for Visual Studio
+    /// is to implement the IVsPackage interface and register itself with the shell.
+    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
+    /// to do it: it derives from the Package class that provides the implementation of the
+    /// IVsPackage interface and uses the registration attributes defined in the framework to
+    /// register itself and its components with the shell. These attributes tell the pkgdef creation
+    /// utility what data to put into .pkgdef file.
+    /// </para>
+    /// <para>
+    /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
+    /// </para>
+    /// </remarks>
     [Guid(GuidList.GuidWakaTimePkgString)]
-    [AsyncPackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Shared.ExtensionUtils.AsyncPackageHelpers.ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F", PackageAutoLoadFlags.BackgroundLoad)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideService(typeof(WakaTimePackage), IsAsyncQueryable = true)]
+    [ProvideAutoLoad(GuidList.GuidWakaTimeUIString, PackageAutoLoadFlags.BackgroundLoad)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    public sealed class WakaTimePackage : Package, IAsyncLoadablePackageInitialize
+    public sealed class WakaTimePackage : AsyncPackage
     {
-        #region Fields
-        private static SettingsForm _settingsForm;
-
+        private DTE _dte;
         private DocumentEvents _docEvents;
         private WindowEvents _windowEvents;
         private SolutionEvents _solutionEvents;
         private DebuggerEvents _debuggerEvents;
         private BuildEvents _buildEvents;
         private TextEditorEvents _textEditorEvents;
-
+        private Shared.ExtensionUtils.WakaTime _wakatime;
+        private ILogger _logger;
+        private SettingsForm _settingsForm;
         private bool _isBuildRunning;
-        private string _runningBuildOutput;
+        private string _solutionName;
 
-        public static DTE ObjDte;
-
-        private static string _solutionName = string.Empty;
-
-        internal Shared.ExtensionUtils.WakaTime WakaTime;
-        #endregion
-
-        #region Startup/Cleanup        
-        protected override void Initialize()
+        /// <summary>
+        /// Initialization of the package; this method is called right after the package is sited, so this is the place
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+        /// <param name="progress">A provider for progress updates.</param>
+        /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            base.Initialize();
-            ObjDte = (DTE)GetService(typeof(DTE));
+            await base.InitializeAsync(cancellationToken, progress);
 
-            var configuration = new Configuration
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            var objDte = await GetServiceAsync(typeof(DTE));
+            _dte = objDte as DTE;
+
+            var configuration = new Shared.ExtensionUtils.Configuration
             {
                 EditorName = "visualstudio",
                 PluginName = "visualstudio-wakatime",
-                EditorVersion = ObjDte == null ? string.Empty : ObjDte.Version,
+                EditorVersion = _dte == null ? string.Empty : _dte.Version,
                 PluginVersion = Constants.PluginVersion
             };
-            WakaTime = new Shared.ExtensionUtils.WakaTime(this, configuration, new Logger());
 
-            // Only perform initialization if async package framework not supported
-            if (WakaTime.IsAsyncLoadSupported) return;
+            _logger = new Logger();
 
-            // Try force initializing in background
-            WakaTime.Logger.Debug("Initializing in background thread.");
-            Task.Run(() =>
-            {
-                InitializeAsync();
-            });
+            _wakatime = new Shared.ExtensionUtils.WakaTime(configuration, _logger);
+
+            _logger.Debug("It will load WakaTime extension");
+
+            await InitializeAsync();
+
+            // Prompt for api key if not already set
+            if (string.IsNullOrEmpty(_wakatime.Config.ApiKey))
+                PromptApiKey();
         }
 
-        public IVsTask Initialize(IAsyncServiceProvider pServiceProvider, IProfferAsyncService pProfferService,
-            IAsyncProgressCallback pProgressCallback)
+        private async Task InitializeAsync()
         {
-            if (!WakaTime.IsAsyncLoadSupported)
-                throw new InvalidOperationException(
-                    "Async Initialize method should not be called when async load is not supported.");
-
-            return ThreadHelper.JoinableTaskFactory.RunAsync<object>(async () =>
+            if (_dte is null)
             {
-                WakaTime.Logger.Debug("Initializing async.");
-                InitializeAsync();
+                _logger.Error("DTE is null");
 
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                return;
+            }
 
-                OnStartupComplete();
-
-                return null;
-            }).AsVsTask();
-        }
-
-        private void InitializeAsync()
-        {
             try
             {
-                // VisualStudio Object                
-                _docEvents = ObjDte.Events.DocumentEvents;
-                _windowEvents = ObjDte.Events.WindowEvents;
-                _solutionEvents = ObjDte.Events.SolutionEvents;
-                _debuggerEvents = ObjDte.Events.DebuggerEvents;
-                _buildEvents = ObjDte.Events.BuildEvents;
-                _textEditorEvents = ObjDte.Events.TextEditorEvents;
+                // Visual Studio Events              
+                _docEvents = _dte.Events.DocumentEvents;
+                _windowEvents = _dte.Events.WindowEvents;
+                _solutionEvents = _dte.Events.SolutionEvents;
+                _debuggerEvents = _dte.Events.DebuggerEvents;
+                _buildEvents = _dte.Events.BuildEvents;
+                _textEditorEvents = _dte.Events.TextEditorEvents;
 
                 // Settings Form
-                _settingsForm = new SettingsForm(ref WakaTime);
+                _settingsForm = new SettingsForm(_wakatime.Config, _logger);
                 _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
-                if (GetService(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
+                if (await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
                 {
                     // Create the command for the menu item.
-                    var menuCommandId = new CommandID(GuidList.GuidWakaTimeCmdSet, (int)PkgCmdIdList.UpdateWakaTimeSettings);
+                    var menuCommandId = new CommandID(new Guid(GuidList.GuidWakaTimeCmdSetString), 0x100);
                     var menuItem = new MenuCommand(MenuItemCallback, menuCommandId);
                     mcs.AddCommand(menuItem);
                 }
@@ -127,239 +135,59 @@ namespace WakaTime
                 _buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
                 _textEditorEvents.LineChanged += TextEditorEventsLineChanged;
 
-                WakaTime.InitializeAsync();
+                _wakatime.Initialize();
             }
             catch (Exception ex)
             {
-                WakaTime.Logger.Error("Error Initializing WakaTime", ex);
-            }
-        }
-        #endregion
-
-        #region Event Handlers
-
-        private void DocEventsOnDocumentOpened(Document document)
-        {
-            try
-            {
-                var category = _isBuildRunning
-                        ? HeartbeatCategory.Building
-                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                            ? HeartbeatCategory.Debugging
-                            : HeartbeatCategory.Coding;
-
-                WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("DocEventsOnDocumentOpened", ex);
-            }
-        }
-
-        private void DocEventsOnDocumentSaved(Document document)
-        {
-            try
-            {
-                var category = _isBuildRunning
-                        ? HeartbeatCategory.Building
-                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                            ? HeartbeatCategory.Debugging
-                            : HeartbeatCategory.Coding;
-
-                WakaTime.HandleActivity(document.FullName, true, GetProjectName(), category);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("DocEventsOnDocumentSaved", ex);
-            }
-        }
-
-        private void WindowEventsOnWindowActivated(Window gotFocus, Window lostFocus)
-        {
-            try
-            {
-                var document = ObjDte.ActiveWindow.Document;
-                if (document != null)
-                {
-                    var category = _isBuildRunning
-                        ? HeartbeatCategory.Building
-                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                            ? HeartbeatCategory.Debugging
-                            : HeartbeatCategory.Coding;
-
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
-                }
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("WindowEventsOnWindowActivated", ex);
-            }
-        }
-
-        private void SolutionEventsOnOpened()
-        {
-            try
-            {
-                _solutionName = ObjDte.Solution.FullName;
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("SolutionEventsOnOpened", ex);
-            }
-        }
-
-        private void DebuggerEventsOnEnterRunMode(dbgEventReason reason)
-        {
-            try
-            {
-                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
-
-                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("DebuggerEventsOnEnterRunMode", ex);
-            }
-        }
-
-        private void DebuggerEventsOnEnterDesignMode(dbgEventReason reason)
-        {
-            try
-            {
-                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
-
-                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("DebuggerEventsOnEnterDesignMode", ex);
-            }
-        }
-
-        private void DebuggerEventsOnEnterBreakMode(dbgEventReason reason, ref dbgExecutionAction executionAction)
-        {
-            try
-            {
-                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
-
-                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("DebuggerEventsOnEnterBreakMode", ex);
-            }
-        }
-
-        private void BuildEventsOnBuildProjConfigBegin(string project, string projectConfig, string platform, string solutionConfig)
-        {
-            try
-            {
-                _isBuildRunning = true;
-
-                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
-
-                _runningBuildOutput = outputFile;
-
-                WakaTime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("BuildEventsOnBuildProjConfigBegin", ex);
-            }
-        }
-
-        private void BuildEventsOnBuildProjConfigDone(string project, string projectConfig, string platform, string solutionConfig, bool success)
-        {
-            try
-            {
-                _isBuildRunning = false;
-
-                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
-
-                WakaTime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("BuildEventsOnBuildProjConfigDone", ex);
-            }
-        }
-
-        private void TextEditorEventsLineChanged(TextPoint startPoint, TextPoint endPoint, int hint)
-        {
-            try
-            {
-                var document = startPoint.Parent.Parent;
-
-                if (document != null)
-                {
-                    var category = _isBuildRunning
-                        ? HeartbeatCategory.Building
-                        : ObjDte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
-                            ? HeartbeatCategory.Debugging
-                            : HeartbeatCategory.Coding;
-
-                    WakaTime.HandleActivity(document.FullName, false, GetProjectName(), category);
-                }
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("TextEditorEventsLineChanged", ex);
-            }
-        }        
-
-        private void OnStartupComplete()
-        {
-            // Prompt for api key if not already set
-            if (string.IsNullOrEmpty(WakaTime.Config.ApiKey))
-                PromptApiKey();
-        }
-        #endregion
-
-        #region Methods
-
-        private void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
-        {
-            WakaTime.Config.Read();
-        }
-
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            try
-            {
-                SettingsPopup();
-            }
-            catch (Exception ex)
-            {
-                WakaTime.Logger.Error("MenuItemCallback", ex);
+                _logger.Error("Error Initializing WakaTime", ex);
             }
         }
 
         private void PromptApiKey()
         {
-            WakaTime.Logger.Info("Please input your api key into the wakatime window.");
-            var form = new ApiKeyForm(ref WakaTime);
+            _logger.Debug("It will ask for user to input its api key");
+
+            var form = new ApiKeyForm(_wakatime.Config, _logger);
+
             form.ShowDialog();
         }
 
-        private static void SettingsPopup()
-        {
-            _settingsForm.ShowDialog();
-        }
-
-        private static string GetProjectName()
+        private string GetProjectName()
         {
             return !string.IsNullOrEmpty(_solutionName)
                 ? Path.GetFileNameWithoutExtension(_solutionName)
-                : ObjDte.Solution != null && !string.IsNullOrEmpty(ObjDte.Solution.FullName)
-                    ? Path.GetFileNameWithoutExtension(ObjDte.Solution.FullName)
+                : _dte.Solution != null && !string.IsNullOrEmpty(_dte.Solution.FullName)
+                    ? Path.GetFileNameWithoutExtension(_dte.Solution.FullName)
                     : string.Empty;
         }
 
-        private static string GetProjectOutputForConfiguration(string projectName, string platform, string projectConfig)
+        private string GetCurrentProjectOutputForCurrentConfiguration()
         {
             try
             {
-                var project = ObjDte.Solution.Projects.Cast<Project>()
+                var activeProjects = (object[])_dte.ActiveSolutionProjects;
+                if (_dte.Solution == null || activeProjects.Length < 1)
+                    return null;
+
+                var project = (Project)((object[])_dte.ActiveSolutionProjects)[0];
+                var config = project.ConfigurationManager.ActiveConfiguration;
+                var outputPath = config.Properties.Item("OutputPath");
+                var outputFileName = project.Properties.Item("OutputFileName");
+                var projectPath = project.Properties.Item("FullPath");
+
+                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string GetProjectOutputForConfiguration(string projectName, string platform, string projectConfig)
+        {
+            try
+            {
+                var project = _dte.Solution.Projects.Cast<Project>()
                                 .FirstOrDefault(proj => proj.UniqueName == projectName);
 
                 var config = project.ConfigurationManager.Cast<EnvDTE.Configuration>()
@@ -371,52 +199,196 @@ namespace WakaTime
 
                 return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
         }
 
-        private static string GetCurrentProjectOutputForCurrentConfiguration()
+        private void MenuItemCallback(object sender, EventArgs e)
         {
             try
             {
-                var activeProjects = (object[])ObjDte.ActiveSolutionProjects;
-                if (ObjDte.Solution == null || activeProjects.Length < 1)
-                    return null;
-
-                var project = (Project)((object[])ObjDte.ActiveSolutionProjects)[0];
-                var config = project.ConfigurationManager.ActiveConfiguration;
-                var outputPath = config.Properties.Item("OutputPath");
-                var outputFileName = project.Properties.Item("OutputFileName");
-                var projectPath = project.Properties.Item("FullPath");
-
-                return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
+                _settingsForm.ShowDialog();
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                return null;
+                _logger.Error("MenuItemCallback", ex);
             }
         }
 
-        protected override void Dispose(bool disposing)
+        private void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
         {
-            base.Dispose(disposing);
-
-            _docEvents.DocumentOpened -= DocEventsOnDocumentOpened;
-            _docEvents.DocumentSaved -= DocEventsOnDocumentSaved;
-            _windowEvents.WindowActivated -= WindowEventsOnWindowActivated;
-            _solutionEvents.Opened -= SolutionEventsOnOpened;
-            _debuggerEvents.OnEnterRunMode -= DebuggerEventsOnEnterRunMode;
-            _debuggerEvents.OnEnterDesignMode -= DebuggerEventsOnEnterDesignMode;
-            _debuggerEvents.OnEnterBreakMode -= DebuggerEventsOnEnterBreakMode;
-            _buildEvents.OnBuildProjConfigBegin -= BuildEventsOnBuildProjConfigBegin;
-            _buildEvents.OnBuildProjConfigDone -= BuildEventsOnBuildProjConfigDone;
-            _textEditorEvents.LineChanged -= TextEditorEventsLineChanged;
-
-            WakaTime.Dispose();
+            _wakatime.Config.Read();
         }
-        #endregion        
+
+        private void DocEventsOnDocumentOpened(Document document)
+        {
+            try
+            {
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : _dte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("DocEventsOnDocumentOpened", ex);
+            }
+        }
+
+        private void DocEventsOnDocumentSaved(Document document)
+        {
+            try
+            {
+                var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : _dte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                _wakatime.HandleActivity(document.FullName, true, GetProjectName(), category);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("DocEventsOnDocumentSaved", ex);
+            }
+        }
+
+        private void WindowEventsOnWindowActivated(Window gotFocus, Window lostFocus)
+        {
+            try
+            {
+                var document = _dte.ActiveWindow.Document;
+                if (document != null)
+                {
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : _dte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("WindowEventsOnWindowActivated", ex);
+            }
+        }
+
+        private void SolutionEventsOnOpened()
+        {
+            try
+            {
+                _solutionName = _dte.Solution.FullName;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("SolutionEventsOnOpened", ex);
+            }
+        }
+
+        private void DebuggerEventsOnEnterRunMode(dbgEventReason reason)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("DebuggerEventsOnEnterRunMode", ex);
+            }
+        }
+
+        private void DebuggerEventsOnEnterDesignMode(dbgEventReason reason)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("DebuggerEventsOnEnterDesignMode", ex);
+            }
+        }
+
+        private void DebuggerEventsOnEnterBreakMode(dbgEventReason reason, ref dbgExecutionAction executionAction)
+        {
+            try
+            {
+                var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
+
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("DebuggerEventsOnEnterBreakMode", ex);
+            }
+        }
+
+        private void BuildEventsOnBuildProjConfigBegin(
+            string project, string projectConfig, string platform, string solutionConfig)
+        {
+            try
+            {
+                _isBuildRunning = true;
+
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("BuildEventsOnBuildProjConfigBegin", ex);
+            }
+        }
+
+        private void BuildEventsOnBuildProjConfigDone(
+            string project, string projectConfig, string platform, string solutionConfig, bool success)
+        {
+            try
+            {
+                _isBuildRunning = false;
+
+                var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
+
+                _wakatime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("BuildEventsOnBuildProjConfigDone", ex);
+            }
+        }
+
+        private void TextEditorEventsLineChanged(TextPoint startPoint, TextPoint endPoint, int hint)
+        {
+            try
+            {
+                var document = startPoint.Parent.Parent;
+                if (document != null)
+                {
+                    var category = _isBuildRunning
+                        ? HeartbeatCategory.Building
+                        : _dte.Debugger.CurrentMode == dbgDebugMode.dbgBreakMode
+                            ? HeartbeatCategory.Debugging
+                            : HeartbeatCategory.Coding;
+
+                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("TextEditorEventsLineChanged", ex);
+            }
+        }
     }
 
     internal static class CoreAssembly

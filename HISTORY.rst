@@ -3,6 +3,15 @@ History
 -------
 
 
+11.0.0 (2021-08-09)
+++++++++++++++++++
+
+- Drop support for versions below 2015.
+- It will correctly initialize asyncronously.
+- Update WakaTime.Shared.ExtensionUtils dependency to v3.0.0.
+- Fix uninstall process that could not find LICENSE file.
+
+
 10.3.1 (2020-10-09)
 ++++++++++++++++++
 

@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Windows.Forms;
+using WakaTime.Shared.ExtensionUtils;
 
 namespace WakaTime.Forms
 {
     public partial class SettingsForm : Form
     {
-        private readonly Shared.ExtensionUtils.WakaTime _wakaTime;
+        private readonly ConfigFile _configFile;
+        private readonly ILogger _logger;
+
         internal event EventHandler ConfigSaved;
 
-        public SettingsForm(ref Shared.ExtensionUtils.WakaTime wakaTime)
+        public SettingsForm(ConfigFile configFile, ILogger logger)
         {
-            _wakaTime = wakaTime;
+            _configFile = configFile;
+            _logger = logger;
+
             InitializeComponent();
         }
 
@@ -18,13 +23,14 @@ namespace WakaTime.Forms
         {
             try
             {
-                txtAPIKey.Text = _wakaTime.Config.ApiKey;
-                txtProxy.Text = _wakaTime.Config.Proxy;
-                chkDebugMode.Checked = _wakaTime.Config.Debug;
+                txtAPIKey.Text = _configFile.ApiKey;
+                txtProxy.Text = _configFile.Proxy;
+                chkDebugMode.Checked = _configFile.Debug;
             }
             catch (Exception ex)
             {
-                _wakaTime.Logger.Error("Error when loading form SettingsForm:", ex);
+                _logger.Error("Error when loading form SettingsForm:", ex);
+
                 MessageBox.Show(ex.Message);
             }
         }
@@ -37,21 +43,24 @@ namespace WakaTime.Forms
                                      
                 if (parse)
                 {
-                    _wakaTime.Config.ApiKey = apiKey.ToString();
-                    _wakaTime.Config.Proxy = txtProxy.Text.Trim();
-                    _wakaTime.Config.Debug = chkDebugMode.Checked;
-                    _wakaTime.Config.Save();
+                    _configFile.ApiKey = apiKey.ToString();
+                    _configFile.Proxy = txtProxy.Text.Trim();
+                    _configFile.Debug = chkDebugMode.Checked;
+                    _configFile.Save();
+
                     OnConfigSaved();
                 }
                 else
                 {
                     MessageBox.Show(@"Please enter valid Api Key.");
+
                     DialogResult = DialogResult.None; // do not close dialog box
                 }
             }
             catch (Exception ex)
             {
-                _wakaTime.Logger.Error("Error when saving data from SettingsForm:", ex);
+                _logger.Error($"Error saving data from SettingsForm: {ex}");
+
                 MessageBox.Show(ex.Message);
             }
         }
