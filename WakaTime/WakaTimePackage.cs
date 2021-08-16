@@ -40,12 +40,6 @@ namespace WakaTime
     public sealed class WakaTimePackage : AsyncPackage
     {
         private DTE _dte;
-        private DocumentEvents _docEvents;
-        private WindowEvents _windowEvents;
-        private SolutionEvents _solutionEvents;
-        private DebuggerEvents _debuggerEvents;
-        private BuildEvents _buildEvents;
-        private TextEditorEvents _textEditorEvents;
         private Shared.ExtensionUtils.WakaTime _wakatime;
         private ILogger _logger;
         private SettingsForm _settingsForm;
@@ -62,10 +56,6 @@ namespace WakaTime
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await base.InitializeAsync(cancellationToken, progress);
-
-            // When initialized asynchronously, the current thread may be a background thread at this point.
-            // Do any initialization that requires the UI thread after switching to the UI thread.
-            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
             var objDte = await GetServiceAsync(typeof(DTE));
             _dte = objDte as DTE;
@@ -84,31 +74,36 @@ namespace WakaTime
 
             _logger.Debug("It will load WakaTime extension");
 
-            await InitializeAsync();
+            await InitializeAsync(cancellationToken);
 
             // Prompt for api key if not already set
             if (string.IsNullOrEmpty(_wakatime.Config.ApiKey))
                 PromptApiKey();
         }
 
-        private async Task InitializeAsync()
+        private async Task InitializeAsync(CancellationToken cancellationToken)
         {
             if (_dte is null)
             {
                 _logger.Error("DTE is null");
-
                 return;
             }
 
             try
             {
+                _wakatime.Initialize();
+
+                // When initialized asynchronously, the current thread may be a background thread at this point.
+                // Do any initialization that requires the UI thread after switching to the UI thread.
+                await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
                 // Visual Studio Events              
-                _docEvents = _dte.Events.DocumentEvents;
-                _windowEvents = _dte.Events.WindowEvents;
-                _solutionEvents = _dte.Events.SolutionEvents;
-                _debuggerEvents = _dte.Events.DebuggerEvents;
-                _buildEvents = _dte.Events.BuildEvents;
-                _textEditorEvents = _dte.Events.TextEditorEvents;
+                var docEvents = _dte.Events.DocumentEvents;
+                var windowEvents = _dte.Events.WindowEvents;
+                var solutionEvents = _dte.Events.SolutionEvents;
+                var debuggerEvents = _dte.Events.DebuggerEvents;
+                var buildEvents = _dte.Events.BuildEvents;
+                var textEditorEvents = _dte.Events.TextEditorEvents;
 
                 // Settings Form
                 _settingsForm = new SettingsForm(_wakatime.Config, _logger);
@@ -124,18 +119,16 @@ namespace WakaTime
                 }
 
                 // setup event handlers
-                _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
-                _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
-                _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
-                _solutionEvents.Opened += SolutionEventsOnOpened;
-                _debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
-                _debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
-                _debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
-                _buildEvents.OnBuildProjConfigBegin += BuildEventsOnBuildProjConfigBegin;
-                _buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
-                _textEditorEvents.LineChanged += TextEditorEventsLineChanged;
-
-                _wakatime.Initialize();
+                docEvents.DocumentOpened += DocEventsOnDocumentOpened;
+                docEvents.DocumentSaved += DocEventsOnDocumentSaved;
+                windowEvents.WindowActivated += WindowEventsOnWindowActivated;
+                solutionEvents.Opened += SolutionEventsOnOpened;
+                debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
+                debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
+                debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
+                buildEvents.OnBuildProjConfigBegin += BuildEventsOnBuildProjConfigBegin;
+                buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
+                textEditorEvents.LineChanged += TextEditorEventsLineChanged;
             }
             catch (Exception ex)
             {
