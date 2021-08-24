@@ -40,6 +40,12 @@ namespace WakaTime
     public sealed class WakaTimePackage : AsyncPackage
     {
         private DTE _dte;
+        private DocumentEvents _docEvents;
+        private WindowEvents _windowEvents;
+        private SolutionEvents _solutionEvents;
+        private DebuggerEvents _debuggerEvents;
+        private BuildEvents _buildEvents;
+        private TextEditorEvents _textEditorEvents;
         private Shared.ExtensionUtils.WakaTime _wakatime;
         private ILogger _logger;
         private SettingsForm _settingsForm;
@@ -60,7 +66,7 @@ namespace WakaTime
             var objDte = await GetServiceAsync(typeof(DTE));
             _dte = objDte as DTE;
 
-            var configuration = new Shared.ExtensionUtils.Configuration
+            var metadata = new Metadata
             {
                 EditorName = "visualstudio",
                 PluginName = "visualstudio-wakatime",
@@ -68,16 +74,15 @@ namespace WakaTime
                 PluginVersion = Constants.PluginVersion
             };
 
-            _logger = new Logger();
-
-            _wakatime = new Shared.ExtensionUtils.WakaTime(configuration, _logger);
+            _logger = new Logger(Dependencies.GetConfigFilePath());
+            _wakatime = new Shared.ExtensionUtils.WakaTime(metadata, _logger);
 
             _logger.Debug("It will load WakaTime extension");
 
             await InitializeAsync(cancellationToken);
 
             // Prompt for api key if not already set
-            if (string.IsNullOrEmpty(_wakatime.Config.ApiKey))
+            if (string.IsNullOrEmpty(_wakatime.Config.GetSetting("api_key")))
                 PromptApiKey();
         }
 
@@ -91,23 +96,22 @@ namespace WakaTime
 
             try
             {
-                _wakatime.Initialize();
+                await _wakatime.InitializeAsync();
 
                 // When initialized asynchronously, the current thread may be a background thread at this point.
                 // Do any initialization that requires the UI thread after switching to the UI thread.
                 await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
                 // Visual Studio Events              
-                var docEvents = _dte.Events.DocumentEvents;
-                var windowEvents = _dte.Events.WindowEvents;
-                var solutionEvents = _dte.Events.SolutionEvents;
-                var debuggerEvents = _dte.Events.DebuggerEvents;
-                var buildEvents = _dte.Events.BuildEvents;
-                var textEditorEvents = _dte.Events.TextEditorEvents;
+                _docEvents = _dte.Events.DocumentEvents;
+                _windowEvents = _dte.Events.WindowEvents;
+                _solutionEvents = _dte.Events.SolutionEvents;
+                _debuggerEvents = _dte.Events.DebuggerEvents;
+                _buildEvents = _dte.Events.BuildEvents;
+                _textEditorEvents = _dte.Events.TextEditorEvents;
 
                 // Settings Form
                 _settingsForm = new SettingsForm(_wakatime.Config, _logger);
-                _settingsForm.ConfigSaved += SettingsFormOnConfigSaved;
 
                 // Add our command handlers for menu (commands must exist in the .vsct file)
                 if (await GetServiceAsync(typeof(IMenuCommandService)) is OleMenuCommandService mcs)
@@ -119,16 +123,16 @@ namespace WakaTime
                 }
 
                 // setup event handlers
-                docEvents.DocumentOpened += DocEventsOnDocumentOpened;
-                docEvents.DocumentSaved += DocEventsOnDocumentSaved;
-                windowEvents.WindowActivated += WindowEventsOnWindowActivated;
-                solutionEvents.Opened += SolutionEventsOnOpened;
-                debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
-                debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
-                debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
-                buildEvents.OnBuildProjConfigBegin += BuildEventsOnBuildProjConfigBegin;
-                buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
-                textEditorEvents.LineChanged += TextEditorEventsLineChanged;
+                _docEvents.DocumentOpened += DocEventsOnDocumentOpened;
+                _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
+                _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
+                _solutionEvents.Opened += SolutionEventsOnOpened;
+                _debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
+                _debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
+                _debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
+                _buildEvents.OnBuildProjConfigBegin += BuildEventsOnBuildProjConfigBegin;
+                _buildEvents.OnBuildProjConfigDone += BuildEventsOnBuildProjConfigDone;
+                _textEditorEvents.LineChanged += TextEditorEventsLineChanged;
             }
             catch (Exception ex)
             {
@@ -208,11 +212,6 @@ namespace WakaTime
             {
                 _logger.Error("MenuItemCallback", ex);
             }
-        }
-
-        private void SettingsFormOnConfigSaved(object sender, EventArgs eventArgs)
-        {
-            _wakatime.Config.Read();
         }
 
         private void DocEventsOnDocumentOpened(Document document)

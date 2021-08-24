@@ -9,8 +9,6 @@ namespace WakaTime.Forms
         private readonly ConfigFile _configFile;
         private readonly ILogger _logger;
 
-        internal event EventHandler ConfigSaved;
-
         public SettingsForm(ConfigFile configFile, ILogger logger)
         {
             _configFile = configFile;
@@ -23,9 +21,9 @@ namespace WakaTime.Forms
         {
             try
             {
-                txtAPIKey.Text = _configFile.ApiKey;
-                txtProxy.Text = _configFile.Proxy;
-                chkDebugMode.Checked = _configFile.Debug;
+                txtAPIKey.Text = _configFile.GetSetting("api_key");
+                txtProxy.Text = _configFile.GetSetting("proxy");
+                chkDebugMode.Checked = _configFile.GetSettingAsBoolean("debug");
             }
             catch (Exception ex)
             {
@@ -35,7 +33,7 @@ namespace WakaTime.Forms
             }
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void BtnOk_Click(object sender, EventArgs e)
         {
             try
             {
@@ -43,12 +41,9 @@ namespace WakaTime.Forms
                                      
                 if (parse)
                 {
-                    _configFile.ApiKey = apiKey.ToString();
-                    _configFile.Proxy = txtProxy.Text.Trim();
-                    _configFile.Debug = chkDebugMode.Checked;
-                    _configFile.Save();
-
-                    OnConfigSaved();
+                    _configFile.SaveSetting("settings", "api_key", apiKey.ToString());
+                    _configFile.SaveSetting("settings", "proxy", txtProxy.Text.Trim());
+                    _configFile.SaveSetting("settings", "debug", chkDebugMode.Checked.ToString().ToLower());
                 }
                 else
                 {
@@ -63,12 +58,6 @@ namespace WakaTime.Forms
 
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        protected virtual void OnConfigSaved()
-        {
-            var handler = ConfigSaved;
-            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }
