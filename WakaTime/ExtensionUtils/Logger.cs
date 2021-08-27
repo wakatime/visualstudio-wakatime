@@ -8,14 +8,16 @@ namespace WakaTime.ExtensionUtils
 {
     public class Logger : ILogger
     {
-        private readonly ConfigFile _config;
         private IVsOutputWindowPane _wakatimeOutputWindowPane;
         private IVsOutputWindowPane WakatimeOutputWindowPane =>
             _wakatimeOutputWindowPane ?? (_wakatimeOutputWindowPane = GetWakatimeOutputWindowPane());
+        private readonly bool _isDebugEnabled;
 
-        public Logger()
+        public Logger(string configFilepath)
         {
-            _config = new ConfigFile();
+            var configFile = new ConfigFile(configFilepath);
+
+            _isDebugEnabled = configFile.GetSettingAsBoolean("debug");
         }
 
         private static IVsOutputWindowPane GetWakatimeOutputWindowPane()
@@ -32,7 +34,7 @@ namespace WakaTime.ExtensionUtils
 
         public void Debug(string message)
         {
-            if (!_config.Debug)
+            if (!_isDebugEnabled)
                 return;
 
             Log(LogLevel.Debug, message);

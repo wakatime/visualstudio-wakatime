@@ -13,7 +13,7 @@ namespace WakaTime.Forms
         {
             _configFile = configFile;
             _logger = logger;
-            
+
             InitializeComponent();
         }
 
@@ -21,28 +21,27 @@ namespace WakaTime.Forms
         {
             try
             {
-                txtAPIKey.Text = _configFile.ApiKey;
+                txtAPIKey.Text = _configFile.GetSetting("api_key");
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-            }            
+            }
         }
-        
-        private void btnOk_Click(object sender, EventArgs e)
+
+        private void BtnOk_Click(object sender, EventArgs e)
         {
             try
             {
-                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);                              
+                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);
+
                 if (parse)
                 {
-                    _configFile.ApiKey = apiKey.ToString();
-                    _configFile.Save();
-                    _configFile.ApiKey = apiKey.ToString();
+                    _configFile.SaveSetting("settings", "api_key", apiKey.ToString());
                 }
                 else
                 {
-                    MessageBox.Show(@"Please enter valid Api Key.");
+                    MessageBox.Show("Please enter valid Api Key.");
 
                     DialogResult = DialogResult.None; // do not close dialog box
                 }
