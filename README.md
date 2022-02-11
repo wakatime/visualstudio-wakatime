@@ -16,7 +16,7 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 
 ## Screen Shots
 
-![Project Overview](WakaTime/Assets/dashboard.png)
+![Project Overview](Dev17/Assets/dashboard.png)
 
 ## Supported Visual Studio Editions
 
@@ -48,7 +48,6 @@ For debugging, configure the product to open in a new Visual Studio instance:
 3. Add command line arguments: ```/rootsuffix Exp```
 4. Change the solution according to the version of Visual Studio you're targeting:
 
-* Express - Visual Studio Express 2015 and 2017
 * Release - Visual Studio 2015+
 
 > Note: The Debug solution is only for including debugger symbols.
@@ -68,7 +67,7 @@ Are there error messages in your Visual Studio Output window?
 
 Open the Output window from `View` → `Output` (`ctrl` + `alt` + `O`).
 
-![Output Window](https://raw.githubusercontent.com/wakatime/visualstudio-wakatime/master/output-window.png)
+![Output Window](Dev17/Assets/output-window.png)
 
 If there are no messages in your Visual Studio Output window, check your `.wakatime.log` file:
 
