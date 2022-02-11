@@ -187,7 +187,7 @@ namespace WakaTime
                 var project = _dte.Solution.Projects.Cast<Project>()
                                 .FirstOrDefault(proj => proj.UniqueName == projectName);
 
-                var config = project.ConfigurationManager.Cast<EnvDTE.Configuration>()
+                var config = project.ConfigurationManager.Cast<Configuration>()
                                 .FirstOrDefault(conf => conf.PlatformName == platform && conf.ConfigurationName == projectConfig);
 
                 var outputPath = config.Properties.Item("OutputPath");
