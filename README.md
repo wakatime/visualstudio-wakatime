@@ -23,6 +23,7 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 * Visual Studio 2015
 * Visual Studio 2017
 * Visual Studio 2019
+* Visual Studio 2022
 
 ## Visual Studio for Mac
 
