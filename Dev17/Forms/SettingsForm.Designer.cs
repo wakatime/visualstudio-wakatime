@@ -44,9 +44,9 @@
             this.chkDebugMode = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
+            //
             // lblAPIKey
-            // 
+            //
             this.lblAPIKey.AutoSize = true;
             this.lblAPIKey.Location = new System.Drawing.Point(162, 40);
             this.lblAPIKey.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
@@ -54,20 +54,20 @@
             this.lblAPIKey.Size = new System.Drawing.Size(133, 41);
             this.lblAPIKey.TabIndex = 0;
             this.lblAPIKey.Text = "API Key :";
-            // 
+            //
             // txtAPIKey
-            // 
-            this.txtAPIKey.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.txtAPIKey.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAPIKey.Location = new System.Drawing.Point(310, 32);
             this.txtAPIKey.Margin = new System.Windows.Forms.Padding(8);
-            this.txtAPIKey.MaxLength = 36;
+            this.txtAPIKey.MaxLength = 41;
             this.txtAPIKey.Name = "txtAPIKey";
             this.txtAPIKey.Size = new System.Drawing.Size(1213, 47);
             this.txtAPIKey.TabIndex = 1;
-            // 
+            //
             // btnOk
-            // 
+            //
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOk.Location = new System.Drawing.Point(310, 353);
@@ -78,9 +78,9 @@
             this.btnOk.Text = "Save";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.BtnOk_Click);
-            // 
+            //
             // btnCancel
-            // 
+            //
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.Location = new System.Drawing.Point(585, 353);
@@ -90,10 +90,10 @@
             this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            // 
+            //
             // txtProxy
-            // 
-            this.txtProxy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            //
+            this.txtProxy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtProxy.Location = new System.Drawing.Point(310, 125);
             this.txtProxy.Margin = new System.Windows.Forms.Padding(8);
@@ -101,9 +101,9 @@
             this.txtProxy.Name = "txtProxy";
             this.txtProxy.Size = new System.Drawing.Size(1213, 47);
             this.txtProxy.TabIndex = 5;
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(52, 132);
             this.label1.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
@@ -111,9 +111,9 @@
             this.label1.Size = new System.Drawing.Size(243, 41);
             this.label1.TabIndex = 4;
             this.label1.Text = "Proxy (optional) :";
-            // 
+            //
             // chkDebugMode
-            // 
+            //
             this.chkDebugMode.AutoSize = true;
             this.chkDebugMode.Location = new System.Drawing.Point(310, 262);
             this.chkDebugMode.Margin = new System.Windows.Forms.Padding(8);
@@ -122,9 +122,9 @@
             this.chkDebugMode.TabIndex = 6;
             this.chkDebugMode.Text = "Debug";
             this.chkDebugMode.UseVisualStyleBackColor = true;
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(302, 190);
             this.label2.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
@@ -133,9 +133,9 @@
             this.label2.TabIndex = 7;
             this.label2.Text = "Example: https://user:pass@host:port or socks5://user:pass@host:port or domain\\us" +
     "er:pass.";
-            // 
+            //
             // SettingsForm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1562, 451);
