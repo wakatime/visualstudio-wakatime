@@ -3,6 +3,13 @@ History
 -------
 
 
+13.0.1 (2022-12-14)
+++++++++++++++++++
+
+- Support new api key prefix format.
+  `#136 <https://github.com/wakatime/visualstudio-wakatime/issues/136>`_
+
+
 13.0.0 (2022-02-11)
 ++++++++++++++++++
 
