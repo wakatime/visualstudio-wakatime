@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WakaTime.Shared.ExtensionUtils;
 
@@ -37,11 +38,11 @@ namespace WakaTime.Forms
         {
             try
             {
-                var parse = Guid.TryParse(txtAPIKey.Text.Trim(), out var apiKey);         
-                                     
-                if (parse)
+                var matched = Regex.IsMatch(txtAPIKey.Text.Trim(), "(?im)^(waka_)?[0-9A-F]{8}[-]?(?:[0-9A-F]{4}[-]?){3}[0-9A-F]{12}$");
+
+                if (matched)
                 {
-                    _configFile.SaveSetting("settings", "api_key", apiKey.ToString());
+                    _configFile.SaveSetting("settings", "api_key", txtAPIKey.Text.Trim());
                     _configFile.SaveSetting("settings", "proxy", txtProxy.Text.Trim());
                     _configFile.SaveSetting("settings", "debug", chkDebugMode.Checked.ToString().ToLower());
                 }
