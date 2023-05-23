@@ -51,6 +51,7 @@ namespace WakaTime
         private SettingsForm _settingsForm;
         private bool _isBuildRunning;
         private string _solutionName;
+        private StatusbarControl _statusbarControl;
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -96,11 +97,23 @@ namespace WakaTime
 
             try
             {
-                await _wakatime.InitializeAsync();
+                // Initialize _wakatime in background, which may take several seconds
+                Task wakaTimeInitializationTask = _wakatime.InitializeAsync();
 
                 // When initialized asynchronously, the current thread may be a background thread at this point.
                 // Do any initialization that requires the UI thread after switching to the UI thread.
                 await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+                // Inject control to status bar
+                _statusbarControl = new StatusbarControl();
+                _statusbarControl.SetText("Initializing...");
+                _statusbarControl.SetToolTip("WakaTime: Initializing...");
+                await StatusbarInjector.InjectControlAsync(_statusbarControl);
+
+                // Wait for _wakatime to complete initialization，and display today's coding time on status bar
+                await wakaTimeInitializationTask;
+                UpdateTimeOnStatusbarControl(_wakatime.TotalTimeToday, _wakatime.TotalTimeTodayDetailed);
+                _wakatime.TotalTimeTodayUpdated += WakatimeTotalTimeTodayUpdated;
 
                 // Visual Studio Events              
                 _docEvents = _dte.Events.DocumentEvents;
@@ -380,6 +393,30 @@ namespace WakaTime
             {
                 _logger.Error("TextEditorEventsLineChanged", ex);
             }
+        }
+
+        private void WakatimeTotalTimeTodayUpdated(object sender, TotalTimeTodayUpdatedEventArgs e)
+        {
+            _ = JoinableTaskFactory.RunAsync(async () =>
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                UpdateTimeOnStatusbarControl(e.TotalTimeToday, e.TotalTimeTodayDetailed);
+            });
+        }
+
+        private void UpdateTimeOnStatusbarControl(string totalTimeToday, string totalTimeTodayDetailed)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            string text = string.IsNullOrEmpty(totalTimeToday) ? "WakaTime" : totalTimeToday;
+            _statusbarControl?.SetText(text);
+
+            string toolTip = "WakaTime: Today's coding time";
+            if (!string.IsNullOrEmpty(totalTimeTodayDetailed))
+            {
+                toolTip += Environment.NewLine + totalTimeTodayDetailed;
+            }
+            _statusbarControl?.SetToolTip(toolTip);
         }
     }
 
