@@ -27,7 +27,7 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 
 ## Visual Studio for Mac
 
-Visual Studio for Mac is supported with the [WakaTime for Monodevlop extension][monodevelop].
+Visual Studio for Mac is supported with the [WakaTime for Monodevelop extension][monodevelop].
 
 ## Visual Studio Express
 
