@@ -95,7 +95,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="WakaTime.Shared.ExtensionUtils">
-      <Version>4.2.0</Version>
+      <Version>4.2.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
