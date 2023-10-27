@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 	<Metadata>
-		<Identity Publisher="WakaTime" Version="13.0.2" Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Language="en-US" />
+		<Identity Publisher="WakaTime" Version="13.2.0" Id="52d9c3ff-c893-408e-95e4-d7484ec7fa47" Language="en-US" />
 		<DisplayName>WakaTime</DisplayName>
 		<Description xml:space="preserve">Metrics, insights, and time tracking automatically generated from your programming activity.</Description>
 		<MoreInfo>https://github.com/wakatime/visualstudio-wakatime</MoreInfo>
