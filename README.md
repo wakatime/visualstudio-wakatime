@@ -81,5 +81,5 @@ For more general troubleshooting info, see the [wakatime-cli Troubleshooting Sec
 [wakatime-cli-help]: https://github.com/wakatime/wakatime#troubleshooting
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
-[monodevelop]: https://wakatime.com/help/plugins/monodevelop
+[monodevelop]: https://github.com/CodeCavePro/monodevelop-wakatime
 [activitylog]: http://blogs.msdn.com/b/visualstudio/archive/2010/02/24/troubleshooting-with-the-activity-log.aspx
