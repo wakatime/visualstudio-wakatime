@@ -1,0 +1,199 @@
+name: Release
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  push:
+    branches: [master]
+    tags-ignore: ["**"]
+
+jobs:
+  version:
+    name: Version
+    concurrency: tagging
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    outputs:
+      semver: ${{ steps.format.outputs.semver }} # Without v prefix
+      semver_tag: ${{ steps.semver-tag.outputs.semver_tag }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      -
+        name: Calculate semver tag
+        id: semver-tag
+        uses: gandarez/semver-action@master
+        with:
+          branching_model: trunk-based
+          prefix: ""
+          debug: true
+      -
+        name: Remove v prefix
+        id: format
+        run: |
+          echo "${{ steps.semver-tag.outputs.semver_tag }}"
+          ver=`echo "${{ steps.semver-tag.outputs.semver_tag }}" | sed 's/^v//'`
+          echo "$ver"
+          echo "semver=$ver" >> $GITHUB_OUTPUT
+      - name: Create tag
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ steps.format.outputs.semver }}",
+              sha: context.sha
+            })
+
+  build-dev16:
+    name: Build Dev16
+    runs-on: windows-2019
+    needs: [version]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      - 
+        name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+      -
+        name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+      -
+        name: Restore NuGet packages
+        run: nuget restore ./Dev16/Dev16.csproj -PackagesDirectory ./packages -NonInteractive 
+      - 
+        name: Update version
+        run: |
+          (Get-Content -Path Dev16\source.extension.vsixmanifest) |
+            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+              Set-Content -Path Dev16\source.extension.vsixmanifest
+          (Get-Content -Path Dev16\Properties\AssemblyInfo.cs) |
+            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+              Set-Content -Path Dev16\Properties\AssemblyInfo.cs
+      - 
+        name: Build Dev16 for Release
+        run: msbuild Dev16/Dev16.csproj -property:Configuration=Release -property:platform="AnyCPU" -property:DeployExtension=false
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WakaTime.Dev16.vsix
+          path: Dev16/bin/Release/WakaTime.Dev16.vsix
+      -
+        name: Remove tag if failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/${{ needs.version.outputs.semver }}"
+            })
+
+  build-dev17:
+    name: Build Dev17
+    runs-on: windows-2019
+    needs: [version]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      - 
+        name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+      -
+        name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+      -
+        name: Restore NuGet packages
+        run: nuget restore ./Dev17/Dev17.csproj -PackagesDirectory ./packages -NonInteractive 
+      - 
+        name: Update version
+        run: |
+          (Get-Content -Path Dev17\source.extension.vsixmanifest) |
+            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+              Set-Content -Path Dev17\source.extension.vsixmanifest
+          (Get-Content -Path Dev17\Properties\AssemblyInfo.cs) |
+            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+              Set-Content -Path Dev17\Properties\AssemblyInfo.cs
+      - 
+        name: Build Dev17 for Release
+        run: msbuild Dev17/Dev17.csproj -property:Configuration=Release -property:platform="x64" -property:DeployExtension=false
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WakaTime.Dev17.vsix
+          path: Dev17/bin/x64/Release/WakaTime.Dev17.vsix
+      -
+        name: Remove tag if failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/${{ needs.version.outputs.semver }}"
+            })
+
+  release:
+    name: Release
+    runs-on: windows-latest
+    needs: [version, build-dev16, build-dev17]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*.vsix"
+          path: build/
+      - 
+        name: Publish Dev16 to Marketplace
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: build\WakaTime.Dev16.vsix
+          publish-manifest-file: publishManifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+      - 
+        name: Publish Dev17 to Marketplace
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: build\WakaTime.Dev16.vsix
+          publish-manifest-file: publishManifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+      -
+        name: "Create release"
+        uses: softprops/action-gh-release@master
+        with:
+          name: ${{ needs.version.outputs.semver }}
+          tag_name: ${{ needs.version.outputs.semver }}
+          target_commitish: ${{ github.sha }}
+          draft: false
+          files: ./build/*.vsix
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      -
+        name: Remove tag if failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/${{ needs.version.outputs.semver }}"
+            })

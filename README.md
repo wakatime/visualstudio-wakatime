@@ -1,4 +1,4 @@
-# visualstudio-wakatime
+# WakaTime for Visual Studio
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/pwyxjwo2q78ao3jl/branch/master?svg=true)](https://ci.appveyor.com/project/alanhamlett/visualstudio-wakatime/branch/master)
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime.svg)](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime)
@@ -20,7 +20,7 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 
 ## Supported Visual Studio Editions
 
-* Visual Studio 2015
+* Visual Studio 2015 (supported by v13.3.0 and earlier)
 * Visual Studio 2017
 * Visual Studio 2019
 * Visual Studio 2022
@@ -52,10 +52,6 @@ For debugging, configure the product to open in a new Visual Studio instance:
 
 > Note: The Debug solution is only for including debugger symbols.
 
-[latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
-[legacy extension]: https://marketplace.visualstudio.com/items?itemName=WakaTime.WakaTime2010
-[express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
-
 ## Troubleshooting
 
 Look for a `Tools` → `WakaTime Settings` menu in Visual Studio.
@@ -83,3 +79,5 @@ For more general troubleshooting info, see the [wakatime-cli Troubleshooting Sec
 [user agents api]: https://wakatime.com/developers#user_agents
 [monodevelop]: https://github.com/CodeCavePro/monodevelop-wakatime
 [activitylog]: http://blogs.msdn.com/b/visualstudio/archive/2010/02/24/troubleshooting-with-the-activity-log.aspx
+[latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
+[express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
