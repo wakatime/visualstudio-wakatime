@@ -78,7 +78,7 @@ Lastly, uncaught exceptions go to [ActivityLog.xml][activitylog]. Uncaught excep
 The [How to Debug Plugins][how to debug] guide shows how to check when coding activity was last received from your IDE using the [User Agents API][user agents api].
 For more general troubleshooting info, see the [wakatime-cli Troubleshooting Section][wakatime-cli-help].
 
-[wakatime-cli-help]: https://github.com/wakatime/wakatime#troubleshooting
+[wakatime-cli-help]: https://github.com/wakatime/wakatime-cli/blob/develop/TROUBLESHOOTING.md
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
 [monodevelop]: https://github.com/CodeCavePro/monodevelop-wakatime
