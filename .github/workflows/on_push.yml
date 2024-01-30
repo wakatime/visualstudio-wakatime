@@ -164,14 +164,14 @@ jobs:
         name: Publish Dev16 to Marketplace
         uses: cezarypiatek/VsixPublisherAction@1.1
         with:
-          extension-file: ${{ env:GITHUB_WORKSPACE }}\build\WakaTime.Dev16.vsix
+          extension-file: ${{ github.workspace }}\build\WakaTime.Dev16.vsix
           publish-manifest-file: publishManifest.json
           personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
       - 
         name: Publish Dev17 to Marketplace
         uses: cezarypiatek/VsixPublisherAction@1.1
         with:
-          extension-file: ${{ env:GITHUB_WORKSPACE }}\build\WakaTime.Dev17.vsix
+          extension-file: ${{ github.workspace }}\build\WakaTime.Dev17.vsix
           publish-manifest-file: publishManifest.json
           personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
       -
