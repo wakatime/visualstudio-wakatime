@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json.schemastore.org/vsix-publish",
+    "categories": [ "coding", "reporting", "programming languages" ],
+    "identity": {
+        "internalName": "WakaTime",
+        "tags": [ "Analytics", "C#", "Coding", "Productivity", "Productivity Tool", "Sim-Ship VS 2017", "Time Tracking", "Timer", "Visual Studio" ]
+    },
+    "overview": "OVERVIEW.md",
+    "priceCategory": "free",
+    "publisher": "WakaTime",
+    "private": false,
+    "qna": true,
+    "repo": "https://github.com/wakatime/visualstudio-wakatime"
+}
