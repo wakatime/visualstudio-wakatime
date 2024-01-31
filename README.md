@@ -1,6 +1,6 @@
 # WakaTime for Visual Studio
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/pwyxjwo2q78ao3jl/branch/master?svg=true)](https://ci.appveyor.com/project/alanhamlett/visualstudio-wakatime/branch/master)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/wakatime/visualstudio-wakatime/on_push.yml)](https://github.com/wakatime/visualstudio-wakatime/actions)
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime.svg)](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime)
 
 Visual Studio extension to quantify your coding using <https://wakatime.com/>.
