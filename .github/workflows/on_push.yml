@@ -146,10 +146,54 @@ jobs:
               ref: "tags/${{ needs.version.outputs.semver }}"
             })
 
+  publish-dev16:
+    name: Publish Dev16
+    runs-on: windows-latest
+    needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*.Dev16.vsix"
+          path: build/
+      - 
+        name: Publish Dev16 to Marketplace
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: ${{ github.workspace }}\build\WakaTime.Dev16.vsix\WakaTime.Dev16.vsix
+          publish-manifest-file: publishManifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+
+  publish-dev17:
+    name: Publish Dev17
+    runs-on: windows-latest
+    needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*.Dev17.vsix"
+          path: build/
+      - 
+        name: Publish Dev17 to Marketplace
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: ${{ github.workspace }}\build\WakaTime.Dev17.vsix\WakaTime.Dev17.vsix
+          publish-manifest-file: publishManifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+  
   release:
     name: Release
-    runs-on: windows-latest
-    needs: [version, build-dev16, build-dev17]
+    runs-on: ubuntu-latest
+    needs: [version, publish-dev16, publish-dev17]
     steps:
       -
         name: Checkout
@@ -160,20 +204,6 @@ jobs:
         with:
           pattern: "*.vsix"
           path: build/
-      - 
-        name: Publish Dev16 to Marketplace
-        uses: cezarypiatek/VsixPublisherAction@1.1
-        with:
-          extension-file: ${{ github.workspace }}\build\WakaTime.Dev16.vsix\WakaTime.Dev16.vsix
-          publish-manifest-file: publishManifest.json
-          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
-      - 
-        name: Publish Dev17 to Marketplace
-        uses: cezarypiatek/VsixPublisherAction@1.1
-        with:
-          extension-file: ${{ github.workspace }}\build\WakaTime.Dev17.vsix\WakaTime.Dev17.vsix
-          publish-manifest-file: publishManifest.json
-          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
       -
         name: "Create release"
         uses: softprops/action-gh-release@master
@@ -185,15 +215,3 @@ jobs:
           files: ./build/*.vsix
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      -
-        name: Remove tag if failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ github.token }}
-          script: |
-            github.rest.git.deleteRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: "tags/${{ needs.version.outputs.semver }}"
-            })
