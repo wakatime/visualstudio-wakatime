@@ -4,7 +4,7 @@
     "identity": {
         "internalName": "WakaTime"
     },
-    "overview": "OVERVIEW.md",
+    "overview": "../OVERVIEW.md",
     "priceCategory": "free",
     "publisher": "WakaTime",
     "private": false,
