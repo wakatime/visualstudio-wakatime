@@ -73,6 +73,9 @@ jobs:
           (Get-Content -Path Dev16\publishManifest.json) |
             ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
               Set-Content -Path Dev16\publishManifest.json
+          (Get-Content -Path Dev16\source.extension.vsixmanifest) |
+              ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+                Set-Content -Path Dev16\source.extension.vsixmanifest
           (Get-Content -Path Dev16\Properties\AssemblyInfo.cs) |
             ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
               Set-Content -Path Dev16\Properties\AssemblyInfo.cs
@@ -121,6 +124,9 @@ jobs:
           (Get-Content -Path Dev17\publishManifest.json) |
             ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
               Set-Content -Path Dev17\publishManifest.json
+          (Get-Content -Path Dev17\source.extension.vsixmanifest) |
+              ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+                Set-Content -Path Dev17\source.extension.vsixmanifest
           (Get-Content -Path Dev17\Properties\AssemblyInfo.cs) |
             ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
               Set-Content -Path Dev17\Properties\AssemblyInfo.cs

@@ -7,37 +7,7 @@
         "description": "Metrics, insights, and time tracking automatically generated from your programming activity.",
         "tags": [ "Analytics", "Coding","Productivity", "Productivity Tool", "Time Tracking", "Timer", "Code Time", "Metrics", "Time Tracker", "Reports" ],
         "vsixId": "52d9c3ff-c893-408e-95e4-d7484ec7fa47",
-        "version": "1.0.0",
-        "installTargets": [
-            {
-                "sku": "Microsoft.VisualStudio.Community",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.Pro",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.Enterprise",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.IntegratedShell",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.Ultimate",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.Premium",
-                "version": "[15.0,17.0)"
-            },
-            {
-                "sku": "Microsoft.VisualStudio.VSLS",
-                "version": "[15.0,17.0)"
-            }
-        ]
+        "version": "1.0.0"
     },
 
     "overview": "OVERVIEW.md",
