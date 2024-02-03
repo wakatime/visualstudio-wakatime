@@ -70,9 +70,6 @@ jobs:
       - 
         name: Update version
         run: |
-          (Get-Content -Path Dev16\publishManifest.json) |
-            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
-              Set-Content -Path Dev16\publishManifest.json
           (Get-Content -Path Dev16\source.extension.vsixmanifest) |
               ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
                 Set-Content -Path Dev16\source.extension.vsixmanifest
@@ -121,9 +118,6 @@ jobs:
       - 
         name: Update version
         run: |
-          (Get-Content -Path Dev17\publishManifest.json) |
-            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
-              Set-Content -Path Dev17\publishManifest.json
           (Get-Content -Path Dev17\source.extension.vsixmanifest) |
               ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
                 Set-Content -Path Dev17\source.extension.vsixmanifest
