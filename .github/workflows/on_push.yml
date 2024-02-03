@@ -146,27 +146,27 @@ jobs:
               ref: "tags/${{ needs.version.outputs.semver }}"
             })
 
-  publish-dev16:
-    name: Publish Dev16
-    runs-on: windows-latest
-    needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
-    steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v4
-      -
-        name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "*.Dev16.vsix"
-          path: build/
-      - 
-        name: Publish Dev16 to Marketplace
-        uses: cezarypiatek/VsixPublisherAction@1.1
-        with:
-          extension-file: ${{ github.workspace }}\build\WakaTime.Dev16.vsix\WakaTime.Dev16.vsix
-          publish-manifest-file: Dev16\publishManifest.json
-          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+  # publish-dev16:
+  #   name: Publish Dev16
+  #   runs-on: windows-latest
+  #   needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
+  #   steps:
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v4
+  #     -
+  #       name: Download artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: "*.Dev16.vsix"
+  #         path: build/
+  #     - 
+  #       name: Publish Dev16 to Marketplace
+  #       uses: cezarypiatek/VsixPublisherAction@1.1
+  #       with:
+  #         extension-file: ${{ github.workspace }}\build\WakaTime.Dev16.vsix\WakaTime.Dev16.vsix
+  #         publish-manifest-file: Dev16\publishManifest.json
+  #         personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
 
   publish-dev17:
     name: Publish Dev17
@@ -193,7 +193,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [version, publish-dev16, publish-dev17]
+    needs: [version, publish-dev17]
     steps:
       -
         name: Checkout
