@@ -2,14 +2,8 @@
     "$schema": "http://json.schemastore.org/vsix-publish",
     "categories": [ "coding", "reporting", "programming languages" ],
     "identity": {
-        "internalName": "WakaTime",
-        "displayName": "WakaTime",
-        "description": "Metrics, insights, and time tracking automatically generated from your programming activity.",
-        "tags": [ "Analytics", "Coding","Productivity", "Productivity Tool", "Time Tracking", "Timer", "Code Time", "Metrics", "Time Tracker", "Reports" ],
-        "vsixId": "41DB9DFA-9F21-45A4-B111-22FBD1C3AD94",
-        "version": "1.0.0"
+        "internalName": "WakaTime"
     },
-
     "overview": "OVERVIEW.md",
     "priceCategory": "free",
     "publisher": "WakaTime",
