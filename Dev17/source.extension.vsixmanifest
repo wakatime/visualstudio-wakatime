@@ -1,28 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-    <Metadata>
-        <Identity Publisher="WakaTime" Version="1.0.0" Id="41DB9DFA-9F21-45A4-B111-22FBD1C3AD94" Language="en-US" />
-        <DisplayName>WakaTime</DisplayName>
-        <Description xml:space="preserve">Metrics, insights, and time tracking automatically generated from your programming activity.</Description>
-        <MoreInfo>https://github.com/wakatime/visualstudio-wakatime</MoreInfo>
-        <License>LICENSE</License>
-        <Icon>Assets\wakatime-120.png</Icon>
-        <PreviewImage>Assets\dashboard.png</PreviewImage>
-        <Tags>metrics, time tracker, productivity, reports</Tags>
-    </Metadata>
-
-    <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
-            <ProductArchitecture>amd64</ProductArchitecture>
-        </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0,18.0)">
-            <ProductArchitecture>amd64</ProductArchitecture>
-        </InstallationTarget>
-        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
-            <ProductArchitecture>amd64</ProductArchitecture>
-        </InstallationTarget>
-    </Installation>
-
     <Dependencies>
         <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.8,)" />
         <Dependency Id="Microsoft.VisualStudio.MPF.16.0" DisplayName="Visual Studio MPF 16.0" d:Source="Installed" Version="[16.0,17.0)" />
