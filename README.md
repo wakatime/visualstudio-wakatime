@@ -11,7 +11,7 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 2. Click the `Online` category at the left, then search for `wakatime`.
 3. Click the `Download` button, then click `Install`.
 4. Click the `Restart Now` button.
-5. (This may not be needed) Enter your [api key](https://wakatime.com/settings#apikey), then press `enter`.
+5. Enter your [api key](https://wakatime.com/settings#apikey), then press `enter`.
 6. Use Visual Studio and your coding activity will be displayed on your [WakaTime dashboard](https://wakatime.com).
 
 ## Screen Shots
