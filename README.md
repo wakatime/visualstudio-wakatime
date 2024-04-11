@@ -39,6 +39,15 @@ The resulting `bin/Express/WakaTime.vsix` extension file will install into Visua
 
 ## Contributing
 
+Pull requests and issues are welcome!
+The main thing to know is we require specific branch name prefixes for PRs:
+
+- `^major/.+` - `major`
+- `^feature/.+` - `minor`
+- `^bugfix/.+` - `patch`
+- `^docs?/.+` - `build`
+- `^misc/.+` - `build`
+
 To open and build this project, please use Visual Studio 2019.
 
 For debugging, configure the product to open in a new Visual Studio instance:
