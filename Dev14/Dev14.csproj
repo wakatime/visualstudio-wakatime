@@ -183,8 +183,8 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=4.2.1.0, Culture=neutral, PublicKeyToken=202d1174b8524eea, processorArchitecture=MSIL">
-      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.4.2.1\lib\netstandard2.0\WakaTime.Shared.ExtensionUtils.dll</HintPath>
+    <Reference Include="WakaTime.Shared.ExtensionUtils, Version=4.2.2.0, Culture=neutral, PublicKeyToken=202d1174b8524eea, processorArchitecture=MSIL">
+      <HintPath>..\packages\WakaTime.Shared.ExtensionUtils.4.2.2\lib\netstandard2.0\WakaTime.Shared.ExtensionUtils.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
