@@ -87,6 +87,6 @@ For more general troubleshooting info, see the [wakatime-cli Troubleshooting Sec
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
 [monodevelop]: https://github.com/CodeCavePro/monodevelop-wakatime
-[activitylog]: http://blogs.msdn.com/b/visualstudio/archive/2010/02/24/troubleshooting-with-the-activity-log.aspx
+[activitylog]: https://devblogs.microsoft.com/visualstudio/troubleshooting-extensions-with-the-activity-log/
 [latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
 [express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
