@@ -104,16 +104,23 @@ namespace WakaTime
                 // Do any initialization that requires the UI thread after switching to the UI thread.
                 await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-                // Inject control to status bar
-                _statusbarControl = new StatusbarControl();
-                _statusbarControl.SetText("Initializing...");
-                _statusbarControl.SetToolTip("WakaTime: Initializing...");
-                await StatusbarInjector.InjectControlAsync(_statusbarControl);
+                // Initialize status bar if enabled
+                if (_wakatime.Config.GetSettingAsBoolean("status_bar_enabled", true))
+                {
+                    // Inject control to status bar
+                    _statusbarControl = new StatusbarControl();
+                    _statusbarControl.SetText("Initializing...");
+                    _statusbarControl.SetToolTip("WakaTime: Initializing...");
+                    await StatusbarInjector.InjectControlAsync(_statusbarControl);
+                }
 
                 // Wait for _wakatime to complete initialization，and display today's coding time on status bar
                 await wakaTimeInitializationTask;
-                UpdateTimeOnStatusbarControl(_wakatime.TotalTimeToday, _wakatime.TotalTimeTodayDetailed);
-                _wakatime.TotalTimeTodayUpdated += WakatimeTotalTimeTodayUpdated;
+                if (_statusbarControl != null)
+                {
+                    UpdateTimeOnStatusbarControl(_wakatime.TotalTimeToday, _wakatime.TotalTimeTodayDetailed);
+                    _wakatime.TotalTimeTodayUpdated += WakatimeTotalTimeTodayUpdated;
+                }
 
                 // Visual Studio Events              
                 _docEvents = _dte.Events.DocumentEvents;
