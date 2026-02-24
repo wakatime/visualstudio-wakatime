@@ -146,10 +146,58 @@ jobs:
               ref: "tags/${{ needs.version.outputs.semver }}"
             })
 
+  build-dev18:
+    name: Build Dev18
+    runs-on: windows-2019
+    needs: [version]
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+      -
+        name: Setup NuGet
+        uses: NuGet/setup-nuget@v1
+      -
+        name: Restore NuGet packages
+        run: nuget restore ./Dev18/Dev18.csproj -PackagesDirectory ./packages -NonInteractive
+      -
+        name: Update version
+        run: |
+          (Get-Content -Path Dev18\source.extension.vsixmanifest) |
+              ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+                Set-Content -Path Dev18\source.extension.vsixmanifest
+          (Get-Content -Path Dev18\Properties\AssemblyInfo.cs) |
+            ForEach-Object {$_ -Replace '1.0.0', '${{ needs.version.outputs.semver }}'} |
+              Set-Content -Path Dev18\Properties\AssemblyInfo.cs
+      -
+        name: Build Dev18 for Release
+        run: msbuild Dev18/Dev18.csproj -property:Configuration=Release -property:platform="x64" -property:DeployExtension=false
+      -
+        name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WakaTime.Dev18.vsix
+          path: Dev18/bin/x64/Release/WakaTime.Dev18.vsix
+      -
+        name: Remove tag if failure
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "tags/${{ needs.version.outputs.semver }}"
+            })
+
   publish-dev16:
     name: Publish Dev16
     runs-on: windows-latest
-    needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
+    needs: [build-dev16, build-dev17, build-dev18] # set dependencies for all build steps to ensure all ran correctly and didn't delete the tag in case of failure
     steps:
       -
         name: Checkout
@@ -171,7 +219,7 @@ jobs:
   publish-dev17:
     name: Publish Dev17
     runs-on: windows-latest
-    needs: [build-dev16, build-dev17] # set dependencies for both build steps to ensure both ran correctly and didn't delete the tag in case of failure
+    needs: [build-dev16, build-dev17, build-dev18] # set dependencies for all build steps to ensure all ran correctly and didn't delete the tag in case of failure
     steps:
       -
         name: Checkout
@@ -190,10 +238,32 @@ jobs:
           publish-manifest-file: Dev17\publishManifest.json
           personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
   
+  publish-dev18:
+    name: Publish Dev18
+    runs-on: windows-latest
+    needs: [build-dev16, build-dev17, build-dev18] # set dependencies for all build steps to ensure all ran correctly and didn't delete the tag in case of failure
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: "*.Dev18.vsix"
+          path: build/
+      -
+        name: Publish Dev18 to Marketplace
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: ${{ github.workspace }}\build\WakaTime.Dev18.vsix\WakaTime.Dev18.vsix
+          publish-manifest-file: Dev18\publishManifest.json
+          personal-access-code: ${{ secrets.VS_PUBLISHER_ACCESS_TOKEN }}
+
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [version, publish-dev16, publish-dev17]
+    needs: [version, publish-dev16, publish-dev17, publish-dev18]
     steps:
       -
         name: Checkout
