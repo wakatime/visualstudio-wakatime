@@ -11,6 +11,7 @@ jobs:
         uses: lekterable/branchlint-action@1.2.0
         with:
           allowed: |
+            /^(.+:)?major/.+/i
             /^(.+:)?bugfix/.+/i
             /^(.+:)?feature/.+/i
             /^(.+:)?release/.+/i
