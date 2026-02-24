@@ -1,4 +1,4 @@
-﻿using EnvDTE;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
@@ -31,7 +31,7 @@ namespace WakaTime
     /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
     /// </para>
     /// </remarks>
-    [Guid(GuidList2022.GuidWakaTimePkgString)]
+    [Guid(GuidList2026.GuidWakaTimePkgString)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideService(typeof(WakaTimePackage), IsAsyncQueryable = true)]
     [ProvideAutoLoad(GuidList.GuidWakaTimeUIString, PackageAutoLoadFlags.BackgroundLoad)]
@@ -115,7 +115,7 @@ namespace WakaTime
                 UpdateTimeOnStatusbarControl(_wakatime.TotalTimeToday, _wakatime.TotalTimeTodayDetailed);
                 _wakatime.TotalTimeTodayUpdated += WakatimeTotalTimeTodayUpdated;
 
-                // Visual Studio Events              
+                // Visual Studio Events
                 _docEvents = _dte.Events.DocumentEvents;
                 _windowEvents = _dte.Events.WindowEvents;
                 _solutionEvents = _dte.Events.SolutionEvents;

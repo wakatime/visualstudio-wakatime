@@ -1,0 +1,23 @@
+name: PR lint
+
+on: pull_request
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Lint allowed branch names
+        uses: lekterable/branchlint-action@1.2.0
+        with:
+          allowed: |
+            /^(.+:)?bugfix/.+/i
+            /^(.+:)?feature/.+/i
+            /^(.+:)?release/.+/i
+            /^(.+:)?docs?/.+/i
+            /^(.+:)?misc/.+/i
+      -
+        name: Block fixup/squash commits
+        uses: xt0rted/block-autosquash-commits-action@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

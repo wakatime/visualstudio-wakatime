@@ -1,13 +1,13 @@
-# visualstudio-wakatime
+# WakaTime for Visual Studio
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/pwyxjwo2q78ao3jl/branch/master?svg=true)](https://ci.appveyor.com/project/alanhamlett/visualstudio-wakatime/branch/master)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/wakatime/visualstudio-wakatime/on_push.yml)](https://github.com/wakatime/visualstudio-wakatime/actions)
 [![Coding time tracker](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime.svg)](https://wakatime.com/badge/github/wakatime/visualstudio-wakatime)
 
 Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 
 ## Installation
 
-1. Inside Visual Studio, navigate to `Tools` → `Extensions...`
+1. Inside Visual Studio, navigate to `Extensions` → `Manage Extensions...`
 2. Click the `Online` category at the left, then search for `wakatime`.
 3. Click the `Download` button, then click `Install`.
 4. Click the `Restart Now` button.
@@ -20,14 +20,14 @@ Visual Studio extension to quantify your coding using <https://wakatime.com/>.
 
 ## Supported Visual Studio Editions
 
-* Visual Studio 2015
+* Visual Studio 2015 (supported by v13.3.0 and earlier)
 * Visual Studio 2017
 * Visual Studio 2019
 * Visual Studio 2022
 
 ## Visual Studio for Mac
 
-Visual Studio for Mac is supported with the [WakaTime for Monodevlop extension][monodevelop].
+Visual Studio for Mac is supported with the [WakaTime for Monodevelop extension][monodevelop].
 
 ## Visual Studio Express
 
@@ -38,6 +38,15 @@ Alternatively, you may clone the github repo and build the extension using the `
 The resulting `bin/Express/WakaTime.vsix` extension file will install into Visual Studio Express when run.
 
 ## Contributing
+
+Pull requests and issues are welcome!
+The main thing to know is we require specific branch name prefixes for PRs:
+
+- `^major/.+` - `major`
+- `^feature/.+` - `minor`
+- `^bugfix/.+` - `patch`
+- `^docs?/.+` - `build`
+- `^misc/.+` - `build`
 
 To open and build this project, please use Visual Studio 2019.
 
@@ -51,10 +60,6 @@ For debugging, configure the product to open in a new Visual Studio instance:
 * Release - Visual Studio 2015+
 
 > Note: The Debug solution is only for including debugger symbols.
-
-[latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
-[legacy extension]: https://marketplace.visualstudio.com/items?itemName=WakaTime.WakaTime2010
-[express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
 
 ## Troubleshooting
 
@@ -78,8 +83,10 @@ Lastly, uncaught exceptions go to [ActivityLog.xml][activitylog]. Uncaught excep
 The [How to Debug Plugins][how to debug] guide shows how to check when coding activity was last received from your IDE using the [User Agents API][user agents api].
 For more general troubleshooting info, see the [wakatime-cli Troubleshooting Section][wakatime-cli-help].
 
-[wakatime-cli-help]: https://github.com/wakatime/wakatime#troubleshooting
+[wakatime-cli-help]: https://github.com/wakatime/wakatime-cli/blob/develop/TROUBLESHOOTING.md
 [how to debug]: https://wakatime.com/faq#debug-plugins
 [user agents api]: https://wakatime.com/developers#user_agents
-[monodevelop]: https://wakatime.com/help/plugins/monodevelop
-[activitylog]: http://blogs.msdn.com/b/visualstudio/archive/2010/02/24/troubleshooting-with-the-activity-log.aspx
+[monodevelop]: https://github.com/CodeCavePro/monodevelop-wakatime
+[activitylog]: https://devblogs.microsoft.com/visualstudio/troubleshooting-extensions-with-the-activity-log/
+[latest release]: https://github.com/wakatime/visualstudio-wakatime/releases/latest
+[express article]: https://visualstudiomagazine.com/articles/2014/05/21/no-extensions-for-visual-studio-express.aspx
