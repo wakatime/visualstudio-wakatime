@@ -52,7 +52,7 @@ jobs:
 
   build-dev16:
     name: Build Dev16
-    runs-on: windows-2019
+    runs-on: windows-latest
     needs: [version]
     steps:
       -
@@ -100,7 +100,7 @@ jobs:
 
   build-dev17:
     name: Build Dev17
-    runs-on: windows-2019
+    runs-on: windows-latest
     needs: [version]
     steps:
       -
