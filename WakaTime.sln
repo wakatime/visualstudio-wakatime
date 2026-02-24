@@ -14,21 +14,31 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM64 = Debug|ARM64
 		Release|Any CPU = Release|Any CPU
+		Release|ARM64 = Release|ARM64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Debug|Any CPU.Build.0 = Debug|x64
+		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Debug|ARM64.Build.0 = Debug|ARM64
 		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Release|Any CPU.ActiveCfg = Release|x64
 		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Release|Any CPU.Build.0 = Release|x64
+		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Release|ARM64.ActiveCfg = Release|ARM64
+		{54CE9CBA-BDCD-477B-A262-7A8A7A2A6834}.Release|ARM64.Build.0 = Release|ARM64
 		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E884658C-F11A-43F0-AC49-94859B3AF72F}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E0DB56B-F70A-48B7-9083-7AA3B9821362}.Release|ARM64.ActiveCfg = Release|Any CPU
 		{20E5D5AE-8299-4522-AD34-FAE0DB331560}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{20E5D5AE-8299-4522-AD34-FAE0DB331560}.Debug|Any CPU.Build.0 = Debug|x64
 		{20E5D5AE-8299-4522-AD34-FAE0DB331560}.Release|Any CPU.ActiveCfg = Release|x64
