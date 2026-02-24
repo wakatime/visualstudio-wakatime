@@ -7,6 +7,11 @@
         private System.Windows.Forms.TextBox txtAPIKey;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.TextBox txtProxy;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox chkDebugMode;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox chkStatusBarEnabled;
 
         /// <summary>
         /// Required designer variable.
@@ -43,6 +48,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkDebugMode = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.chkStatusBarEnabled = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             //
             // lblAPIKey
@@ -134,11 +140,23 @@
             this.label2.Text = "Example: https://user:pass@host:port or socks5://user:pass@host:port or domain\\us" +
     "er:pass.";
             //
+            // chkStatusBarEnabled
+            //
+            this.chkStatusBarEnabled.AutoSize = true;
+            this.chkStatusBarEnabled.Location = new System.Drawing.Point(310, 315);
+            this.chkStatusBarEnabled.Margin = new System.Windows.Forms.Padding(8);
+            this.chkStatusBarEnabled.Name = "chkStatusBarEnabled";
+            this.chkStatusBarEnabled.Size = new System.Drawing.Size(146, 45);
+            this.chkStatusBarEnabled.TabIndex = 8;
+            this.chkStatusBarEnabled.Text = "Show Status Bar";
+            this.chkStatusBarEnabled.UseVisualStyleBackColor = true;
+            //
             // SettingsForm
             //
             this.AutoScaleDimensions = new System.Drawing.SizeF(240F, 240F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1562, 451);
+            this.Controls.Add(this.chkStatusBarEnabled);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.chkDebugMode);
             this.Controls.Add(this.txtProxy);
@@ -163,10 +181,5 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.TextBox txtProxy;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.CheckBox chkDebugMode;
-        private System.Windows.Forms.Label label2;
     }
 }

@@ -25,6 +25,7 @@ namespace WakaTime.Forms
                 txtAPIKey.Text = _configFile.GetSetting("api_key");
                 txtProxy.Text = _configFile.GetSetting("proxy");
                 chkDebugMode.Checked = _configFile.GetSettingAsBoolean("debug");
+                chkStatusBarEnabled.Checked = _configFile.GetSettingAsBoolean("status_bar_enabled", true);
             }
             catch (Exception ex)
             {
@@ -45,6 +46,7 @@ namespace WakaTime.Forms
                     _configFile.SaveSetting("settings", "api_key", txtAPIKey.Text.Trim());
                     _configFile.SaveSetting("settings", "proxy", txtProxy.Text.Trim());
                     _configFile.SaveSetting("settings", "debug", chkDebugMode.Checked.ToString().ToLower());
+                    _configFile.SaveSetting("settings", "status_bar_enabled", chkStatusBarEnabled.Checked.ToString().ToLower());
                 }
                 else
                 {
