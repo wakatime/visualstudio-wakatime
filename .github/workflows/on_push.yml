@@ -161,6 +161,58 @@ jobs:
           pattern: "*.Dev16.vsix"
           path: build/
       -
+        name: Print VSIX identity
+        shell: pwsh
+        run: |
+          $vsix = Join-Path $env:GITHUB_WORKSPACE 'build\WakaTime.Dev16.vsix\WakaTime.Dev16.vsix'
+          Write-Host "VSIX path: $vsix"
+
+          if (-not (Test-Path $vsix)) {
+            Write-Error "VSIX not found at $vsix"
+          }
+
+          $tmp = Join-Path $env:RUNNER_TEMP ("vsix_" + [guid]::NewGuid().ToString("N"))
+          New-Item -ItemType Directory -Path $tmp | Out-Null
+
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($vsix, $tmp)
+
+          $manifest = Get-ChildItem -Path $tmp -Recurse -File |
+            Where-Object { $_.Name -in @('extension.vsixmanifest','source.extension.vsixmanifest') } |
+            Select-Object -First 1
+
+          if (-not $manifest) {
+            Write-Error "Could not find extension.vsixmanifest/source.extension.vsixmanifest inside the VSIX."
+          }
+
+          [xml]$xml = Get-Content $manifest.FullName
+
+          # VSIX manifests can be slightly different shapes; handle both common ones
+          $identity = $xml.PackageManifest.Metadata.Identity
+          if (-not $identity) { $identity = $xml.PackageManifest.Metadata[0].Identity }
+
+          Write-Host "Manifest file: $($manifest.FullName)"
+          Write-Host "VSIX Id (Identity/@Id): $($identity.Id)"
+          Write-Host "Publisher (Identity/@Publisher): $($identity.Publisher)"
+          Write-Host "Version (Identity/@Version): $($identity.Version)"
+
+          $displayName = $xml.PackageManifest.Metadata.DisplayName
+          if ($displayName) { Write-Host "DisplayName: $displayName" }
+
+          $internalName = $xml.PackageManifest.Metadata.InternalName
+          if ($internalName) { Write-Host "InternalName: $internalName" }
+      -
+        name: Print publishManifest.json identity
+        shell: pwsh
+        run: |
+          $pm = Join-Path $env:GITHUB_WORKSPACE 'Dev16\publishManifest.json'
+          $json = Get-Content $pm -Raw | ConvertFrom-Json
+          Write-Host "publishManifest.json: $pm"
+          Write-Host "Publisher: $($json.publisher)"
+          if ($json.identity) {
+            Write-Host "Identity.InternalName: $($json.identity.internalName)"
+          }
+      -
         name: Publish Dev16 to Marketplace
         uses: cezarypiatek/VsixPublisherAction@1.1
         with:
@@ -182,6 +234,58 @@ jobs:
         with:
           pattern: "*.Dev17.vsix"
           path: build/
+      -
+        name: Print VSIX identity
+        shell: pwsh
+        run: |
+          $vsix = Join-Path $env:GITHUB_WORKSPACE 'build\WakaTime.Dev17.vsix\WakaTime.Dev17.vsix'
+          Write-Host "VSIX path: $vsix"
+
+          if (-not (Test-Path $vsix)) {
+            Write-Error "VSIX not found at $vsix"
+          }
+
+          $tmp = Join-Path $env:RUNNER_TEMP ("vsix_" + [guid]::NewGuid().ToString("N"))
+          New-Item -ItemType Directory -Path $tmp | Out-Null
+
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($vsix, $tmp)
+
+          $manifest = Get-ChildItem -Path $tmp -Recurse -File |
+            Where-Object { $_.Name -in @('extension.vsixmanifest','source.extension.vsixmanifest') } |
+            Select-Object -First 1
+
+          if (-not $manifest) {
+            Write-Error "Could not find extension.vsixmanifest/source.extension.vsixmanifest inside the VSIX."
+          }
+
+          [xml]$xml = Get-Content $manifest.FullName
+
+          # VSIX manifests can be slightly different shapes; handle both common ones
+          $identity = $xml.PackageManifest.Metadata.Identity
+          if (-not $identity) { $identity = $xml.PackageManifest.Metadata[0].Identity }
+
+          Write-Host "Manifest file: $($manifest.FullName)"
+          Write-Host "VSIX Id (Identity/@Id): $($identity.Id)"
+          Write-Host "Publisher (Identity/@Publisher): $($identity.Publisher)"
+          Write-Host "Version (Identity/@Version): $($identity.Version)"
+
+          $displayName = $xml.PackageManifest.Metadata.DisplayName
+          if ($displayName) { Write-Host "DisplayName: $displayName" }
+
+          $internalName = $xml.PackageManifest.Metadata.InternalName
+          if ($internalName) { Write-Host "InternalName: $internalName" }
+      -
+        name: Print publishManifest.json identity
+        shell: pwsh
+        run: |
+          $pm = Join-Path $env:GITHUB_WORKSPACE 'Dev17\publishManifest.json'
+          $json = Get-Content $pm -Raw | ConvertFrom-Json
+          Write-Host "publishManifest.json: $pm"
+          Write-Host "Publisher: $($json.publisher)"
+          if ($json.identity) {
+            Write-Host "Identity.InternalName: $($json.identity.internalName)"
+          }
       -
         name: Publish Dev17 to Marketplace
         uses: cezarypiatek/VsixPublisherAction@1.1
