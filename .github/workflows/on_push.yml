@@ -25,7 +25,7 @@ jobs:
       -
         name: Calculate semver tag
         id: semver-tag
-        uses: wakatime/semver-action@master
+        uses: gandarez/semver-action@master
         with:
           branching_model: trunk-based
           major_pattern: "(?i)^(.+:)?(major/.+)"
