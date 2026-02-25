@@ -28,6 +28,7 @@ jobs:
         uses: gandarez/semver-action@master
         with:
           branching_model: trunk-based
+          major_pattern: "(?i)^(.+:)?(major/.+)"
           prefix: ""
           debug: true
       -
