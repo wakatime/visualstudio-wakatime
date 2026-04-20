@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.Shell;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,12 +10,15 @@ namespace WakaTime.ExtensionUtils
     internal class StatusbarControl : TextBlock
     {
         private const string Icon = "🕑";
+        private const string DefaultDashboardUrl = "https://wakatime.com/";
 
         private readonly Brush _normalBackground = new SolidColorBrush(Colors.Transparent);
         private readonly Brush _hoverBackground = new SolidColorBrush(Colors.White) { Opacity = 0.2 };
+        private readonly string _dashboardUrl;
 
-        public StatusbarControl()
+        public StatusbarControl(string apiUrl)
         {
+            _dashboardUrl = GetDashboardUrl(apiUrl);
             Text = Icon;
             Foreground = new SolidColorBrush(Colors.White);
             Background = _normalBackground;
@@ -38,8 +42,28 @@ namespace WakaTime.ExtensionUtils
             MouseLeftButtonUp += (s, e) =>
             {
                 // Open WakaTime in browser
-                System.Diagnostics.Process.Start("https://wakatime.com/");
+                System.Diagnostics.Process.Start(_dashboardUrl);
             };
+        }
+
+        private static string GetDashboardUrl(string apiUrl)
+        {
+            if (string.IsNullOrWhiteSpace(apiUrl))
+                return DefaultDashboardUrl;
+
+            if (!Uri.TryCreate(apiUrl, UriKind.Absolute, out var apiUri))
+                return DefaultDashboardUrl;
+
+            var host = apiUri.Host.StartsWith("api.", StringComparison.OrdinalIgnoreCase)
+                ? apiUri.Host.Substring(4)
+                : apiUri.Host;
+
+            var dashboardUriBuilder = new UriBuilder(apiUri.Scheme, host, apiUri.IsDefaultPort ? -1 : apiUri.Port)
+            {
+                Path = "/"
+            };
+
+            return dashboardUriBuilder.Uri.AbsoluteUri;
         }
 
         public void SetText(string text)

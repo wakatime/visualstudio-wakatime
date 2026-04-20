@@ -107,7 +107,7 @@ namespace WakaTime
                 if (_wakatime.Config.GetSettingAsBoolean("status_bar_enabled", true))
                 {
                     // Inject control to status bar
-                    _statusbarControl = new StatusbarControl();
+                    _statusbarControl = new StatusbarControl(_wakatime.Config.GetSetting("api_url"));
                     _statusbarControl.SetText("Initializing...");
                     _statusbarControl.SetToolTip("WakaTime: Initializing...");
                     await StatusbarInjector.InjectControlAsync(_statusbarControl);
