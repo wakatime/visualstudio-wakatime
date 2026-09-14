@@ -531,7 +531,22 @@ namespace WakaTime
                     ? _solutionName
                     : _dte.Solution != null ? _dte.Solution.FullName : null;
 
-                return string.IsNullOrEmpty(solution) ? null : Path.GetDirectoryName(solution);
+                if (string.IsNullOrEmpty(solution))
+                    return null;
+
+                var folder = Path.GetDirectoryName(solution);
+
+                // wakatime-cli uses the folder's basename as the project name before
+                // falling back to --alternate-project when nothing is auto-detected.
+                // Only send the folder when that basename matches the solution name,
+                // so a solution at C:\work\src\MySolution.sln stays tracked as
+                // "MySolution" rather than "src" and solutions sharing a directory
+                // are not conflated.
+                if (string.IsNullOrEmpty(folder)
+                    || !string.Equals(Path.GetFileName(folder), Path.GetFileNameWithoutExtension(solution), StringComparison.Ordinal))
+                    return null;
+
+                return folder;
             }
             catch (Exception ex)
             {
