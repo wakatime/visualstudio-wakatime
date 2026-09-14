@@ -146,6 +146,8 @@ namespace WakaTime
                 _docEvents.DocumentSaved += DocEventsOnDocumentSaved;
                 _windowEvents.WindowActivated += WindowEventsOnWindowActivated;
                 _solutionEvents.Opened += SolutionEventsOnOpened;
+                _solutionEvents.Renamed += SolutionEventsOnRenamed;
+                _solutionEvents.AfterClosing += SolutionEventsOnAfterClosing;
                 _debuggerEvents.OnEnterRunMode += DebuggerEventsOnEnterRunMode;
                 _debuggerEvents.OnEnterDesignMode += DebuggerEventsOnEnterDesignMode;
                 _debuggerEvents.OnEnterBreakMode += DebuggerEventsOnEnterBreakMode;
@@ -193,8 +195,9 @@ namespace WakaTime
 
                 return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.Debug($"Could not get current project output file: {ex.Message}");
                 return null;
             }
         }
@@ -215,8 +218,9 @@ namespace WakaTime
 
                 return $"{projectPath.Value}{outputPath.Value}{outputFileName.Value}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.Debug($"Could not get project output file for configuration: {ex.Message}");
                 return null;
             }
         }
@@ -243,7 +247,12 @@ namespace WakaTime
                             ? HeartbeatCategory.Debugging
                             : HeartbeatCategory.Coding;
 
-                _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                var position = GetDocumentPosition(document);
+
+                _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category,
+                    lineNumber: position.LineNumber, cursorPosition: position.CursorPosition,
+                    lines: position.Lines, alternateLanguage: GetAlternateLanguage(document),
+                    isUnsavedEntity: IsUnsavedEntity(document), projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -261,7 +270,12 @@ namespace WakaTime
                             ? HeartbeatCategory.Debugging
                             : HeartbeatCategory.Coding;
 
-                _wakatime.HandleActivity(document.FullName, true, GetProjectName(), category);
+                var position = GetDocumentPosition(document);
+
+                _wakatime.HandleActivity(document.FullName, true, GetProjectName(), category,
+                    lineNumber: position.LineNumber, cursorPosition: position.CursorPosition,
+                    lines: position.Lines, alternateLanguage: GetAlternateLanguage(document),
+                    isUnsavedEntity: IsUnsavedEntity(document), projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -282,7 +296,12 @@ namespace WakaTime
                             ? HeartbeatCategory.Debugging
                             : HeartbeatCategory.Coding;
 
-                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                    var position = GetDocumentPosition(document);
+
+                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category,
+                        lineNumber: position.LineNumber, cursorPosition: position.CursorPosition,
+                        lines: position.Lines, alternateLanguage: GetAlternateLanguage(document),
+                        isUnsavedEntity: IsUnsavedEntity(document), projectFolder: GetProjectFolder());
                 }
             }
             catch (Exception ex)
@@ -303,13 +322,31 @@ namespace WakaTime
             }
         }
 
+        private void SolutionEventsOnRenamed(string oldName)
+        {
+            try
+            {
+                _solutionName = _dte.Solution.FullName;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("SolutionEventsOnRenamed", ex);
+            }
+        }
+
+        private void SolutionEventsOnAfterClosing()
+        {
+            _solutionName = null;
+        }
+
         private void DebuggerEventsOnEnterRunMode(dbgEventReason reason)
         {
             try
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
 
-                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging,
+                    projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -323,7 +360,8 @@ namespace WakaTime
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
 
-                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging,
+                    projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -337,7 +375,8 @@ namespace WakaTime
             {
                 var outputFile = GetCurrentProjectOutputForCurrentConfiguration();
 
-                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging);
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Debugging,
+                    projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -354,7 +393,8 @@ namespace WakaTime
 
                 var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
 
-                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building);
+                _wakatime.HandleActivity(outputFile, false, GetProjectName(), HeartbeatCategory.Building,
+                    projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -371,7 +411,8 @@ namespace WakaTime
 
                 var outputFile = GetProjectOutputForConfiguration(project, platform, projectConfig);
 
-                _wakatime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building);
+                _wakatime.HandleActivity(outputFile, success, GetProjectName(), HeartbeatCategory.Building,
+                    projectFolder: GetProjectFolder());
             }
             catch (Exception ex)
             {
@@ -392,13 +433,133 @@ namespace WakaTime
                             ? HeartbeatCategory.Debugging
                             : HeartbeatCategory.Coding;
 
-                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category);
+                    var position = GetDocumentPosition(document);
+
+                    // Prefer the changed line reported by the event over the selection,
+                    // since the caret may already have moved past it.
+                    _wakatime.HandleActivity(document.FullName, false, GetProjectName(), category,
+                        lineNumber: position.LineNumber ?? endPoint.Line,
+                        cursorPosition: position.CursorPosition,
+                        lines: position.Lines, alternateLanguage: GetAlternateLanguage(document),
+                        isUnsavedEntity: IsUnsavedEntity(document), projectFolder: GetProjectFolder());
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error("TextEditorEventsLineChanged", ex);
             }
+        }
+
+        private DocumentPosition GetDocumentPosition(Document document)
+        {
+            var position = new DocumentPosition();
+
+            try
+            {
+                var textDocument = document == null ? null : document.Object("TextDocument") as TextDocument;
+                if (textDocument == null)
+                    return position;
+
+                position.Lines = textDocument.EndPoint.Line;
+
+                var selection = textDocument.Selection;
+                if (selection != null)
+                {
+                    position.LineNumber = selection.ActivePoint.Line;
+                    position.CursorPosition = selection.ActivePoint.LineCharOffset;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug($"Could not get document position: {ex.Message}");
+            }
+
+            return position;
+        }
+
+        private string GetAlternateLanguage(Document document)
+        {
+            try
+            {
+                // Map Visual Studio language ids that differ from WakaTime
+                // language names, passing the rest through as-is. Only sent as
+                // --alternate-language, so wakatime-cli's own detection still
+                // takes priority when it recognizes the file.
+                var language = document.Language;
+
+                switch (language)
+                {
+                    case "CSharp": return "C#";
+                    case "C/C++": return "C++";
+                    case "Basic": return "VB.NET";
+                    case "HTMLX": return "HTML";
+                    case "HTMLXProjection": return "HTML";
+                    case "Plain Text": return "Text";
+                    default:
+                        // Covers SQL, T-SQL, T-SQL80, T-SQL90, SQL Server Tools etc.
+                        if (language != null && language.IndexOf("SQL", StringComparison.OrdinalIgnoreCase) >= 0)
+                            return "SQL";
+
+                        return language;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug($"Could not get document language: {ex.Message}");
+                return null;
+            }
+        }
+
+        private bool IsUnsavedEntity(Document document)
+        {
+            try
+            {
+                return !File.Exists(document.FullName);
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug($"Could not check whether document is unsaved: {ex.Message}");
+                return false;
+            }
+        }
+
+        private string GetProjectFolder()
+        {
+            try
+            {
+                var solution = !string.IsNullOrEmpty(_solutionName)
+                    ? _solutionName
+                    : _dte.Solution != null ? _dte.Solution.FullName : null;
+
+                if (string.IsNullOrEmpty(solution))
+                    return null;
+
+                var folder = Path.GetDirectoryName(solution);
+
+                // wakatime-cli uses the folder's basename as the project name before
+                // falling back to --alternate-project when nothing is auto-detected.
+                // Only send the folder when that basename matches the solution name,
+                // so a solution at C:\work\src\MySolution.sln stays tracked as
+                // "MySolution" rather than "src" and solutions sharing a directory
+                // are not conflated.
+                if (string.IsNullOrEmpty(folder)
+                    || !string.Equals(Path.GetFileName(folder), Path.GetFileNameWithoutExtension(solution), StringComparison.Ordinal))
+                    return null;
+
+                return folder;
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug($"Could not get project folder: {ex.Message}");
+                return null;
+            }
+        }
+
+        private class DocumentPosition
+        {
+            public int? LineNumber { get; set; }
+            public int? CursorPosition { get; set; }
+            public int? Lines { get; set; }
         }
 
         private void WakatimeTotalTimeTodayUpdated(object sender, TotalTimeTodayUpdatedEventArgs e)
