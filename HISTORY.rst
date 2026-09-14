@@ -3,6 +3,12 @@ History
 -------
 
 
+14.1.0 (2026-09-14)
+++++++++++++++++++
+
+- Update WakaTime.Shared.ExtensionUtils dependency to v4.3.0.
+
+
 13.3.0 (2024-04-27)
 ++++++++++++++++++
 
